@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "kissa"
+version = "0.1.0"
+description = ""
+authors = ["Daniel Braghis <ddb1u20@soton.ac.uk>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "0.105.0"
+uvicorn = "0.24.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "23.12.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
