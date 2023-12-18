@@ -5,7 +5,7 @@ on:
   # Automatically trigger it when detected changes in repo
   push:
     branches: 
-      [ master ]
+    - master
     paths:
     - '/backend/**'
     - '.github/workflows/kissa-api-AutoDeployTrigger-4b6d7d2c-0246-48de-9b00-56d9d8671a04.yml'
