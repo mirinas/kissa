@@ -2,10 +2,11 @@ name: Trigger auto deployment for kissa-api-dev
 
 # When this action will be executed
 on:
-  # Automatically trigger it when detected changes in repo
+  # Automatically trigger it when detected changes on anything but master backend
   push:
     branches: 
-      [ master ]
+    - '*'
+    - '!master'
     paths:
     - '/backend/**'
     - '.github/workflows/kissa-api-dev-AutoDeployTrigger-cf3556da-60d8-4411-a421-70d000d5b730.yml'
