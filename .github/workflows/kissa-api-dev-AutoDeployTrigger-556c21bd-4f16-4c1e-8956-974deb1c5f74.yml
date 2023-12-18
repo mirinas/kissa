@@ -1,0 +1,42 @@
+name: Trigger auto deployment for kissa-api-dev
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ dev ]
+    paths:
+    - '/backend/**'
+    - '.github/workflows/kissa-api-dev-AutoDeployTrigger-556c21bd-4f16-4c1e-8956-974deb1c5f74.yml'
+
+  # Allow manual trigger 
+  workflow_dispatch:
+      
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.KISSAAPIDEV_AZURE_CREDENTIALS }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }}/backend 
+          registryUrl: kissacontainer.azurecr.io
+          registryUsername: ${{ secrets.KISSAAPIDEV_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.KISSAAPIDEV_REGISTRY_PASSWORD }}
+          containerAppName: kissa-api-dev
+          resourceGroup: kissa-rg
+          imageToBuild: kissacontainer.azurecr.io/kissa-api-dev:${{ github.sha }}
+          dockerfilePath: Dockerfile
+
+     
+
