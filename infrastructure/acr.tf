@@ -29,7 +29,7 @@ resource "azurerm_container_registry_task" "kissa_task" {
 
   timer_trigger {
     name     = "t1"
-    schedule = "0 */12 * * *"
+    schedule = "0 0 * * *" // Deletes every hour
     enabled  = true
   }
 }
@@ -55,7 +55,7 @@ resource "azurerm_container_registry_task" "kissa_task_dev" {
 
   timer_trigger {
     name     = "t1"
-    schedule = "0 */12 * * *"
+    schedule = "0 0 * * *" // Deletes every hour
     enabled  = true
   }
 }
