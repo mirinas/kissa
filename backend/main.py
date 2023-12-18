@@ -5,4 +5,4 @@ app = FastAPI()
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World, CLI test, targeted"}
+    return {"message": "Hello World, merge CLI"}

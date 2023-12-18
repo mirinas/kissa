@@ -3,6 +3,8 @@ name: Trigger auto deployment for kissa-api
 # When this action will be executed
 on:
   push:
+    branches:
+      - master
     paths:
       - 'backend/**'
       
