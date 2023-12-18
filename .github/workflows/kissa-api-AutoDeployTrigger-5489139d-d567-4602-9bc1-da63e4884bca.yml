@@ -1,7 +1,10 @@
 name: Trigger auto deployment for kissa-api
 
 # When this action will be executed
-on: [push]
+on:
+  push:
+    paths:
+      - 'backend/**'
       
 jobs:
   build-and-deploy:
