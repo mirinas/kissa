@@ -1,4 +1,4 @@
-name: Trigger auto deployment for kissa-web
+name: Trigger deployment for kissa-web
 
 # When this action will be executed
 on:
