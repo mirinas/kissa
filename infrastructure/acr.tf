@@ -20,6 +20,7 @@ resource "azurerm_container_registry_task" "kissa_task_api" {
     task_content = <<EOF
     version: v1.1.0
     steps:
+      - cmd: az acr login --name kissacontainer
       - cmd: acr purge --filter 'REPO:kissa-api.*' --ago 1h
         disableWorkingDirectoryOverride: true
         timeout: 3600
@@ -29,7 +30,7 @@ resource "azurerm_container_registry_task" "kissa_task_api" {
 
   timer_trigger {
     name     = "t1"
-    schedule = "0 0 * * *" // Deletes every hour
+    schedule = "0 * * * *" // Deletes every hour
     enabled  = true
   }
 }
@@ -46,6 +47,7 @@ resource "azurerm_container_registry_task" "kissa_task__api_dev" {
     task_content = <<EOF
     version: v1.1.0
     steps:
+      - cmd: az acr login --name kissacontainer
       - cmd: acr purge --filter 'REPO:kissa-api-dev.*' --ago 1h
         disableWorkingDirectoryOverride: true
         timeout: 3600
@@ -55,7 +57,7 @@ resource "azurerm_container_registry_task" "kissa_task__api_dev" {
 
   timer_trigger {
     name     = "t1"
-    schedule = "0 0 * * *" // Deletes every hour
+    schedule = "0 * * * *" // Deletes every hour
     enabled  = true
   }
 }
@@ -72,6 +74,7 @@ resource "azurerm_container_registry_task" "kissa_task_web" {
     task_content = <<EOF
     version: v1.1.0
     steps:
+      - cmd: az acr login --name kissacontainer
       - cmd: acr purge --filter 'REPO:kissa-web.*' --ago 1h
         disableWorkingDirectoryOverride: true
         timeout: 3600
@@ -81,7 +84,7 @@ resource "azurerm_container_registry_task" "kissa_task_web" {
 
   timer_trigger {
     name     = "t1"
-    schedule = "0 0 * * *" // Deletes every hour
+    schedule = "0 * * * *" // Deletes every hour
     enabled  = true
   }
 }
