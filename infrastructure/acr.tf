@@ -21,9 +21,7 @@ resource "azurerm_container_registry_task" "kissa_task_api" {
     version: v1.1.0
     steps:
       - cmd: az acr login --name kissacontainer
-      - cmd: acr purge --filter 'REPO:kissa-api.*' --ago 1h
-        disableWorkingDirectoryOverride: true
-        timeout: 3600
+      - cmd: acr purge --registry kissacontainer --filter 'REPO:kissa-api-dev.*' --untagged --ago 1h
     EOF
     context_path = "/dev/null"
   }
@@ -48,9 +46,7 @@ resource "azurerm_container_registry_task" "kissa_task__api_dev" {
     version: v1.1.0
     steps:
       - cmd: az acr login --name kissacontainer
-      - cmd: acr purge --filter 'REPO:kissa-api-dev.*' --ago 1h
-        disableWorkingDirectoryOverride: true
-        timeout: 3600
+      - cmd: acr purge --registry kissacontainer --filter 'REPO:kissa-api-dev.*' --untagged --ago 1h
     EOF
     context_path = "/dev/null"
   }
@@ -75,9 +71,7 @@ resource "azurerm_container_registry_task" "kissa_task_web" {
     version: v1.1.0
     steps:
       - cmd: az acr login --name kissacontainer
-      - cmd: acr purge --filter 'REPO:kissa-web.*' --ago 1h
-        disableWorkingDirectoryOverride: true
-        timeout: 3600
+      - cmd: acr purge --registry kissacontainer --filter 'REPO:kissa-api-dev.*' --untagged --ago 1h
     EOF
     context_path = "/dev/null"
   }
