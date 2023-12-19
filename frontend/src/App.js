@@ -5,7 +5,7 @@ import './App.css';
 function App() {
   const [message, setMessage] = useState('');
 
-  const API_ENDPOINT = process.env.KISSA_API_ENDPOINT || 'http://localhost:8080';
+  const API_ENDPOINT = process.env.REACT_APP_KISSA_API_ENDPOINT || 'http://localhost:8080';
   console.log(process.env);
   console.log(API_ENDPOINT);
 
