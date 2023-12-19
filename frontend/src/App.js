@@ -6,6 +6,7 @@ function App() {
   const [message, setMessage] = useState('');
 
   const API_ENDPOINT = process.env.KISSA_API_ENDPOINT || 'http://localhost:8080';
+  console.log(process.env.KISSA_API_ENDPOINT);
   console.log(API_ENDPOINT);
 
   const handleClick = async () => {
