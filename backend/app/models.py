@@ -14,3 +14,4 @@ class RegistrationData(BaseModel):
     username: str
     password: str
     email: EmailStr
+    album: str
