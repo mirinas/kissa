@@ -1,4 +1,8 @@
-# Pydantic models
+"""
+Models module.
+
+This module provides all the schema models and their types in the form of pydantic models
+"""
 
 from pydantic import BaseModel, EmailStr
 

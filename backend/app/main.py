@@ -1,4 +1,8 @@
-# Entry point of application, defines the FastAPI app and routes
+"""
+Main module.
+
+This module provides the entry point of the application, instantiates FastAPI app and routes
+"""
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware

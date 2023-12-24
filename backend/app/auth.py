@@ -1,19 +1,22 @@
-# Contains authentication logic, password hashing, and JWT token handling
+"""
+User authentication routes module.
+
+This smodule containes authentication logic, password hashing, and JWT/JSON token handling
+"""
 
 from fastapi import APIRouter, HTTPException, status
 from models import LoginCredentials, RegistrationData
 from passlib.context import CryptContext
+from database import create_user, get_user
 
 # New router for authentication routes
 router = APIRouter()
 
-# Make hashed password for newly registered, uses passlib library 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 @router.post("/login") 
 async def login(credentials: LoginCredentials):
-    if credentials.username == "admin" and credentials.password == "secret":
-        return {"message": "Login successful", "token": "some_jwt_token"}
+    user = get_user(credentials.username, credentials.password)
+    if user:
+        return {"message": "Login successful", "token": "some_token"}
     else:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -23,18 +26,14 @@ async def login(credentials: LoginCredentials):
 
 @router.post("/register")
 async def register(user_data: RegistrationData):
+    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     hashed_password = pwd_context.hash(user_data.password)
 
     user = create_user(username=user_data.username, password=hashed_password, email=user_data.email)
     if user:
         return {"message": "User created successfully"}
     else:
-        raise HTTPException(status_code=400, detail="Error creating user")
-
-def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
-
-def create_user(username: str, password: str, email: str):
-    # TODO: Implement create_user
-
-    return true
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="Error creating user"
+        )
