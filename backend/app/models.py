@@ -11,7 +11,15 @@ class LoginCredentials(BaseModel):
     password: str
 
 class RegistrationData(BaseModel):
+    id: int
     username: str
     password: str
     email: EmailStr
     album: str
+
+class CatProfile(BaseModel):
+    name: str
+    age: int
+    breed: str
+    bio: str
+    image_url: str 
