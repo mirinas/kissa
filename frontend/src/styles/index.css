@@ -1,14 +1,19 @@
 body {
+
+  --border-radius: 1em;
+  --background: #fdeeee;
+  --accent: indianred;
+  --foreground: #FFAAAA;
+
   margin: 0;
+  background: var(--background);
+
+  font-size: 24px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  display: block;
 }
 
 code {
