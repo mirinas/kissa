@@ -4,11 +4,11 @@ import JoinLayout from "./pages/JoinLayout";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import MainLayout from "./pages/MainLayout";
-import MainPage from "./pages/MainScreen";
-import MessagesPage from "./pages/Messages";
-import SettingsPage from "./pages/Settings";
-import NotFoundPage from "./pages/NotFound";
-import RootPage from "./pages/Root";
+import MainPage from "./pages/MainPage";
+import MessagesPage from "./pages/MessagesPage";
+import SettingsPage from "./pages/SettingsPage";
+import NotFoundPage from "./pages/NotFoundPage";
+import RootPage from "./pages/RootPage";
 
 export default function App() {
     return (

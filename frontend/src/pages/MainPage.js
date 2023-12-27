@@ -1,6 +1,6 @@
 import {API_ENDPOINT} from '../globals'
 
-export default function MainScreen() {
+export default function MainPage() {
     return (
         <>
             <h1>Main Screen</h1>

@@ -1,6 +1,6 @@
 import {Link} from "react-router-dom";
 
-export default function Root() {
+export default function RootPage() {
     return (
         <>
             <Link to={'/acc/login'}>Login</Link>
