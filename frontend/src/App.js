@@ -1,35 +1,30 @@
-import React, { useState } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import './styles/App.css';
 
-function App() {
-  const [message, setMessage] = useState('');
+export default function App() {
 
-  const API_ENDPOINT = process.env.REACT_APP_KISSA_API_ENDPOINT || 'http://localhost:8080';
+    const API_ENDPOINT = process.env.REACT_APP_KISSA_API_ENDPOINT || 'http://localhost:8080';
 
-  const handleClick = async () => {
-    try {
-      const response = await fetch(`${API_ENDPOINT}/`);
-      const data = await response.json();
-      setMessage(data.message);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
+    return (
+        <BrowserRouter>
+            <Routes>
+                {/* ASK TO LOGIN OR REGISTER */}
+                <Route index element={<Index />}/>
 
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload. Deploy tested.
-        </p>
-        <button onClick={handleClick}>Fetch API</button>
-        { message && <h3>Message from API</h3>}
-        <p>{message}</p>
-      </header>
-    </div>
-  );
+                {/* PAGES FOR LOGIN AND REGISTER */}
+                <Route path='/acc/' element={<JoinPage/>}>
+                    <Route path='login' element={<LoginPage />}/>
+                    <Route path='register' element={<RegisterPage />}/>
+                </Route>
+
+                {/* MAIN PAGES */}
+                <Route path='/app/' element={<Application />}>
+                    <Route index element={<MainScreen />}/>
+                    <Route path='messages' element={<Messages />}/>
+                    <Route path='settings' element={<Settings />}/>
+                </Route>
+                <Route path="/*" element={<NoPage/>}/>
+            </Routes>
+        </BrowserRouter>
+    );
 }
-
-export default App;
