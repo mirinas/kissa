@@ -17,7 +17,7 @@ router = APIRouter()
 async def login(credentials: LoginCredentials):
     user = user_db.get_user(credentials.username, credentials.password) 
     if user:
-        return {"message": "Login successful", "token": "some_token"}
+        return {"message": "Login successful", "code": "200"}
     else:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
