@@ -13,7 +13,7 @@ user_db = UserDatabase()
 
 router = APIRouter()
 
-@router.post("/login") 
+@router.post("/profile/login")
 async def login(credentials: LoginCredentials):
     user = user_db.get_user(credentials.username, credentials.password) 
     if user:
@@ -25,7 +25,7 @@ async def login(credentials: LoginCredentials):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-@router.post("/register")
+@router.post("/profile/register")
 async def register(user_data: RegistrationData):
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     hashed_password = pwd_context.hash(user_data.password)

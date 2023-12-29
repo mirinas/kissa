@@ -6,9 +6,11 @@ This module provides all the schema models and their types in the form of pydant
 
 from pydantic import BaseModel, EmailStr
 
+
 class LoginCredentials(BaseModel):
     username: str
     password: str
+
 
 class RegistrationData(BaseModel):
     id: int
@@ -16,6 +18,7 @@ class RegistrationData(BaseModel):
     password: str
     email: EmailStr
     album: str
+
 
 class CatProfile(BaseModel):
     name: str
