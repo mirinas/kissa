@@ -5,6 +5,7 @@ This module provides all the schema models and their types in the form of pydant
 """
 
 from pydantic import BaseModel, EmailStr
+from typing import Optional, List
 import base64
 
 
@@ -37,6 +38,7 @@ class UserData(BaseModel):
 
 # This model is used for returning the hashed password of a user after authentication subset of UserData
 class UserInDB(UserData):
+    id: str
     hashed_password: str
 
 
@@ -64,16 +66,18 @@ class CatProfile(BaseModel):
 
 class UserProfile(UserData):
     id: str
+    username: str
     # list to ids of matches
-    matches: list[str]
-    matches_allowed: int
+    matches: Optional[List[str]] = None
+    matches_allowed: Optional[int] = None
     # profiles that a user selected
-    selections: list[str]
+    selections: Optional[List[str]] = None
     # list of profiles nearby
-    potentials: list[str]
+    potentials: Optional[List[str]] = None
     # search radius in km
     search_radius: float = 10.0
     cat_profile: CatProfile
+    hashed_password: str
 
 
 class Message(BaseModel):
@@ -116,8 +120,10 @@ fake_profile = CatProfile(
 
 user_profile = UserProfile(
     id="abscd",
+    username="testName",
     name="German",
     surname="test",
+    hashed_password="",
     age=20,
     email='gn2g21@soton.ac.uk',
     dob='30/05/2003',

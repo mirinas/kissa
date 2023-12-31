@@ -36,9 +36,9 @@ class UserDatabase:
             return user  # dictionary like object
         return None
 
-    def create_user(self, username: str, password: str, email: str) -> bool:
+    def create_user(self, user_dict) -> bool:
         try:
-            self.collection.insert_one({"username": username, "password": password, "email": email})
+            self.collection.insert_one(user_dict)
             return True
         except Exception as e:
             print("Error registering user: " + e)

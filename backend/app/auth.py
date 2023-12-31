@@ -11,7 +11,7 @@ from fastapi import Depends, HTTPException, status
 from passlib.context import CryptContext
 
 from fastapi import APIRouter, HTTPException, status
-from models import LoginCredentials, RegistrationData, Token, UserInDB
+from models import LoginCredentials, RegistrationData, Token, UserInDB, UserProfile
 from passlib.context import CryptContext
 from database import UserDatabase 
 
@@ -40,7 +40,8 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
 
 @router.post("/token", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    user = await authenticate_user(form_data.username, form_data.password)
+    login_credentials = LoginCredentials(username=form_data.username, password=form_data.password)
+    user = await authenticate_user(login_credentials)
 
     if not user:
         raise HTTPException(
@@ -58,15 +59,15 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
     return {"access_token": access_token, "token_type": "bearer"}
 
-async def authenticate_user(username: str, password: str):
-    user = get_user(username)
+async def authenticate_user(login_credentials: LoginCredentials):
+    user = get_user(login_credentials.username)
 
     # Return 'None' instead of False as per fastAPI docs
     if not user:
         return None 
 
     # the password retrieved here from database is hashed, and gets verified
-    if not pwd_context.verify(password, user.hashed_password):
+    if not pwd_context.verify(login_credentials.password, user.hashed_password):
         return None
 
     return user
@@ -80,11 +81,16 @@ def get_user(username: str):
         return None
 
 @router.post("/register")
-async def register(user_data: RegistrationData):
+async def register(user_data: UserProfile):
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    hashed_password = pwd_context.hash(user_data.password)
+    hashed_password = pwd_context.hash(user_data.hashed_password)
 
-    user_created = user_db.create_user(username=user_data.username, password=hashed_password, email=user_data.email)
+    # Update hashed password and remove plain one
+    user_dict = user_data.model_dump()
+    user_dict['hashed_password'] = hashed_password
+
+    user_created = user_db.create_user(user_dict)
+
     if user_created:
         return {"message": "User created successfully"}
     else:
