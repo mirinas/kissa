@@ -11,8 +11,8 @@ from models import CatProfile, UserProfile, user_profile, fake_profile, ConfirmR
 router = APIRouter(prefix="/profile")
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_profile(profile: CatProfile) -> UserProfile:
+@router.post("/{pid}", status_code=status.HTTP_201_CREATED)
+async def create_profile(pid: str, profile: CatProfile) -> UserProfile:
     # TODO: Logic to save profile data to the database
     # perhaps after registering, the user is taken to a screen to fill in their info?
 
