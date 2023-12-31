@@ -12,17 +12,17 @@ router = APIRouter(prefix="pictures")
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def upload_picture(file: UploadFile = File(...)):
+async def upload_picture(file: UploadFile = File(...)) -> str:
     # TODO: Logic to upload picture and return the URL
 
-    pass
+    return "todo"
 
 
-@router.get("/{id}", status_code=status.HTTP_200_OK)
+@router.get("/{pid}", status_code=status.HTTP_200_OK)
 async def get_picture(pid: str):
-    pass
+    return 'base64 blob'
 
 
-@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{pid}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_picture(pid: str):
     pass

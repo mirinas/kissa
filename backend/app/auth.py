@@ -13,6 +13,7 @@ user_db = UserDatabase()
 
 router = APIRouter()
 
+
 @router.post("/profile/login")
 async def login(credentials: LoginCredentials):
     user = user_db.get_user(credentials.username, credentials.password) 
@@ -24,6 +25,7 @@ async def login(credentials: LoginCredentials):
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
 
 @router.post("/profile/register")
 async def register(user_data: RegistrationData):
