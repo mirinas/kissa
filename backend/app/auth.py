@@ -11,7 +11,7 @@ from fastapi import Depends, HTTPException, status
 from passlib.context import CryptContext
 
 from fastapi import APIRouter, HTTPException, status
-from models import LoginCredentials, RegistrationData, Token
+from models import LoginCredentials, RegistrationData, Token, UserInDB
 from passlib.context import CryptContext
 from database import UserDatabase 
 
@@ -59,22 +59,32 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     return {"access_token": access_token, "token_type": "bearer"}
 
 async def authenticate_user(username: str, password: str):
-    user = user_db.get_user(username)
+    user = get_user(username)
 
     # Return 'None' instead of False as per fastAPI docs
     if not user:
         return None 
-    if not pwd_context.verify(password, user.password): #the password retrieved here from database is hashed
+
+    # the password retrieved here from database is hashed, and gets verified
+    if not pwd_context.verify(password, user.hashed_password):
         return None
 
     return user
+
+def get_user(username: str):
+    user_dict = user_db.get_user_by_username(username)
+    if user_dict:
+        return UserInDB(**user_dict)
+    else:
+        print("User not found.")
+        return None
 
 @router.post("/register")
 async def register(user_data: RegistrationData):
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     hashed_password = pwd_context.hash(user_data.password)
 
-    user_created = user_db.create_user(username=user_data.username, password=hashed_password, email=user_data.email)  # Use the class method
+    user_created = user_db.create_user(username=user_data.username, password=hashed_password, email=user_data.email)
     if user_created:
         return {"message": "User created successfully"}
     else:

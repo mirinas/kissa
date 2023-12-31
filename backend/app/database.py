@@ -4,32 +4,38 @@ Database operations module.
 This module provides functions to interact with the user database.
 """
 
-from pymongo import MongoClient, gridfs
+from pymongo import MongoClient
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
+import gridfs
 
 class UserDatabase:
     # Uses azures key vault
     def __init__(self):
         KEY_VAULT_URL = "https://kissa-vault.vault.azure.net/"
         credential = DefaultAzureCredential()
-        client = SecretClient(vault_url=KEY_VAULT_URL, credential=credential)
+        #client = SecretClient(vault_url=KEY_VAULT_URL, credential=credential)
 
-        COSMOS_DB_URI = client.get_secret("COSMOS-DB-URI")
-        COSMOS_DB_NAME = client.get_secret("COSMOS-DB-NAME")
-        COSMOS_DB_COLLECTION = client.get_secret("COSMOS-DB-COLLECTION")
+        #COSMOS_DB_URI = client.get_secret("COSMOS-DB-URI")
+        #COSMOS_DB_NAME = client.get_secret("COSMOS-DB-NAME")
+        #COSMOS_DB_COLLECTION = client.get_secret("COSMOS-DB-COLLECTION")
 
+        COSMOS_DB_URI = "mongodb://kissa-db-dpwvhfkg:7i661s7SDxYdbRP3PTGLQEaCUGiaQea0zyqvrNelWu1ZBJByuROpU5D6AbUUcIYZYkl7NaG1IE7VACDbloh7Iw==@kissa-db-dpwvhfkg.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@kissa-db-dpwvhfkg@"
+        COSMOS_DB_NAME = "kissa-db"
+        COSMOS_DB_COLLECTION = "kissa-db-collection"
+        
         client = MongoClient(COSMOS_DB_URI)
         self.db = client[COSMOS_DB_NAME]
         self.collection = self.db[COSMOS_DB_COLLECTION]
 
         self.fs = gridfs.GridFS(self.db) #initialise gridFS
 
-    def get_user(self, username: str, password: str):
+    def get_user_by_username(self, username: str):
         user = self.collection.find_one({"username": username})
-    
-        return user
-    
+        if user:
+            return user  # dictionary like object
+        return None
+
     def create_user(self, username: str, password: str, email: str) -> bool:
         try:
             self.collection.insert_one({"username": username, "password": password, "email": email})

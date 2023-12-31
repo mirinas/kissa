@@ -7,6 +7,7 @@ This module provides all the schema models and their types in the form of pydant
 from pydantic import BaseModel, EmailStr
 import base64
 
+
 class Token(BaseModel):
     access_token: str
     token_type: str
@@ -18,7 +19,7 @@ class TokenData(BaseModel):
 
 class Picture(BaseModel):
     id: str
-    data: base64
+    data: str 
     owner: str
 
 
@@ -33,8 +34,10 @@ class UserData(BaseModel):
     location: str
     profile_pic_url: str
 
-    # list of session ids
-    sessions: [str]
+
+# This model is used for returning the hashed password of a user after authentication subset of UserData
+class UserInDB(UserData):
+    hashed_password: str
 
 
 class LoginCredentials(BaseModel):
@@ -68,6 +71,8 @@ class UserProfile(UserData):
     selections: list[str]
     # list of profiles nearby
     potentials: list[str]
+    # search radius in km
+    search_radius: float = 10.0
     cat_profile: CatProfile
 
 
@@ -87,7 +92,6 @@ class Match(BaseModel):
 
 
 class MeetingConfirmation(BaseModel):
-    uid: str
     picture_url: str
 
 
@@ -100,22 +104,30 @@ class ConfirmResponse(BaseModel):
     is_matched: bool
 
 
-fake_profile = CatProfile()
-fake_profile.name = "Fnuffy"
-# age is in months
-fake_profile.age = 11
-fake_profile.bio = 'He loves flowers'
-fake_profile.sex = False
-fake_profile.breed = 'N/A'
-fake_profile.image_urls = ['https://images.unsplash.com/photo-1561948955-570b270e7c36?q=80&w=3035&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D']
+fake_profile = CatProfile(
+    owner_id="0",
+    name="Fnuffy",
+    age=11,
+    breed="N/A",
+    sex=False,
+    bio="He loves flowers",
+    image_urls=['https://images.unsplash.com/photo-1561948955-570b270e7c36?q=80&w=3035&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D']
+)
 
-
-user_profile = UserProfile()
-user_profile.id = 'abscd'
-user_profile.name = "German"
-user_profile.age = 20
-user_profile.email = 'gn2g21@soton.ac.uk'
-user_profile.dob = '30/05/2003'
-user_profile.location = "26.7674446, 81.109758"
-user_profile.matches_allowed = 3
-user_profile.cat_profile = fake_profile
+user_profile = UserProfile(
+    id="abscd",
+    name="German",
+    surname="test",
+    age=20,
+    email='gn2g21@soton.ac.uk',
+    dob='30/05/2003',
+    location="26.7674446, 81.109758",
+    gender="male",
+    matches=["0", "1", "2"],
+    matches_allowed=3,
+    selections=["73", "22"],
+    potentials=["9", "7"],
+    search_radius=12.2,
+    cat_profile = fake_profile,
+    profile_pic_url="test"
+)
