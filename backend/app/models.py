@@ -8,6 +8,15 @@ from pydantic import BaseModel, EmailStr
 import base64
 
 
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    user_id: str | None = None
+
+
 class Picture(BaseModel):
     id: str
     data: base64
@@ -24,9 +33,6 @@ class UserData(BaseModel):
     # "lat, lon" Used to find matches nearby
     location: str
     profile_pic_url: str
-
-    # list of session ids
-    sessions: [str]
 
 
 class LoginCredentials(BaseModel):
@@ -60,6 +66,8 @@ class UserProfile(UserData):
     selections: list[str]
     # list of profiles nearby
     potentials: list[str]
+    # search radius in km
+    search_radius: float = 10.0
     cat_profile: CatProfile
 
 
@@ -79,7 +87,6 @@ class Match(BaseModel):
 
 
 class MeetingConfirmation(BaseModel):
-    uid: str
     picture_url: str
 
 
