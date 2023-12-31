@@ -49,10 +49,11 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    # If user in database, grant token with 30min expiration
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": user.id}, expires_delta=access_token_expires
     )
 
     return {"access_token": access_token, "token_type": "bearer"}
@@ -63,7 +64,7 @@ async def authenticate_user(username: str, password: str):
     # Return 'None' instead of False as per fastAPI docs
     if not user:
         return None 
-    if not pwd_context.verify(password, user.hashed_password):
+    if not pwd_context.verify(password, user.password): #the password retrieved here from database is hashed
         return None
 
     return user
