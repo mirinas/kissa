@@ -4,7 +4,7 @@ Database operations module.
 This module provides functions to interact with the user database.
 """
 
-from pymongo import MongoClient
+from pymongo import MongoClient, gridfs
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 
@@ -23,6 +23,8 @@ class UserDatabase:
         self.db = client[COSMOS_DB_NAME]
         self.collection = self.db[COSMOS_DB_COLLECTION]
 
+        self.fs = gridfs.GridFS(self.db) #initialise gridFS
+
     def get_user(self, username: str, password: str):
         user = self.collection.find_one({"username": username})
     
@@ -35,3 +37,21 @@ class UserDatabase:
         except Exception as e:
             print("Error registering user: " + e)
             return False
+        
+    # Stores the file in GridFS and is represented as a string id
+    def upload_file(self, file_data):
+        file_id = self.fs.put(file_data)
+        return file_id
+
+    def get_file(self, id):
+        try:
+            file = self.fs.get(id)
+            return file.read()
+        except gridfs.errors.NoFile:
+            return None
+
+    def delete_file(self, id):
+        try:
+            self.fs.delete(id)
+        except gridfs.errors.NoFile:
+            return None

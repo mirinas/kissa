@@ -12,8 +12,9 @@ router = APIRouter(prefix="pictures")
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def upload_picture(file: UploadFile = File(...)) -> str:
-    # TODO: Logic to upload picture and return the URL
+async def upload_picture(file: UploadFile = File(...)) -> str: # Expects a file uploaded by the user as argument
+
+
 
     return "todo"
 

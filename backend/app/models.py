@@ -7,6 +7,14 @@ This module provides all the schema models and their types in the form of pydant
 from pydantic import BaseModel, EmailStr
 import base64
 
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    user_id: str | None = None
+
 
 class Picture(BaseModel):
     id: str
