@@ -36,7 +36,6 @@ resource "azurerm_cosmosdb_mongo_collection" "kissa_mongodb_collection" {
   account_name        = azurerm_cosmosdb_account.kissa_db_account.name
   database_name       = azurerm_cosmosdb_mongo_database.kissa_mongodb.name
 
-  default_ttl_seconds = "777"
   throughput          = 400
 
   index {
