@@ -30,7 +30,11 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World, a change on dev"}
+    return {
+        "api_version": "v1.0",
+        "status": "live",
+        "documentation_url": "https://kissa-api.jollymoss-4112728e.uksouth.azurecontainerapps.io/docs"
+    }
 
 # Authentication routes for login and registering
 app.include_router(auth_router) 
