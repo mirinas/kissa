@@ -39,6 +39,7 @@ class UserData(BaseModel):
 # This model is used for returning the hashed password of a user after authentication subset of UserData
 class UserInDB(UserData):
     id: str
+    username: str
     hashed_password: str
 
 

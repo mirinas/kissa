@@ -4,12 +4,13 @@ User authentication routes module.
 This module contains authentication logic, password hashing, and JWT/JSON token handling.
 """
 
+from fastapi import Security
+from pydantic import ValidationError
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi import Depends, HTTPException, status
 from passlib.context import CryptContext
-
 from fastapi import APIRouter, HTTPException, status
 from models import LoginCredentials, RegistrationData, Token, UserInDB, UserProfile
 from passlib.context import CryptContext
@@ -20,7 +21,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 user_db = UserDatabase()
-router = APIRouter(prefix="/profiles")
+router = APIRouter()
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/profiles/token")
@@ -38,7 +39,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
 
     return encoded_jwt
 
-@router.post("/token", response_model=Token)
+@router.post("/profiles/token", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     login_credentials = LoginCredentials(username=form_data.username, password=form_data.password)
     user = await authenticate_user(login_credentials)
@@ -54,7 +55,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     
     access_token = create_access_token(
-        data={"sub": user.id}, expires_delta=access_token_expires
+        data={"sub": user.username}, expires_delta=access_token_expires
     )
 
     return {"access_token": access_token, "token_type": "bearer"}
@@ -80,7 +81,7 @@ def get_user(username: str):
         print("User not found.")
         return None
 
-@router.post("/register")
+@router.post("/profiles/register")
 async def register(user_data: UserProfile):
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     hashed_password = pwd_context.hash(user_data.hashed_password)
@@ -98,3 +99,29 @@ async def register(user_data: UserProfile):
             status_code=status.HTTP_400_BAD_REQUEST, 
             detail="Error creating user"
         )
+
+# Once the user is provided a token, use this function to access routes with user authentication
+async def get_current_user(token: str = Security(oauth2_scheme)) -> UserInDB:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except (JWTError, ValidationError):
+        raise credentials_exception
+
+    user = get_user(username)
+    if user is None:
+        raise credentials_exception
+    
+    return user
+
+@router.get("/users/me")
+async def read_users_me(current_user: UserInDB = Depends(get_current_user)):
+    return current_user

@@ -33,7 +33,14 @@ class UserDatabase:
     def get_user_by_username(self, username: str):
         user = self.collection.find_one({"username": username})
         if user:
-            return user  # dictionary like object
+            return user 
+        return None
+
+    # function if we decide to change the authentication method later 
+    def get_user_by_id(self, id: str):
+        user = self.collection.find_one({"id": id})
+        if user:
+            return user 
         return None
 
     def create_user(self, user_dict) -> bool:
@@ -41,7 +48,7 @@ class UserDatabase:
             self.collection.insert_one(user_dict)
             return True
         except Exception as e:
-            print("Error registering user: " + e)
+            print("Error registering user: " + str(e))
             return False
         
     # Stores the file in GridFS and is represented as a string id
