@@ -85,5 +85,5 @@ class UserDatabase:
            )
            return True
        except Exception as e:
-           print(f"Error updating cat profile: {e}")
+           print("Error updating cat profile: " + str(e))
            return False
