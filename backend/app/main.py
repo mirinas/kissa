@@ -8,6 +8,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from auth import router as auth_router
 from profile import router as profile_router
+from pictures import router as picture_router
 
 app = FastAPI()
 
@@ -29,10 +30,17 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World, a change on dev"}
+    return {
+        "api_version": "v1.0",
+        "status": "live",
+        "documentation_url": "https://kissa-api.jollymoss-4112728e.uksouth.azurecontainerapps.io/docs"
+    }
 
 # Authentication routes for login and registering
 app.include_router(auth_router) 
 
 # Routes for profile actions
 app.include_router(profile_router)
+
+# Routes for picture actions
+app.include_router(picture_router)

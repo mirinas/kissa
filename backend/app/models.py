@@ -5,6 +5,7 @@ This module provides all the schema models and their types in the form of pydant
 """
 
 from pydantic import BaseModel, EmailStr
+from typing import Optional, List
 import base64
 
 
@@ -19,28 +20,28 @@ class TokenData(BaseModel):
 
 class Picture(BaseModel):
     id: str
-    data: base64
+    data: str 
     owner: str
 
 
 class UserData(BaseModel):
     email: EmailStr
-    # date of birth
-    dob: str
+    dob: str # date of birth
     gender: str
     name: str
     surname: str
-    # "lat, lon" Used to find matches nearby
-    location: str
+    location: str # "lat, lon" Used to find matches nearby
     profile_pic_url: str
 
 
+# This model is used for returning the hashed password of a user after authentication subset of UserData
+class UserInDB(UserData):
+    email: EmailStr
+    hashed_password: str
+
+
 class LoginCredentials(BaseModel):
-    username: str
-    password: str
-
-
-class RegistrationData(UserData):
+    email: EmailStr
     password: str
 
 
@@ -49,26 +50,20 @@ class CatProfile(BaseModel):
     name: str
     age: int
     breed: str
-    # false - male
-    # true - female
-    sex: bool
+    sex: bool # false = male, true = female
     bio: str
-    # list of image urls
-    image_urls: list[str]
+    image_ids: List[str] = [] # list of image ids
 
 
 class UserProfile(UserData):
     id: str
-    # list to ids of matches
-    matches: list[str]
-    matches_allowed: int
-    # profiles that a user selected
-    selections: list[str]
-    # list of profiles nearby
-    potentials: list[str]
-    # search radius in km
-    search_radius: float = 10.0
+    matches: Optional[List[str]] = None # list to ids of matches
+    matches_allowed: Optional[int] = None
+    selections: Optional[List[str]] = None # profiles that a user selected
+    potentials: Optional[List[str]] = None # list of profiles nearby
+    search_radius: float = 10.0 # search radius in km
     cat_profile: CatProfile
+    hashed_password: str
 
 
 class Message(BaseModel):
@@ -81,8 +76,7 @@ class Match(BaseModel):
     id: str
     user_1: str
     user_2: str
-    # list of confirmation who confirmed the meeting
-    meeting_confirmation: list[str]
+    meeting_confirmation: list[str] # list of confirmation who confirmed the meeting
     messages: list[Message]
 
 
@@ -99,22 +93,31 @@ class ConfirmResponse(BaseModel):
     is_matched: bool
 
 
-fake_profile = CatProfile()
-fake_profile.name = "Fnuffy"
-# age is in months
-fake_profile.age = 11
-fake_profile.bio = 'He loves flowers'
-fake_profile.sex = False
-fake_profile.breed = 'N/A'
-fake_profile.image_urls = ['https://images.unsplash.com/photo-1561948955-570b270e7c36?q=80&w=3035&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D']
+fake_profile = CatProfile(
+    owner_id="0",
+    name="Fnuffy",
+    age=11,
+    breed="N/A",
+    sex=False,
+    bio="He loves flowers",
+    image_ids=['id_1']
+)
 
-
-user_profile = UserProfile()
-user_profile.id = 'abscd'
-user_profile.name = "German"
-user_profile.age = 20
-user_profile.email = 'gn2g21@soton.ac.uk'
-user_profile.dob = '30/05/2003'
-user_profile.location = "26.7674446, 81.109758"
-user_profile.matches_allowed = 3
-user_profile.cat_profile = fake_profile
+user_profile = UserProfile(
+    id="abscd",
+    name="German",
+    surname="test",
+    hashed_password="",
+    age=20,
+    email='gn2g21@soton.ac.uk',
+    dob='30/05/2003',
+    location="26.7674446, 81.109758",
+    gender="male",
+    matches=["0", "1", "2"],
+    matches_allowed=3,
+    selections=["73", "22"],
+    potentials=["9", "7"],
+    search_radius=12.2,
+    cat_profile = fake_profile,
+    profile_pic_url="test"
+)
