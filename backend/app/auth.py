@@ -4,6 +4,7 @@ User authentication routes module.
 This module contains authentication logic, password hashing, and JWT/JSON token handling.
 """
 
+import uuid
 from fastapi import Security
 from pydantic import ValidationError
 from datetime import datetime, timedelta
@@ -86,9 +87,18 @@ async def register(user_data: UserProfile):
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     hashed_password = pwd_context.hash(user_data.hashed_password)
 
-    # Update hashed password and remove plain one
-    user_dict = user_data.model_dump()
+    # Convert the Pydantic model to a dictionary
+    user_dict = user_data.dict()
     user_dict['hashed_password'] = hashed_password
+
+    # Give cat profile a randomly generated id, different from user so we can upload images directly to cat profile
+    random_owner_id = str(uuid.uuid4())
+    if 'cat_profile' in user_dict and user_dict['cat_profile'] is not None:
+        user_dict['cat_profile']['owner_id'] = random_owner_id
+
+    # Give user a backup id for testing purposes, can be removed later
+    random_user_id = str(uuid.uuid4())
+    user_dict['id'] = random_user_id 
 
     user_created = user_db.create_user(user_dict)
 

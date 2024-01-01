@@ -13,8 +13,8 @@ import gridfs
 class UserDatabase:
     # Uses azures key vault
     def __init__(self):
-        KEY_VAULT_URL = "https://kissa-vault.vault.azure.net/"
-        credential = DefaultAzureCredential()
+        #KEY_VAULT_URL = "https://kissa-vault.vault.azure.net/"
+        #credential = DefaultAzureCredential()
         #client = SecretClient(vault_url=KEY_VAULT_URL, credential=credential)
 
         #COSMOS_DB_URI = client.get_secret("COSMOS-DB-URI")
