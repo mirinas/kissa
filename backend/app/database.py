@@ -5,6 +5,7 @@ This module provides functions to interact with the user database.
 """
 
 from pymongo import MongoClient
+from bson import ObjectId
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 import gridfs
@@ -51,13 +52,45 @@ class UserDatabase:
 
     def get_file(self, id):
         try:
-            file = self.fs.get(id)
+            file_id = ObjectId(id)
+            file = self.fs.get(file_id)
             return file.read()
         except gridfs.errors.NoFile:
             return None
 
     def delete_file(self, id):
         try:
-            self.fs.delete(id)
+            file_id = ObjectId(id)
+            self.fs.delete(file_id)
         except gridfs.errors.NoFile:
             return None
+
+    def delete_file(self, id):
+        try:
+            # Remove image from database
+            file_id = ObjectId(id)
+            self.fs.delete(file_id)
+
+            # Remove database entry
+            self.collection.update_many(
+                {"cat_profile.image_ids": file_id},
+                {"$pull": {"cat_profile.image_ids": file_id}}
+            )
+
+            return True
+        except gridfs.errors.NoFile: # if file not found
+            return False 
+        except Exception as e: # if error occurred
+            print("Error deleting file: " + str(e))
+            return False  
+
+    def update_cat_profile_with_image(self, cat_profile_id, image_id):
+       try:
+           self.collection.update_one(
+               {"cat_profile.owner_id": cat_profile_id},
+               {"$push": {"cat_profile.image_ids": image_id}}
+           )
+           return True
+       except Exception as e:
+           print(f"Error updating cat profile: {e}")
+           return False

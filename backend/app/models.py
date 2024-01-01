@@ -26,13 +26,11 @@ class Picture(BaseModel):
 
 class UserData(BaseModel):
     email: EmailStr
-    # date of birth
-    dob: str
+    dob: str # date of birth
     gender: str
     name: str
     surname: str
-    # "lat, lon" Used to find matches nearby
-    location: str
+    location: str # "lat, lon" Used to find matches nearby
     profile_pic_url: str
 
 
@@ -47,34 +45,23 @@ class LoginCredentials(BaseModel):
     password: str
 
 
-class RegistrationData(UserData):
-    password: str
-
-
 class CatProfile(BaseModel):
     owner_id: str
     name: str
     age: int
     breed: str
-    # false - male
-    # true - female
-    sex: bool
+    sex: bool # false = male, true = female
     bio: str
-    # list of image urls
-    image_urls: list[str]
+    image_ids: List[str] = [] # list of image ids
 
 
 class UserProfile(UserData):
     id: str
-    # list to ids of matches
-    matches: Optional[List[str]] = None
+    matches: Optional[List[str]] = None # list to ids of matches
     matches_allowed: Optional[int] = None
-    # profiles that a user selected
-    selections: Optional[List[str]] = None
-    # list of profiles nearby
-    potentials: Optional[List[str]] = None
-    # search radius in km
-    search_radius: float = 10.0
+    selections: Optional[List[str]] = None # profiles that a user selected
+    potentials: Optional[List[str]] = None # list of profiles nearby
+    search_radius: float = 10.0 # search radius in km
     cat_profile: CatProfile
     hashed_password: str
 
@@ -89,8 +76,7 @@ class Match(BaseModel):
     id: str
     user_1: str
     user_2: str
-    # list of confirmation who confirmed the meeting
-    meeting_confirmation: list[str]
+    meeting_confirmation: list[str] # list of confirmation who confirmed the meeting
     messages: list[Message]
 
 
@@ -114,7 +100,7 @@ fake_profile = CatProfile(
     breed="N/A",
     sex=False,
     bio="He loves flowers",
-    image_urls=['https://images.unsplash.com/photo-1561948955-570b270e7c36?q=80&w=3035&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D']
+    image_ids=['https://images.unsplash.com/photo-1561948955-570b270e7c36?q=80&w=3035&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D']
 )
 
 user_profile = UserProfile(

@@ -12,7 +12,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi import Depends, HTTPException, status
 from passlib.context import CryptContext
 from fastapi import APIRouter, HTTPException, status
-from models import LoginCredentials, RegistrationData, Token, UserInDB, UserProfile
+from models import LoginCredentials, Token, UserInDB, UserProfile
 from passlib.context import CryptContext
 from database import UserDatabase 
 

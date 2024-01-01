@@ -8,6 +8,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from auth import router as auth_router
 from profile import router as profile_router
+from pictures import router as picture_router
 
 app = FastAPI()
 
@@ -36,3 +37,6 @@ app.include_router(auth_router)
 
 # Routes for profile actions
 app.include_router(profile_router)
+
+# Routes for picture actions
+app.include_router(picture_router)
