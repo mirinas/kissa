@@ -60,13 +60,6 @@ class UserDatabase:
 
     def delete_file(self, id):
         try:
-            file_id = ObjectId(id)
-            self.fs.delete(file_id)
-        except gridfs.errors.NoFile:
-            return None
-
-    def delete_file(self, id):
-        try:
             # Remove image from database
             file_id = ObjectId(id)
             self.fs.delete(file_id)
