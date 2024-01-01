@@ -18,7 +18,7 @@ from database import UserDatabase
 
 SECRET_KEY = "1cd38e0a7004b1694efbf1908bfc32ea0f858bb170e14b73ecc5fc1b412ecd20"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 user_db = UserDatabase()
 router = APIRouter()
@@ -41,13 +41,13 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
 
 @router.post("/profiles/token", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    login_credentials = LoginCredentials(username=form_data.username, password=form_data.password)
+    login_credentials = LoginCredentials(email=form_data.username, password=form_data.password)
     user = await authenticate_user(login_credentials)
 
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -55,13 +55,13 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": user.email}, expires_delta=access_token_expires
     )
 
     return {"access_token": access_token, "token_type": "bearer"}
 
 async def authenticate_user(login_credentials: LoginCredentials):
-    user = get_user(login_credentials.username)
+    user = get_user(login_credentials.email)
 
     # Return 'None' instead of False as per fastAPI docs
     if not user:
@@ -73,8 +73,8 @@ async def authenticate_user(login_credentials: LoginCredentials):
 
     return user
 
-def get_user(username: str):
-    user_dict = user_db.get_user_by_username(username)
+def get_user(email: str):
+    user_dict = user_db.get_user_by_email(email)
     if user_dict:
         return UserInDB(**user_dict)
     else:
@@ -110,16 +110,16 @@ async def get_current_user(token: str = Security(oauth2_scheme)) -> UserInDB:
 
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
+        email: str = payload.get("sub")
+        if email is None:
             raise credentials_exception
     except (JWTError, ValidationError):
         raise credentials_exception
 
-    user = get_user(username)
+    user = get_user(email)
     if user is None:
         raise credentials_exception
-    
+
     return user
 
 @router.get("/users/me")

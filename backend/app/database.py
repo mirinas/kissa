@@ -30,15 +30,8 @@ class UserDatabase:
 
         self.fs = gridfs.GridFS(self.db) #initialise gridFS
 
-    def get_user_by_username(self, username: str):
-        user = self.collection.find_one({"username": username})
-        if user:
-            return user 
-        return None
-
-    # function if we decide to change the authentication method later 
-    def get_user_by_id(self, id: str):
-        user = self.collection.find_one({"id": id})
+    def get_user_by_email(self, email: str):
+        user = self.collection.find_one({"email": email})
         if user:
             return user 
         return None

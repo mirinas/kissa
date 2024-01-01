@@ -38,13 +38,12 @@ class UserData(BaseModel):
 
 # This model is used for returning the hashed password of a user after authentication subset of UserData
 class UserInDB(UserData):
-    id: str
-    username: str
+    email: EmailStr
     hashed_password: str
 
 
 class LoginCredentials(BaseModel):
-    username: str
+    email: EmailStr
     password: str
 
 
@@ -67,7 +66,6 @@ class CatProfile(BaseModel):
 
 class UserProfile(UserData):
     id: str
-    username: str
     # list to ids of matches
     matches: Optional[List[str]] = None
     matches_allowed: Optional[int] = None
@@ -121,7 +119,6 @@ fake_profile = CatProfile(
 
 user_profile = UserProfile(
     id="abscd",
-    username="testName",
     name="German",
     surname="test",
     hashed_password="",
