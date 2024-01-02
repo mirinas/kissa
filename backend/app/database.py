@@ -13,8 +13,8 @@ import gridfs
 class UserDatabase:
     # Uses azures key vault
     def __init__(self):
-        KEY_VAULT_URL = "https://kissa-vault.vault.azure.net/"
-        credential = DefaultAzureCredential()
+        #KEY_VAULT_URL = "https://kissa-vault.vault.azure.net/"
+        #credential = DefaultAzureCredential()
         #client = SecretClient(vault_url=KEY_VAULT_URL, credential=credential)
 
         #COSMOS_DB_URI = client.get_secret("COSMOS-DB-URI")
@@ -45,9 +45,10 @@ class UserDatabase:
             print("Error registering user: " + str(e))
             return False
         
-    # Stores the file in GridFS and is represented as a string id
-    def upload_file(self, file_data):
-        file_id = self.fs.put(file_data)
+    def upload_file(self, file_data, owner_id):
+        # Stores the file in GridFS and is represented as a string id
+        # GraphFS stores owner_id using the 'metadata' tag
+        file_id = self.fs.put(file_data, metadata={'owner_id': owner_id})
         return file_id
 
     def get_file(self, id):
@@ -60,7 +61,7 @@ class UserDatabase:
 
     def delete_file(self, id):
         try:
-            # Remove image from database
+            # Remove image from database using its id
             file_id = ObjectId(id)
             self.fs.delete(file_id)
 
@@ -71,17 +72,19 @@ class UserDatabase:
             )
 
             return True
-        except gridfs.errors.NoFile: # if file not found
+        except gridfs.errors.NoFile:
             return False 
-        except Exception as e: # if error occurred
-            print("Error deleting file: " + str(e))
+        except Exception as e:
+            print("Error when deleting file: " + str(e))
             return False  
 
     def update_cat_profile_with_image(self, cat_profile_id, image_id):
        try:
+           image_id_str = str(image_id)
+
            self.collection.update_one(
                {"cat_profile.owner_id": cat_profile_id},
-               {"$push": {"cat_profile.image_ids": image_id}}
+               {"$push": {"cat_profile.image_ids": image_id_str}}
            )
            return True
        except Exception as e:

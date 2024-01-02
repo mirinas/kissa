@@ -4,6 +4,7 @@ User authentication routes module.
 This module contains authentication logic, password hashing, and JWT/JSON token handling.
 """
 
+import uuid
 from fastapi import Security
 from pydantic import ValidationError
 from datetime import datetime, timedelta
@@ -51,9 +52,8 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # If user in database, grant token with 30min expiration
+    # If user in database, grant token with set expiration
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    
     access_token = create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
     )
@@ -75,6 +75,7 @@ async def authenticate_user(login_credentials: LoginCredentials):
 
 def get_user(email: str):
     user_dict = user_db.get_user_by_email(email)
+
     if user_dict:
         return UserInDB(**user_dict)
     else:
@@ -86,9 +87,18 @@ async def register(user_data: UserProfile):
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     hashed_password = pwd_context.hash(user_data.hashed_password)
 
-    # Update hashed password and remove plain one
-    user_dict = user_data.model_dump()
+    # Convert the Pydantic model to a dictionary, to store hash password
+    user_dict = user_data.dict()
     user_dict['hashed_password'] = hashed_password
+
+    # Give cat profile a randomly generated id, different from user so we can upload images directly to cat profile
+    random_owner_id = str(uuid.uuid4())
+    if 'cat_profile' in user_dict and user_dict['cat_profile'] is not None:
+        user_dict['cat_profile']['owner_id'] = random_owner_id
+
+    # Give user a backup id for testing purposes, can be removed later
+    random_user_id = str(uuid.uuid4())
+    user_dict['id'] = random_user_id 
 
     user_created = user_db.create_user(user_dict)
 

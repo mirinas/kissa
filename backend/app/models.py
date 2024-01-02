@@ -34,17 +34,6 @@ class UserData(BaseModel):
     profile_pic_url: str
 
 
-# This model is used for returning the hashed password of a user after authentication subset of UserData
-class UserInDB(UserData):
-    email: EmailStr
-    hashed_password: str
-
-
-class LoginCredentials(BaseModel):
-    email: EmailStr
-    password: str
-
-
 class CatProfile(BaseModel):
     owner_id: str
     name: str
@@ -55,15 +44,27 @@ class CatProfile(BaseModel):
     image_ids: List[str] = [] # list of image ids
 
 
+# This model is used for returning a user from database
+class UserInDB(UserData):
+    email: EmailStr
+    hashed_password: str
+    cat_profile: CatProfile
+
+
+class LoginCredentials(BaseModel):
+    email: EmailStr
+    password: str
+
+
 class UserProfile(UserData):
     id: str
-    matches: Optional[List[str]] = None # list to ids of matches
-    matches_allowed: Optional[int] = None
-    selections: Optional[List[str]] = None # profiles that a user selected
-    potentials: Optional[List[str]] = None # list of profiles nearby
-    search_radius: float = 10.0 # search radius in km
-    cat_profile: CatProfile
-    hashed_password: str
+    matches: Optional[List[str]] = None     # List of IDs of matches
+    matches_allowed: int = 3                # Number of matches allowed
+    selections: Optional[List[str]] = None  # Profiles that a user selected
+    potentials: Optional[List[str]] = None  # List of profiles nearby
+    search_radius: float = 10.0             # Search radius in km, default is 10.0
+    cat_profile: CatProfile                 # User's cat profile
+    hashed_password: str                    # Hashed password
 
 
 class Message(BaseModel):
