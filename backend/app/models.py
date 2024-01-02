@@ -34,17 +34,6 @@ class UserData(BaseModel):
     profile_pic_url: str
 
 
-# This model is used for returning the hashed password of a user after authentication subset of UserData
-class UserInDB(UserData):
-    email: EmailStr
-    hashed_password: str
-
-
-class LoginCredentials(BaseModel):
-    email: EmailStr
-    password: str
-
-
 class CatProfile(BaseModel):
     owner_id: str
     name: str
@@ -53,6 +42,19 @@ class CatProfile(BaseModel):
     sex: bool # false = male, true = female
     bio: str
     image_ids: List[str] = [] # list of image ids
+
+
+# This model is used for returning a user from database
+class UserInDB(UserData):
+    email: EmailStr
+    hashed_password: str
+    cat_profile: CatProfile
+
+
+class LoginCredentials(BaseModel):
+    email: EmailStr
+    password: str
+
 
 class UserProfile(UserData):
     id: str
@@ -63,6 +65,7 @@ class UserProfile(UserData):
     search_radius: float = 10.0             # Search radius in km, default is 10.0
     cat_profile: CatProfile                 # User's cat profile
     hashed_password: str                    # Hashed password
+
 
 class Message(BaseModel):
     from_u: str

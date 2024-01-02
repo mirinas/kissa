@@ -52,9 +52,8 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # If user in database, grant token with 30min expiration
+    # If user in database, grant token with set expiration
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    
     access_token = create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
     )
@@ -76,6 +75,7 @@ async def authenticate_user(login_credentials: LoginCredentials):
 
 def get_user(email: str):
     user_dict = user_db.get_user_by_email(email)
+
     if user_dict:
         return UserInDB(**user_dict)
     else:
@@ -87,7 +87,7 @@ async def register(user_data: UserProfile):
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     hashed_password = pwd_context.hash(user_data.hashed_password)
 
-    # Convert the Pydantic model to a dictionary
+    # Convert the Pydantic model to a dictionary, to store hash password
     user_dict = user_data.dict()
     user_dict['hashed_password'] = hashed_password
 
