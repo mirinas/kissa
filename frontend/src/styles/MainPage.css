@@ -46,6 +46,7 @@
     font-weight: bold;
     font-style: italic;
     background: var(--accent);
+    cursor: pointer;
 
     border: unset;
     font-size: unset;
