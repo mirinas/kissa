@@ -21,6 +21,7 @@ azure-keyvault-secrets = "^4.7.0"
 azure-keyvault-keys = "^4.8.0"
 azure-keyvault-certificates = "^4.7.0"
 
+
 [tool.poetry.group.dev.dependencies]
 black = "23.12.0"
 
