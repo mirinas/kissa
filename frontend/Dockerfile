@@ -7,8 +7,7 @@ RUN yarn install
 COPY . .
 
 # Replace placeholder with actual API endpoint
-#ARG REACT_APP_KISSA_API_ENDPOINT=https://kissa-api.jollymoss-4112728e.uksouth.azurecontainerapps.io
-ARG REACT_APP_KISSA_API_ENDPOINT=http://0.0.0.0:8080
+ARG REACT_APP_KISSA_API_ENDPOINT=https://kissa-api-dev.jollymoss-4112728e.uksouth.azurecontainerapps.io
 RUN sed -i "s|placeholder|${REACT_APP_KISSA_API_ENDPOINT}|g" src/*.js
 
 

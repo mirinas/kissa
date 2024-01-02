@@ -17,6 +17,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "apistart": "cross-env REACT_APP_KISSA_API_ENDPOINT=https://kissa-api-dev.jollymoss-4112728e.uksouth.azurecontainerapps.io npm start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -38,5 +39,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
   }
 }
