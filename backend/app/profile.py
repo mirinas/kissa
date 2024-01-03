@@ -5,72 +5,90 @@ For handling profile data, such as profile changes.
 """
 from math import radians, sin, cos, sqrt, atan2
 
-from fastapi import APIRouter, HTTPException, File, UploadFile, status
-from database import UserDatabase 
-from models import CatProfile, UserProfile, user_profile, fake_cat, ConfirmResponse, ConfirmSuggestion
+from fastapi import APIRouter, HTTPException, File, UploadFile, status, Depends
+from database import Database
+from auth_ops import get_current_user
+from models import CatProfile, UserProfile, user_profile, fake_cat, ConfirmResponse, ConfirmSuggestion, UserData, UserPatch
 
 router = APIRouter(prefix="/profiles", tags=['profiles'])
+user_db = Database()
 
 
-@router.get("/{pid}", status_code=status.HTTP_200_OK)
-async def get_user_profile(pid: str) -> UserProfile:
-    return user_profile
+@router.get("/{pid}", status_code=status.HTTP_200_OK, response_model=UserProfile,
+            response_model_exclude={'hashed_password'})
+async def get_user_profile(pid: str, current_user: UserProfile = Depends(get_current_user)) -> UserProfile:
+    """
+    Get user profile data
+    :param pid: profile id
+    :param current_user: authenticated user
+    :return: user profile data
+    """
+    user = user_db.get_user_by_id(pid)
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+
+    res = list(filter(lambda u: u.uid == pid, current_user.potentials))
+    if len(res) == 0 and current_user.oid != pid:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail='You do not have permission to request this profile data')
+
+    return user
 
 
-@router.get("/{pid}/cat", status_code=status.HTTP_200_OK)
-async def get_cat_profile(pid: str) -> CatProfile:
-    return fake_cat
+@router.get("/{pid}/cat", status_code=status.HTTP_200_OK, response_model=CatProfile)
+async def get_cat_profile(pid: str, current_user: UserProfile = Depends(get_current_user)) -> CatProfile:
+    """
+    Get owner's cat profile data
+    :param pid: profile id
+    :param current_user: authenticated user
+    :return: cat profile with owner id
+    """
+    user = await get_user_profile(pid, current_user)
+    cat_dict = user['cat']
+    cat = CatProfile(**cat_dict, owner_id=user['oid'])
+    return cat
 
 
 @router.patch("/{pid}", status_code=status.HTTP_200_OK)
-async def update_profile(pid: str, profile: UserProfile) -> UserProfile:
-    return profile
+async def update_profile(pid: str, profile: UserPatch,
+                         current_user: UserProfile = Depends(get_current_user)) -> UserProfile:
+    """
+    Update profile by patch
+
+    # Note
+    `cat` field needs to accept the complete object if present
+    """
+    user = user_db.get_user_by_id(pid)
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+    if current_user.oid != pid:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail='You do not have permission to patch this profile')
+
+    updated_user = user_db.update_user(pid, profile.dict())
+    if updated_user is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail='Patch request was not successful')
+
+    return updated_user
 
 
 @router.delete("/{pid}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_profile(pid: str):
-    return pid
+async def delete_profile(pid: str, current_user: UserProfile = Depends(get_current_user)):
+    """
+    Delete profile
+    :param pid: user id to delete
+    :param current_user: authenticated user
+    :return: Nothing
+    """
+    user = user_db.get_user_by_id(pid)
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+    if current_user.oid != pid:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail='You do not have permission to patch this profile')
+
+    if not user_db.delete_user(pid):
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error during deletion")
 
 
-@router.get("/{pid}/suggest", status_code=status.HTTP_200_OK)
-async def get_suggestion(pid: str) -> CatProfile:
-    # TODO: return the next suggestion for the given profile
-    return fake_cat
-
-
-@router.post("/{pid}/suggest", status_code=status.HTTP_200_OK)
-async def confirm_suggestion(pid: str, confirmation: ConfirmSuggestion) -> ConfirmResponse:
-    r = ConfirmResponse()
-    r.matches_left = 3
-    r.is_matched = False
-    return r
-
-
-# Function to calculate the Haversine distance between two points
-# Source: https://louwersj.medium.com/calculate-geographic-distances-in-python-with-the-haversine-method-ed99b41ff04b
-def haversine_distance(lat1, lon1, lat2, lon2):
-    R = 6371  # Earth radius in kilometers
-
-    dlat = radians(lat2 - lat1)
-    dlon = radians(lon2 - lon1)
-
-    a = sin(dlat / 2) ** 2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlon / 2) ** 2
-    c = 2 * atan2(sqrt(a), sqrt(1 - a))
-
-    distance = R * c
-    return distance
-
-
-def find_matches_within_radius(user_profiles, user, max_distance):
-    matches = []
-
-    for other_user in user_profiles:
-        if user.user_id != other_user.user_id:
-            distance = haversine_distance(
-                user.latitude, user.longitude, other_user.latitude, other_user.longitude
-            )
-
-            if distance <= max_distance:
-                matches.append(other_user)
-
-    return matches

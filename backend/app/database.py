@@ -22,7 +22,7 @@ def pythonize(d: dict) -> dict:
     return d
 
 
-class UserDatabase:
+class Database:
     # Uses azures key vault
     def __init__(self):
         #KEY_VAULT_URL = "https://kissa-vault.vault.azure.net/"
@@ -71,7 +71,33 @@ class UserDatabase:
         except Exception as e:
             print("Error registering user: " + str(e))
             return None
-        
+
+    def update_user(self, user_id: str, user_dict: dict):
+        try:
+            oid = ObjectId(user_id)
+
+            # filter out keys with `None` values
+            filtered = {k: v for k, v in user_dict.items() if v is not None}
+
+            update = dict()
+            update['$set'] = filtered
+            if self.profile_collection.update_one({'_id': oid}, update, upsert=False).acknowledged:
+                return self.get_user_by_id(user_id)
+            else:
+                return None
+        except Exception as e:
+            print("Error updating user: " + str(e))
+            return None
+
+    def delete_user(self, user_id: str) -> bool:
+        try:
+            oid = ObjectId(user_id)
+            self.profile_collection.delete_one({'_id': oid})
+            return True
+        except Exception as e:
+            print("Error deleting user: " + str(e))
+            return False
+
     def upload_file(self, file_data, owner_id):
         # Stores the file in GridFS and is represented as a string id
         # GraphFS stores owner_id using the 'metadata' tag
@@ -128,5 +154,5 @@ class UserDatabase:
 
 
 if __name__ == "__main__":
-    db = UserDatabase()
+    db = Database()
     db.clear_database()

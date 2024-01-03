@@ -36,6 +36,29 @@ class UserData(BaseModel):
     cat: CatData  # User's cat profile
 
 
+class CatPatch(BaseModel):
+    """Cat patch model"""
+    name: str | None
+    age: int | None
+    breed: str | None
+    sex: bool | None
+    bio: str | None
+    image_ids: List[str] | None
+
+
+class UserPatch(BaseModel):
+    """User patch model"""
+    email: EmailStr | None
+    dob: str | None
+    gender: str | None
+    name: str | None
+    surname: str | None
+    bio: str | None
+    location: str | None
+    profile_pic_url: str | None
+    cat: CatData | None  # User's cat profile
+
+
 class CatProfile(CatData):
     """Can profile that is returned separately from the owner"""
     owner_id: str
@@ -83,8 +106,12 @@ class ConfirmSuggestion(BaseModel):
 
 
 class ConfirmResponse(BaseModel):
+    """
+    Represents a confirmation of matching
+    `match_id` is only set if match is bidirectional
+    """
     matches_left: int
-    is_matched: bool
+    match_id: Optional[str]
 
 
 fake_cat = CatProfile(
