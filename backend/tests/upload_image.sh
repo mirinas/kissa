@@ -5,16 +5,15 @@
 # user = true
 # cat = false
 
-if [ "$#" -ne 3 ]; then
-    echo "Usage: $0 <token> <is_profile_pic> <profile_id>"
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <token> <is_profile_pic>"
     exit 1
 fi
 
 TOKEN="$1"
 IS_PROFILE_PIC="$2"
-PROFILE_ID="$3"
 
-URL="http://0.0.0.0:8080/pictures/?is_profile_pic=$IS_PROFILE_PIC&cat_profile_id=$PROFILE_ID"
+URL="http://0.0.0.0:8080/pictures/?is_profile_pic=$IS_PROFILE_PIC"
 
 curl -X 'POST' \
   "$URL" \
