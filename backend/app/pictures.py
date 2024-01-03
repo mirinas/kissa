@@ -18,7 +18,7 @@ user_db = Database()
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def upload_picture(cat_profile_id: str, file: UploadFile = File(...), is_profile_pic: bool = Query(False), current_user: UserProfile = Depends(get_current_user)):
+async def upload_picture(file: UploadFile = File(...), is_profile_pic: bool = Query(False), current_user: UserProfile = Depends(get_current_user)):
     """Store the image in GridFS and update the user/cat profile according to is_profile_pic bool argument provided"""
 
     contents = await file.read()
