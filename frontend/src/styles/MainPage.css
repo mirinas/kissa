@@ -1,0 +1,84 @@
+.profile-view {
+    display: flex;
+    flex-direction: column;
+    background: white;
+    height: 100%;
+    border-radius: var(--border-radius);
+}
+
+.profile-view img {
+    width: 100%;
+    max-height: 70vh;
+    border-radius: inherit;
+    object-fit: cover;
+}
+
+.profile-view h3 > span {
+    font-size: 0.7em;
+}
+
+.description {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.description p {
+    flex: 1;
+}
+
+.description > * {
+    margin: 0.5em;
+}
+
+.match-options {
+    padding-top: 1em;
+    display: flex;
+    margin: 0;
+    gap: 1px;
+}
+
+.match-options button {
+    flex: 1;
+    padding: 0.5em;
+    color: white;
+    font-weight: bold;
+    font-style: italic;
+    background: var(--accent);
+
+    border: unset;
+    font-size: unset;
+    font-family: inherit;
+}
+
+.match-options button:first-child {
+    border-top-left-radius: var(--border-radius);
+    border-bottom-left-radius: var(--border-radius);
+}
+
+.match-options button:last-child {
+    border-top-right-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+}
+
+
+@media (min-width: 900px) {
+
+    .profile-view img {
+        width: auto;
+        height: 100%;
+        max-height: unset;
+        max-width: 60%;
+    }
+
+    .profile-view {
+        max-height: 80vh;
+        flex-direction: row;
+    }
+
+    .match-options {
+        flex: 0;
+        margin: 0 0.5em;
+    }
+}

@@ -1,0 +1,143 @@
+@import url('https://fonts.googleapis.com/css2?family=Sacramento&family=Urbanist:wght@300;500;700;800&display=swap');
+
+body {
+	background-color: var(--foreground2);
+}
+
+.title {
+	color: var(--accent2);
+	text-align: center;
+	font-family: 'Urbanist', sans-serif;
+	font-weight: 800;
+	font-size: 100px;
+}
+
+.bigtext {
+	color: var(--accent2);
+	text-align: center;
+	font-family: 'Urbanist', sans-serif;
+	font-weight: 700;
+	font-size: 50px;
+}
+
+.smalltext {
+	color: var(--accent2);
+	text-align: center;
+	font-family: 'Urbanist', sans-serif;
+	font-weight: 700;
+	font-size: 30px;
+}
+
+.smallertext {
+	color: var(--accent2);
+	text-align: center;
+	font-family: 'Urbanist', sans-serif;
+	font-weight: 500;
+	font-size: 25px;
+	margin-top: -25px;
+}
+
+.cursive {
+	color: var(--accent2);
+	text-align: center;
+	font-family: 'Sacramento', cursive;
+	font-size: 40px;
+}
+
+.items {
+	position: fixed;
+	bottom: 200px;
+	text-align: center;
+	width: 100%;
+}
+
+input[type="text"], input[type="email"], input[type="password"], input[type="date"] {
+	background: none;
+	color:gray;
+	font-family: 'Urbanist', sans-serif;
+	font-size: 20px;
+	border: 2px solid var(--accent2);
+	border-radius: 5px;
+	width: 80%;
+	padding: 5px;
+	margin: 5px;
+}
+
+textarea {
+	background: none;
+	color:gray;
+	font-family: 'Urbanist', sans-serif;
+	font-size: 20px;
+	border: 2px solid var(--accent2);
+	border-radius: 5px;
+	width: 90%;
+	padding: 5px;
+	margin: 5px;
+	margin-top: -25px;
+	height: 94px;
+}
+
+.btn_kissa {
+	background-color: var(--accent2);
+	color: #ffffff;
+	font-family: 'Urbanist', sans-serif;
+	font-size: 25px;
+	font-weight: 700;
+	text-decoration: none;
+	border: none;
+	border-radius: 5px;
+	display: inline-block;
+	cursor: pointer;
+	padding: 5px 6px;
+	width: 130px;
+	margin: 5px;
+}
+
+.light {
+	background-color: var(--accent2light);
+}
+
+#buttons {
+	margin-top: 50px;
+}
+
+.center_div {
+	position: absolute;
+	width: 80%;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.radio {
+	display: block;
+	position: relative;
+	padding-left: 35px;
+	margin-bottom: 12px;
+	cursor: pointer;
+	font-family: 'Urbanist', sans-serif;
+	font-size: 20px;
+	font-weight: 500;
+}
+
+/* Hide the browser's default radio button */
+.radio input {
+	position: absolute;
+	opacity: 0;
+	cursor: pointer;
+}
+
+.checkmark {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 25px;
+	width: 25px;
+	background: none;
+	border: 2px solid var(--accent2);
+	border-radius: 50%;
+}
+
+.radio input:checked~.checkmark {
+	background-color: var(--accent2light);
+}
