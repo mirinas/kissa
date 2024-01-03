@@ -8,7 +8,7 @@ from database import UserDatabase
 from models import Match, Message, MeetingConfirmation
 from typing import Any
 
-router = APIRouter(prefix="/match")
+router = APIRouter(prefix="/match", tags=["match"])
 
 
 @router.get("/{mid}", status_code=status.HTTP_200_OK, response_model=Match, response_model_exclude_unset=True)

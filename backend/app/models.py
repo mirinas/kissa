@@ -14,41 +14,31 @@ class Token(BaseModel):
     token_type: str
 
 
-class TokenData(BaseModel):
-    user_id: str | None = None
-
-
-class Picture(BaseModel):
-    id: str
-    data: str 
-    owner: str
+class CatData(BaseModel):
+    """Cat data model"""
+    name: str
+    age: int
+    breed: str
+    sex: bool  # false = male, true = female
+    bio: str
+    image_ids: List[str] = []  # list of image ids
 
 
 class UserData(BaseModel):
     email: EmailStr
-    dob: str # date of birth
+    dob: str  # date of birth
     gender: str
     name: str
     surname: str
-    location: str # "lat, lon" Used to find matches nearby
-    profile_pic_url: str
-
-
-class CatProfile(BaseModel):
-    owner_id: str
-    name: str
-    age: int
-    breed: str
-    sex: bool # false = male, true = female
     bio: str
-    image_ids: List[str] = [] # list of image ids
+    location: str  # "lat, lon" Used to find matches nearby
+    profile_pic_url: str
+    cat: CatData  # User's cat profile
 
 
-# This model is used for returning a user from database
-class UserInDB(UserData):
-    email: EmailStr
-    hashed_password: str
-    cat_profile: CatProfile
+class CatProfile(CatData):
+    """Can profile that is returned separately from the owner"""
+    owner_id: str
 
 
 class LoginCredentials(BaseModel):
@@ -57,14 +47,17 @@ class LoginCredentials(BaseModel):
 
 
 class UserProfile(UserData):
-    id: str
-    matches: Optional[List[str]] = None     # List of IDs of matches
-    matches_allowed: int = 3                # Number of matches allowed
-    selections: Optional[List[str]] = None  # Profiles that a user selected
-    potentials: Optional[List[str]] = None  # List of profiles nearby
-    search_radius: float = 10.0             # Search radius in km, default is 10.0
-    cat_profile: CatProfile                 # User's cat profile
+    oid: str
     hashed_password: str                    # Hashed password
+    matches: List[str] = []     # List of IDs of matches
+    matches_allowed: int = 3                # Number of matches allowed
+    selections: List[str] = []  # Profiles that a user selected
+    potentials: List[str] = []  # List of profiles nearby
+    search_radius: float = 10.0              # Search radius in km, default is 10.0
+
+
+class RegisterUser(UserData):
+    password: str
 
 
 class Message(BaseModel):
@@ -74,7 +67,7 @@ class Message(BaseModel):
 
 
 class Match(BaseModel):
-    id: str
+    oid: str
     user_1: str
     user_2: str
     meeting_confirmation: list[str] # list of confirmation who confirmed the meeting
@@ -86,7 +79,7 @@ class MeetingConfirmation(BaseModel):
 
 
 class ConfirmSuggestion(BaseModel):
-    id: str
+    oid: str
 
 
 class ConfirmResponse(BaseModel):
@@ -94,7 +87,7 @@ class ConfirmResponse(BaseModel):
     is_matched: bool
 
 
-fake_profile = CatProfile(
+fake_cat = CatProfile(
     owner_id="0",
     name="Fnuffy",
     age=11,
@@ -105,10 +98,11 @@ fake_profile = CatProfile(
 )
 
 user_profile = UserProfile(
-    id="abscd",
+    oid='some id',
     name="German",
     surname="test",
-    hashed_password="",
+    bio='I want to find love of my life',
+    hashed_password="H1H12D",
     age=20,
     email='gn2g21@soton.ac.uk',
     dob='30/05/2003',
@@ -119,6 +113,6 @@ user_profile = UserProfile(
     selections=["73", "22"],
     potentials=["9", "7"],
     search_radius=12.2,
-    cat_profile = fake_profile,
+    cat=fake_cat,
     profile_pic_url="test"
 )
