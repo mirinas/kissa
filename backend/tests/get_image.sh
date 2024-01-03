@@ -4,7 +4,7 @@
 # Gets and image based on the image id
 
 if [ "$#" -ne 2 ]; then
-    echo "Usage: $0 <token>"
+    echo "Usage: $0 <token> <img_id>"
     exit 1
 fi
 

@@ -1,17 +1,17 @@
 #!/bin/bash
 
-# Requires a single command-line argument to function, the authentication token.
-# Deletes as image from the cat profile
+# Requires two command-line arguments to function: the image ID and the authentication token.
+# Deletes an image from the cat profile
 
-# Check if a token argument is provided
-if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 <token>"
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <token> <image_id>"
     exit 1
 fi
 
-# Assign the first argument to a variable
 TOKEN="$1"
+IMG_ID="$2"
 
 curl -X 'DELETE' \
-  "http://0.0.0.0:8080/pictures/$TOKEN" \
-  -H 'accept: application/json'
+  "http://0.0.0.0:8080/pictures/$IMG_ID" \
+  -H 'accept: application/json' \
+  -H "Authorization: Bearer $TOKEN"

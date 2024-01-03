@@ -4,6 +4,7 @@ Models module.
 This module provides all the schema models and their types in the form of pydantic models
 """
 
+
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 import base64

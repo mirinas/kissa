@@ -5,24 +5,28 @@
 curl -X POST http://0.0.0.0:8080/profiles/register \
      -H "Content-Type: application/json" \
      -d '{
-         "id": "",
-         "username": "newuser",
-         "hashed_password": "newpassword",
-         "email": "newuser@example.com",
-         "name": "John",
-         "surname": "Doe",
-         "age": 30,
-         "dob": "1991-01-01",
-         "gender": "male",
-         "location": "52.5200, 13.4050",
-         "profile_pic_url": "http://example.com/profilepic.jpg",
-         "cat_profile": {
-             "owner_id": "",
-             "name": "Fluffy",
-             "age": 5,
-             "breed": "Siamese",
-             "sex": true,
-             "bio": "Loves to play all day",
-             "image_urls": ["http://example.com/catpic.jpg"]
-         }
-     }'
+	    "email" : "test@example.com",
+	    "dob" : "30/05/2003",
+        "password": "newpassword",
+	    "gender" : "male",
+	    "name" : "test",
+	    "surname" : "Nicolisin",
+	    "bio" : "I want to find love",
+	    "location" : "51.50722, -0.12750",
+	    "profile_pic_url" : "",
+	    "cat" : {
+	    	"name" : "Fluffy",
+	    	"age" : 10,
+	    	"breed" : "N/A",
+	    	"sex" : false,
+	    	"bio" : "He loves to hunt",
+	    	"image_ids" : [ ]
+	    },
+	    "id" : "",
+	    "hashed_password" : "",
+	    "matches" : [ ],
+	    "matches_allowed" : 3,
+	    "selections" : [ ],
+	    "potentials" : [ ],
+	    "search_radius" : 999
+}'

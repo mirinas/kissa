@@ -7,7 +7,7 @@
 # Password: mypassword
 
 if [ "$#" -ne 2 ]; then
-    echo "Usage: $0 <token>"
+    echo "Usage: $0 <username> <password>"
     exit 1
 fi
 

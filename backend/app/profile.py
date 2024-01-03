@@ -3,12 +3,15 @@ Profile module.
 
 For handling profile data, such as profile changes.
 """
+
+
 from math import radians, sin, cos, sqrt, atan2
 
 from fastapi import APIRouter, HTTPException, File, UploadFile, status, Depends
 from database import Database
 from auth_ops import get_current_user
 from models import CatProfile, UserProfile, user_profile, fake_cat, ConfirmResponse, ConfirmSuggestion, UserData, UserPatch
+
 
 router = APIRouter(prefix="/profiles", tags=['profiles'])
 user_db = Database()

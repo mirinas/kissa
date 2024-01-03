@@ -12,7 +12,7 @@ TOKEN="$1"
 
 # Perform the curl request
 curl -X 'GET' \
-    'http://0.0.0.0:8080/users/me' \
+    'http://0.0.0.0:8080/profiles/me' \
     -H 'accept: application/json' \
     -H "Authorization: Bearer $TOKEN"
 
