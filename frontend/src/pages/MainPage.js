@@ -15,25 +15,25 @@ const register_data = {
     "profile_pic_url": "string",
     "id": "string",
     "matches": [
-    "string"
-],
-    "matches_allowed": 0,
+        "string"
+    ],
+    "matches_allowed": 3,
     "selections": [
-    "string"
-],
+        "string"
+    ],
     "potentials": [
-    "string"
-],
+        "string"
+    ],
     "search_radius": 10,
     "cat_profile": {
-    "owner_id": "string",
+        "owner_id": "string",
         "name": "string",
         "age": 0,
         "breed": "string",
         "sex": true,
         "bio": "string",
         "image_ids": []
-},
+    },
     "hashed_password": "string"
 }
 
@@ -42,12 +42,13 @@ export default function MainPage() {
     useEffect(() => setSelected('main'), [setSelected]);
 
     const handleMatch = () => {
-        console.log(API_ENDPOINT);
-        axios.post(API_ENDPOINT + '/profiles/register', register_data)
-            .then(r => console.log(r.data))
-            .catch(e => console.error(e));
-
-        // axios.get(API_ENDPOINT).then(res => console.log(res.data));
+        axios.post(API_ENDPOINT + '/profiles/token', {
+            username: 'newuser@example.com',
+            password: 'newpassword'
+        }, {
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        }).then(r => console.log(r.data)
+        ).catch(e => console.error(e));
     }
 
     return (

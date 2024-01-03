@@ -5,7 +5,7 @@ import HSlider from "../components/HSlider";
 
 export default function ProfilePage() {
     const {setSelected} = useOutletContext();
-    useEffect(() => setSelected('profile'));
+    useEffect(() => setSelected('profile'), [setSelected]);
 
     const openedState = useState('Preferences');
     const rangeState = useState(20);
