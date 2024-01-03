@@ -13,8 +13,7 @@ router = APIRouter(prefix="/profile")
 
 @router.post("/{pid}", status_code=status.HTTP_201_CREATED)
 async def create_profile(pid: str, profile: CatProfile) -> UserProfile:
-    # TODO: Logic to save profile data to the database
-    # perhaps after registering, the user is taken to a screen to fill in their info?
+    # TODO: Remove this? Registering does the same thing as this
 
     return user_profile
 
