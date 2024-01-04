@@ -264,18 +264,30 @@ function StateTwo({ handleRegister,
     )
 }
 
-// Ask user for picture for verification (ai authentication still needs to be implemented)
+// Ask user for picture verification (ai authentication needs to be implemented)
 function StateThree({ previewImage, handleSelectImage, handleUploadImage, uploadedImage }) {
     return (
         <div className="center_div">
-            <div className='smalltext'>
                 <h2 className='smalltext'>How do you look?</h2>
                 <p className='smallertext'> We <strong><em>won't</em></strong> share it publicly</p>
-                <input type="file" onChange={handleSelectImage} />
-                {previewImage && <img src={previewImage} alt="Preview" />}
+
+                <div className='smalltext'>
+                    <input type="file" id="fileInput" className="file-input" onChange={handleSelectImage} />
+                    <label htmlFor="fileInput" className="btn_kissa">Choose File</label>
+                </div>
+
+                <br></br>
+                <div className='smalltext'>
+                    {previewImage && <img src={previewImage} alt="Preview" className="user-image-preview" />}
+                </div>
+                <br></br>
+
                 {uploadedImage && <img src={uploadedImage} alt="Uploaded" />}
-                <button onClick={handleUploadImage}>Upload</button>
-            </div>
+
+
+                <div className='smalltext'>
+                    <button className="btn_kissa" onClick={handleUploadImage}>Upload</button>
+                </div>
         </div>
     );
 }

@@ -141,3 +141,18 @@ textarea {
 .radio input:checked~.checkmark {
 	background-color: var(--accent2light);
 }
+
+/* Hide the file upload default styling */
+.file-input {
+    display: none;
+}
+
+.user-image-preview {
+    max-width: 500px; 
+    max-height: 500px; 
+    width: auto;
+    height: auto;
+    border-radius: 15%; 
+    object-fit: cover; 
+    border: 10px solid #c75050; 
+}
