@@ -6,7 +6,7 @@ const cookie = new Cookies();
 
 export default function RegisterPage() {
 
-    const [state, setState] = useState(2);
+    const [state, setState] = useState(3);
 
     const [previewImage, setPreviewImage] = useState(null);
     const [uploadedImage, setUploadedImage] = useState(null);
@@ -47,17 +47,24 @@ export default function RegisterPage() {
             }),
         })
         .then(async (response) => {
-            const data = await response.json();
-            cookie.set("access_token", data.access_token, {
-                path: '/', // sets cookie at root level, make it accessible to all domains
-
-                // TODO: Set other options like expiration and whatnot
-            });
-
-            console.log("Server returned: ");
-            console.log(data);
+            console.log("Server returned this for registration: ");
+            console.log(response);
             console.log("\n");
-            setState(3);  
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("Server returned an error: ", errorData);
+                throw new Error(`HTTP error! status: ${response.status}`);
+            } else {
+                const data = await response.json();
+                cookie.set("access_token", data.access_token, {
+                    path: '/', // sets cookie at root level, make it accessible to all domains
+
+                    // TODO: Set other options like expiration and whatnot
+                });
+
+                setState(3);  
+            }
         })
         .catch((err) => {
             console.error('Registration Error:', err);
