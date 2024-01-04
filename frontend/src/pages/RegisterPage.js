@@ -5,45 +5,46 @@ import '../styles/LoginRegister.css';
 const cookie = new Cookies();
 
 export default function RegisterPage() {
+
     const [state, setState] = useState(2);
+
     const [previewImage, setPreviewImage] = useState(null);
     const [uploadedImage, setUploadedImage] = useState(null);
 
-    const register = () => {
-        const userData = {
-            "email": "test@example.com",
-            "dob": "30/05/2003",
-            "password": "newpassword",
-            "gender": "male",
-            "name": "test",
-            "surname": "Nicolisin",
-            "bio": "I want to find love",
-            "location": "51.50722, -0.12750",
-            "profile_pic_url": "",
-            "cat": {
-                "name": "Fluffy",
-                "age": 10,
-                "breed": "N/A",
-                "sex": false,
-                "bio": "He loves to hunt",
-                "image_ids": []
-            },
-            "id": "",
-            "hashed_password": "",
-            "matches": [],
-            "matches_allowed": 3,
-            "selections": [],
-            "potentials": [],
-            "search_radius": 999
-        };
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
+    const [surname, setSurname] = useState('');
+    const [dob, setDob] = useState('');
+    const [bio, setBio] = useState('');
+    const [gender, setGender] = useState('');
 
+    const handleRegister = async (event) => {
+        event.preventDefault();
         fetch("http://localhost:8000/profiles/register", {
             method: 'POST',
             headers: {
-                'accept': 'application/json',
                 'Content-Type': 'application/json', 
             },
-            body: JSON.stringify(userData)
+            body: JSON.stringify({
+                'email': email,
+                'password': password,
+                'name': name,
+                'surname': surname,
+                'dob': dob,
+                'bio': bio,
+                'gender': gender,
+                'location': '',
+                'profile_pic_url': '',
+                'cat': {
+                    'name': '',
+                    'age': 0,
+                    'breed': '',
+                    'sex': false,
+                    'bio': '',
+                    'image_ids': []
+                },
+            }),
         })
         .then(async (response) => {
             const data = await response.json();
@@ -53,7 +54,9 @@ export default function RegisterPage() {
                 // TODO: Set other options like expiration and whatnot
             });
 
-            console.log("Registration data sent to server");
+            console.log("Server returned: ");
+            console.log(data);
+            console.log("\n");
             setState(3);  
         })
         .catch((err) => {
@@ -90,15 +93,37 @@ export default function RegisterPage() {
         fileReader.readAsDataURL(file);
     }
 
-    // User must rgister first before performing any other actions such as image uploads as the auth token is needed
+    // User must register first before performing any other actions such as image uploads as the auth token is needed
     const renderContent = () => {
         switch (state) {
             case 1:
                 return <StateOne />;
             case 2:
-                return <StateTwo 
-                            register={register}
-                        />;
+                return ( 
+                    <StateTwo 
+                        handleRegister={handleRegister}
+
+                        email={email}
+                        setEmail={setEmail}
+
+                        password={password}
+                        setPassword={setPassword}
+
+                        name={name}
+                        setName={setName}
+                        
+                        surname={surname}
+                        setSurname={setSurname}
+
+                        dob={dob}
+                        setDob={setDob}
+
+                        bio={bio}
+                        setBio={setBio}
+
+                        gender={gender}
+                        setGender={setGender}
+                    />);
             case 3:
                 return (
                     <StateThree 
@@ -130,53 +155,109 @@ function StateOne() {
 }
 
 // Ask user to provide profile data
-function StateTwo({ register }) {
+function StateTwo({ handleRegister, 
+                    email, 
+                    setEmail, 
+                    password, 
+                    setPassword, 
+                    name, 
+                    setName, 
+                    surname, 
+                    setSurname, 
+                    dob, 
+                    setDob, 
+                    bio, 
+                    setBio, 
+                    gender, 
+                    setGender}) {
     return (
-        <div className="center_div">
 
-            <div>
-                <h2 className='smalltext'>How can we call you?</h2>
-                <input type="text" placeholder="Name"></input>
-                <input type="text" placeholder="Surname"></input>
-                <input type="text" placeholder="email"></input>
-            </div>
-
-            <div>
-                <h2 className='smalltext'>What's your sex?</h2>
-                <label class="radio">Male
-                    <input type="radio" name="radio"></input>
-                    <span class="checkmark"></span>
-                </label>
-                <label class="radio">Female
-                    <input type="radio" name="radio"></input>
-                    <span class="checkmark"></span>
-                </label>
-                <label class="radio">Other
-                    <input type="radio" name="radio"></input>
-                    <span class="checkmark"></span>
-                </label>
-            </div>
-
-            <div>
-                <h2 className='smalltext'>Why do you want to join us?</h2>
-                <textarea placeholder="I want to find other cat people" name="multilineInput" rows="4" cols="50"></textarea>
-            </div>
-
-            <div>
-                <h2 className='smalltext'>When were you born?</h2>
-                <input type="date" placeholder="dd/mm/yy"></input>
-            </div>
+        <form onSubmit={handleRegister}>
 
             <div className="center_div">
+
                 <div className='smalltext'>
-                    <button onClick={register}>Test</button>
+                    <h2 className='smalltext'>How can we call you?</h2>
+                    <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
+                    <input type="text" placeholder="Surname" value={surname} onChange={(e) => setSurname(e.target.value)} />
+
+                    <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                </div>
+
+                <div>
+                    <h2 className='smalltext'>What's your sex?</h2>
+
+                    <label className="radio">
+                        Male
+                        <input 
+                            type="radio" 
+                            name="gender" 
+                            value="Male" 
+                            checked={gender === 'Male'} 
+                            onChange={(e) => setGender(e.target.value)}
+                        />
+                        <span className="checkmark"></span>
+                    </label>
+                    <label className="radio">
+                        Female
+                        <input 
+                            type="radio" 
+                            name="gender" 
+                            value="Female" 
+                            checked={gender === 'Female'} 
+                            onChange={(e) => setGender(e.target.value)}
+                        />
+                        <span className="checkmark"></span>
+                    </label>
+                    <label className="radio">
+                        Other
+                        <input 
+                            type="radio" 
+                            name="gender" 
+                            value="Other" 
+                            checked={gender === 'Other'} 
+                            onChange={(e) => setGender(e.target.value)}
+                        />
+                        <span className="checkmark"></span>
+                    </label>
+                </div>
+
+                <div>
+                    <h2 className='smalltext'>Why do you want to join us?</h2>
+
+                    <div className='smalltext'>
+                        <textarea 
+                            placeholder="I want to find other cat people" 
+                            value={bio} 
+                            onChange={(e) => setBio(e.target.value)} 
+                            rows="4" 
+                            cols="50"
+                        ></textarea>
+                    </div>
+
+                </div>
+
+                <div>
+                    <h2 className='smalltext'>When were you born?</h2>
+
+                    <div className='smalltext'>
+                        <input type="date" placeholder="dd/mm/yy" value={dob} onChange={(e) => setDob(e.target.value)} />
+                    </div>
+                </div>
+
+                <br></br>
+                <div className='smalltext'>
+                    <button className="btn_kissa" onClick={handleRegister}>Next</button>
                 </div>
             </div>
-        </div>
+
+        </form>
+
     )
 }
 
-// Ask user for picture for verification (still needs to be implemented)
+// Ask user for picture for verification (ai authentication still needs to be implemented)
 function StateThree({ previewImage, handleSelectImage, handleUploadImage, uploadedImage }) {
     return (
         <div className="center_div">
@@ -192,7 +273,7 @@ function StateThree({ previewImage, handleSelectImage, handleUploadImage, upload
     );
 }
 
-// ASk the user to fill in cat profile information
+// Ask the user to fill in cat profile information
 function StateFour({ }) {
     return (
         <>
