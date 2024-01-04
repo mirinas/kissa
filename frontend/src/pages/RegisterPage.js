@@ -6,7 +6,7 @@ const cookie = new Cookies();
 
 export default function RegisterPage() {
 
-    const [state, setState] = useState(3);
+    const [state, setState] = useState(4);
 
     const [previewImage, setPreviewImage] = useState(null);
     const [uploadedImage, setUploadedImage] = useState(null);
@@ -100,7 +100,8 @@ export default function RegisterPage() {
         fileReader.readAsDataURL(file);
     }
 
-    // User must register first before performing any other actions such as image uploads as the auth token is needed
+    // User must register first before performing any other actions such as image uploads as the auth token is granted after
+    // successful registration or login
     const renderContent = () => {
         switch (state) {
             case 1:
