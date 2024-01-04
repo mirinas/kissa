@@ -23,8 +23,16 @@ resource "azurerm_key_vault" "kissa_vault" {
     ]
 
     secret_permissions = [
+      "Get",
       "Set",
-      "List"
+      "List",
+      "Update"
     ]
   }
+}
+
+resource "azurerm_key_vault_secret" "secret" {
+  name         = "SECRET-KEY-TOKEN"
+  value        = "1cd38e0a7004b1694efbf1908bfc32ea0f858bb170e14b73ecc5fc1b412ecd20"
+  key_vault_id = azurerm_key_vault.kissa_vault.id
 }
