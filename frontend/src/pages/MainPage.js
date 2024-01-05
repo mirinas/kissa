@@ -5,38 +5,6 @@ import {useEffect} from "react";
 import {API_ENDPOINT} from "../globals";
 import axios from 'axios'
 
-const register_data = {
-    "email": "user@example.com",
-    "dob": "string",
-    "gender": "string",
-    "name": "string",
-    "surname": "string",
-    "location": "string",
-    "profile_pic_url": "string",
-    "id": "string",
-    "matches": [
-        "string"
-    ],
-    "matches_allowed": 3,
-    "selections": [
-        "string"
-    ],
-    "potentials": [
-        "string"
-    ],
-    "search_radius": 10,
-    "cat_profile": {
-        "owner_id": "string",
-        "name": "string",
-        "age": 0,
-        "breed": "string",
-        "sex": true,
-        "bio": "string",
-        "image_ids": []
-    },
-    "hashed_password": "string"
-}
-
 export default function MainPage() {
     const {setSelected} = useOutletContext();
     useEffect(() => setSelected('main'), [setSelected]);
