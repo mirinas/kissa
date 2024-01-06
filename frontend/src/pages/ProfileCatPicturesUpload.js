@@ -63,24 +63,20 @@ function CatPicturesUpload({ setState }) {
 
             <div className='smalltext'>
                 <input type="file" id="catImageInput" className="file-input" onChange={handleSelectImageCat} multiple />
-                <label htmlFor="catImageInput" className="btn_kissa">Select images(3)</label>
-                <br></br>
+            </div>
 
-                <div>
+                <div className="cat_image_container">
                     {previewCatImages.map((image, index) => (
-                        <img key={index} src={image} alt={""} className="image-preview" />
+                        <img key={index} src={image} alt={""} className="image_preview_cat" />
                     ))}
                 </div>
-            </div>
 
-            <div>
-                {uploadedCatImages.map((url, index) => (
-                    <img key={index} src={url} alt="Uploaded" className="image-preview" />
-                ))}
+            <div className='smalltext'>
+                <label htmlFor="catImageInput" className="btn_kissa">Select images(3)</label>
+                <br></br>
+                <button className="btn_kissa" onClick={handleUploadCatImages}>Upload</button>
+            
             </div>
-
-            <br></br>
-            <button className="btn_kissa" onClick={handleUploadCatImages}>Upload</button>
         </div>
     );
 }

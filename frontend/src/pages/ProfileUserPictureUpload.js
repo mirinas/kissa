@@ -52,11 +52,9 @@ function UserPictureUpload({ setState }) {
 
                 <br></br>
                 <div className='smalltext'>
-                    {previewImage && <img src={previewImage} alt="Preview" className="user-image-preview" />}
+                    {previewImage && <img src={previewImage} alt="Preview" className="user_image_preview" />}
                 </div>
                 <br></br>
-
-                {uploadedImage && <img src={uploadedImage} alt="Uploaded" />}
 
 
                 <div className='smalltext'>
