@@ -7,6 +7,7 @@ and then updates the corresponding cat profile by adding the new file ID.
 All these functions are authorised-only operations
 """
 
+from typing import List
 from fastapi import APIRouter, HTTPException, File, UploadFile, status, Depends, Query
 from database import Database
 from models import CatProfile, UserProfile
@@ -18,8 +19,8 @@ user_db = Database()
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def upload_picture(file: UploadFile = File(...), is_profile_pic: bool = Query(False), current_user: UserProfile = Depends(get_current_user)):
-    """Store the image in GridFS and update the user/cat profile according to is_profile_pic bool argument provided"""
+async def upload_picture(file: UploadFile = File(...), current_user: UserProfile = Depends(get_current_user)):
+    """Store the image in GridFS and update the user profile"""
 
     contents = await file.read()
     file_id = user_db.upload_file(contents, current_user.oid)
@@ -27,19 +28,32 @@ async def upload_picture(file: UploadFile = File(...), is_profile_pic: bool = Qu
     if not file_id:
         raise HTTPException(status_code=500, detail="Failed to upload file")
 
-    if is_profile_pic:
-        # Update the user's profile picture ID
-        updated_user = user_db.update_user_profile_pic(current_user.oid, file_id)
-        if not updated_user:
-            raise HTTPException(status_code=500, detail="Failed to update user profile")
-    else:
-        # Add cat's image to profile 
+    updated_user = user_db.update_user_profile_pic(current_user.oid, file_id)
+    if not updated_user:
+        raise HTTPException(status_code=500, detail="Failed to update user profile")
+
+    return {"file_id": str(file_id)}
+
+@router.post("/cat", status_code=status.HTTP_201_CREATED)
+async def upload_cat_pictures(files: List[UploadFile] = File(...), current_user: UserProfile = Depends(get_current_user)):
+    """Store multiple images in GridFS and update the user's cat profile"""
+
+    file_ids = []
+
+    for file in files:
+        contents = await file.read()
+        file_id = user_db.upload_file(contents, current_user.oid)
+
+        if not file_id:
+            raise HTTPException(status_code=500, detail="Failed to upload file")
+
         updated_cat = user_db.update_cat_profile_images(current_user.oid, file_id)
         if not updated_cat:
             raise HTTPException(status_code=500, detail="Failed to update cat profile")
 
-    return {"file_id": str(file_id)}
+        file_ids.append(str(file_id))
 
+    return {"file_ids": file_ids}
 
 @router.get("/{pid}", status_code=status.HTTP_200_OK)
 async def get_picture(pid: str, current_user: UserProfile = Depends(get_current_user)):

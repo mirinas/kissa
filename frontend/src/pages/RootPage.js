@@ -1,11 +1,28 @@
-import {Link} from "react-router-dom";
+import Cookies from 'universal-cookie';
+import { useNavigate } from 'react-router-dom';
 
 export default function RootPage() {
+    const cookie = new Cookies();
+    const accessToken = cookie.get('access_token');
+    const navigate = useNavigate();
+
+    if (accessToken) {
+        setTimeout(() => navigate('/app/'), 0);
+        return null;
+    }
+
+    const goToLogin = () => {
+        navigate('/acc/login');
+    }
+
+    const goToRegister = () => {
+        navigate('/acc/register');
+    }
+
     return (
-        <>
-            <Link to={'/acc/login'}>Login</Link>
-            <Link to={'/acc/register'}>Register</Link>
-            <p>Maybe check for saved session to skip login process here</p>
-        </>
+        <div className='center_div'>
+            <button className="btn_kissa" onClick={goToLogin}>Login</button>
+            <button className="btn_kissa" onClick={goToRegister}>Join us</button>
+        </div>
     );
 }

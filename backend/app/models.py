@@ -39,29 +39,31 @@ class UserData(BaseModel):
 
 class CatPatch(BaseModel):
     """Cat patch model"""
-    name: str | None
-    age: int | None
-    breed: str | None
-    sex: bool | None
-    bio: str | None
-    image_ids: List[str] | None
+    name: str = None
+    age: int = None
+    breed: str = None
+    sex: bool = None
+    bio: str = None
+    image_ids: List[str] = None
 
 
+# This model can assign attributes to default None as it allows for
+# partial patching of db entries
 class UserPatch(BaseModel):
     """User patch model"""
-    email: EmailStr | None
-    dob: str | None
-    gender: str | None
-    name: str | None
-    surname: str | None
-    bio: str | None
-    location: str | None
-    profile_pic_url: str | None
-    cat: CatData | None  # User's cat profile
+    email: Optional[EmailStr] = None
+    dob: Optional[str] = None
+    gender: Optional[str] = None
+    name: Optional[str] = None
+    surname: Optional[str] = None
+    bio: Optional[str] = None
+    location: Optional[str] = None
+    profile_pic_url: Optional[str] = None
+    cat: Optional[CatPatch] = None
 
 
 class CatProfile(CatData):
-    """Can profile that is returned separately from the owner"""
+    """Cat profile that is returned separately from the owner"""
     owner_id: str
 
 
