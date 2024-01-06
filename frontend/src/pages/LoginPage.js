@@ -2,15 +2,32 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Cookies from "universal-cookie";
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 import '../styles/LoginRegister.css';
 
+
 const cookie = new Cookies();
+const expiryCheckInterval = 6000;
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const navigate = useNavigate();
+
+    const isExpired = (exp) => {
+        const currentTime = Math.floor(Date.now()/1000);
+
+        //console.log("Current time: " + currentTime);
+        //console.log("Expiry: " + exp);
+
+        if (exp && currentTime > exp) {
+            cookie.remove("access_token");
+            navigate('/acc/login');
+        
+            console.log("Logged out, cookie has expired - please log in again.");
+        }
+    }
 
     const handleLogin = async (event) => {
 
@@ -33,15 +50,27 @@ export default function LoginPage() {
             else {
                 // Get auth token and make cookie
                 const data = await response.json();
-                cookie.set("access_token", data.access_token, {
-                    path: '/', // sets cookie at root level, make it accessible to all domains
+                const token = data.access_token; 
+                const decodedToken = jwtDecode(token);
+                const exp = decodedToken.exp;
 
-                    // TODO: Set other options like expiration and whatnot
+                console.log("Cookie assigned: " + token);
+                cookie.set("access_token", token, {
+                    path: '/',
                 });
 
                 navigate('/app/');
 
-                console.log('Login Successful, data returned: ', data);
+                const intervalId = setInterval(() => {
+                    const accessCookie = cookie.get("access_token");
+                    if (accessCookie && exp) {
+                        isExpired(exp);
+                    }
+                }, expiryCheckInterval);
+                
+                return () => {
+                    clearInterval(intervalId);                
+                }
             }
         } catch (error) {
             console.error('Login Error:', error);
@@ -51,7 +80,7 @@ export default function LoginPage() {
 
     return (
         <>
-            <div>
+            <div className="login_container">
                 <div>
                     <h1 className="title">kissa</h1>
                     <p className="cursive">Find your purrfect soulmate</p>

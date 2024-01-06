@@ -10,6 +10,7 @@ body {
 	font-family: 'Urbanist', sans-serif;
 	font-weight: 800;
 	font-size: 100px;
+	margin-bottom: 20px; 
 }
 
 .bigtext {
@@ -49,6 +50,7 @@ body {
 	bottom: 200px;
 	text-align: center;
 	width: 100%;
+	margin-top: 100px; 
 }
 
 input[type="text"], input[type="email"], input[type="password"], input[type="date"] {

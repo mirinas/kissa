@@ -12,10 +12,6 @@ from auth_ops import *
 user_db = Database()
 router = APIRouter(prefix='/profiles', tags=['auth'])
 
-
-
-
-
 @router.post("/token", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     login_credentials = LoginCredentials(email=form_data.username, password=form_data.password)

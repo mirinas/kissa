@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 import Cookies from 'universal-cookie';
 
 function UserForm({ setState })
 { 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [passwordConfirm, setPasswordConfirm] = useState('');
     const [name, setName] = useState('');
     const [surname, setSurname] = useState('');
     const [dob, setDob] = useState('');
@@ -18,9 +21,32 @@ function UserForm({ setState })
     const [catBio, setCatBio] = useState('');
    
     const cookie = new Cookies();
+    const expiryCheckInterval = 6000;
+    const navigate = useNavigate();
+
+    const isExpired = (exp) => {
+        const currentTime = Math.floor(Date.now()/1000);
+
+        //console.log("Current time: " + currentTime);
+        //console.log("Expiry: " + exp);
+
+        if (exp && currentTime > exp) {
+            cookie.remove("access_token");
+            navigate('/acc/login');
+        
+            console.log("Logged out, cookie has expired - please log in again.");
+        }
+    }
 
     const handleRegister = async (event) => {
+
         event.preventDefault();
+
+        if (password !== passwordConfirm) {
+            console.error("Passwords do not match");
+            return;
+        }
+
         fetch("http://localhost:8000/profiles/register", {
             method: 'POST',
             headers: {
@@ -56,17 +82,31 @@ function UserForm({ setState })
                 console.error("Server returned an error: ", errorData);
                 throw new Error(`HTTP error! status: ${response.status}`);
             } else {
-                const data = await response.json();
-                cookie.set("access_token", data.access_token, {
-                    path: '/', // sets cookie at root level, make it accessible to all domains
-
-                    // TODO: Set other options like expiration and whatnot
-                });
-
                 if (cookie) {
                     console.log("\nClient has been assigned a cookie: ");
-                    console.log(cookie)
+
+                    const data = await response.json();
+                    const token = data.access_token; 
+                    const decodedToken = jwtDecode(token);
+                    const exp = decodedToken.exp;
+
+                    console.log("Cookie assigned: " + token);
+                    cookie.set("access_token", token, {
+                        path: '/',
+                    });
+
+                    const intervalId = setInterval(() => {
+                        const accessCookie = cookie.get("access_token");
+                        if (accessCookie && exp) {
+                            isExpired(exp);
+                        }
+                    }, expiryCheckInterval);
+                
                     setState(2);
+
+                    return () => {
+                        clearInterval(intervalId);                
+                    }
                 }
             }
         })
@@ -86,6 +126,7 @@ function UserForm({ setState })
 
                     <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
                     <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                    <input type="password" placeholder="Confirm password" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} />
                 </div>
 
                 <h2 className='smalltext'>What's your sex?</h2>
