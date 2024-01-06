@@ -22,7 +22,7 @@ function UserPictureUpload({ setState }) {
 
             }).then(async (response) => {
                 //const imageResponse = await response.json();
-                setState.setState = 4;
+                setState(3);
             }).catch((err) => {
                 console.log("Image upload error: ", err);
             });

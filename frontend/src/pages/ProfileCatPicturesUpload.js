@@ -27,7 +27,7 @@ function CatPicturesUpload({ setState }) {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                setState.setState(3);
+                setState(4);
                 return response.json();
             })
             .then(imageResponse => {

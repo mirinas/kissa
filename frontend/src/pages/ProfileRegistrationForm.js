@@ -66,7 +66,7 @@ function UserForm({ setState })
                 if (cookie) {
                     console.log("\nClient has been assigned a cookie: ");
                     console.log(cookie)
-                    setState.setState(2);
+                    setState(2);
                 }
             }
         })
