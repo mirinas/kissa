@@ -30,20 +30,6 @@ code {
   display: none;
 }
 
-.slider-container {
-  display: flex;
-  gap: 1em;
-  align-items: center;
-  font-size: 0.8em;
-  max-width: 600px;
-}
-
-.slider-container .slider {
-  margin: 0.5em 0;
-  flex: 1;
-}
-
-
 
 
 

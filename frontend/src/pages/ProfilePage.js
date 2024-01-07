@@ -5,42 +5,6 @@ import HSlider from "../components/HSlider";
 import {API_ENDPOINT} from "../globals";
 import axios from 'axios';
 
-
-
-const register_data = {
-    "email": "user@example.com",
-    "dob": "string",
-    "gender": "string",
-    "name": "string",
-    "surname": "string",
-    "location": "string",
-    "profile_pic_url": "string",
-    "id": "string",
-    "matches": [
-        "string"
-    ],
-    "matches_allowed": 3,
-    "selections": [
-        "string"
-    ],
-    "potentials": [
-        "string"
-    ],
-    "search_radius": 10,
-    "cat_profile": {
-        "owner_id": "string",
-        "name": "string",
-        "age": 0,
-        "breed": "string",
-        "sex": true,
-        "bio": "string",
-        "image_ids": []
-    },
-    "hashed_password": "string"
-}
-
-
-
 export default function ProfilePage() {
     const {setSelected} = useOutletContext();
     useEffect(() => setSelected('profile'), [setSelected]);
@@ -50,24 +14,6 @@ export default function ProfilePage() {
     const matchingPrefsState = useState(
         {'males': true, 'females': false, 'others': false}
     );
-
-
-    useEffect(() => {
-
-        console.log(API_ENDPOINT);
-        axios.post(API_ENDPOINT + '/profiles/register', register_data)
-            .then(r => console.log(r.data));
-
-    }, [API_ENDPOINT, register_data]);
-
-
-    const handleLogin = () => {
-
-        axios.post(API_ENDPOINT + '/profiles/register', {
-            username: document.getElementById('name')
-        }).then(r => console.log(r.data));
-    }
-
 
 
     return (

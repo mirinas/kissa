@@ -1,5 +1,6 @@
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
+import '../styles/components.css';
 export default function HSlider({state, min, max, label = '', step = 1}) {
     const [value, setValue] = state;
     return <div className={'slider-container'}>
