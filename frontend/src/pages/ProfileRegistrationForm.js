@@ -60,8 +60,10 @@ function UserForm({ setState })
                 'dob': dob,
                 'bio': bio,
                 'gender': gender,
-                'location': '',
                 'profile_pic_url': '',
+                'location': [],
+                'age_range': [],
+                'preference': '',
                 'cat': {
                     'name': catName,
                     'age': catAge,

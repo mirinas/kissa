@@ -14,7 +14,7 @@ export default function MainPage() {
     return (
         <>
             <div className={'profile-view'}>
-                <img src={cat}/>
+                <img src={cat} alt={""}/>
                 <div className={'description'}>
                     <h3>Haika <span>1.5km</span></h3>
                     <p>Description about the owner and the cat</p>
