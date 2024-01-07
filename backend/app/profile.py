@@ -134,7 +134,8 @@ def find_matches_within_radius(user: UserProfile, user_profiles: list[UserProfil
 
             user_age = current_age(other_user.dob)
             if distance <= max_distance and user.preference == other_user.gender and other_user.oid not in user.skips\
-                    and user.age_range[0] <= user_age <= user.age_range[1]:
+                    and user.age_range[0] <= user_age <= user.age_range[1]\
+                    and other_user not in user.selections:
                 matches.append(other_user)
 
     return list(map(lambda u: u.oid, matches))

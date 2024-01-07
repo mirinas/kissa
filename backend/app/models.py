@@ -96,7 +96,7 @@ class Match(BaseModel):
     oid: str
     user_1: str
     user_2: str
-    meeting_confirmation: list[str] # list of confirmation who confirmed the meeting
+    meeting_confirmation: list[str]  # list of confirmation who confirmed the meeting
     messages: list[Message]
 
 
@@ -108,13 +108,17 @@ class ConfirmSuggestion(BaseModel):
     oid: str
 
 
+class SkipSuggestion(BaseModel):
+    oid: str
+
+
 class ConfirmResponse(BaseModel):
     """
     Represents a confirmation of matching
     `match_id` is only set if match is bidirectional
     """
     matches_left: int
-    match_id: Optional[str]
+    match_id: str | None
 
 
 fake_cat = CatProfile(
