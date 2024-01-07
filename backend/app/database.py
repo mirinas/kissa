@@ -52,7 +52,7 @@ class Database:
             return user 
         return None
 
-    def get_user_by_id(self, user_id: str):
+    def get_user_by_id(self, user_id: str) -> dict | None:
         if not ObjectId.is_valid(user_id):
             print('User id is not valid', user_id)
             return None
@@ -72,7 +72,7 @@ class Database:
             print("Error registering user: " + str(e))
             return None
 
-    def update_user(self, user_id: str, user_dict: dict):
+    def update_user(self, user_id: str, user_dict: dict) -> dict | None:
         try:
             oid = ObjectId(user_id)
 
@@ -88,6 +88,9 @@ class Database:
         except Exception as e:
             print("Error updating user: " + str(e))
             return None
+
+    def get_all_users(self):
+        list(self.profile_collection.find())
 
     def delete_user(self, user_id: str) -> bool:
         try:

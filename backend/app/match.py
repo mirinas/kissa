@@ -58,35 +58,13 @@ def post_message(mid: int, msg: Message):
 
 
 @router.post("/{mid}/confirm", status_code=status.HTTP_200_OK)
-def confirm_meeting(mid: int, confirmation: MeetingConfirmation):
+def confirm_match(mid: int, confirmation: MeetingConfirmation):
+    """Likes the given profile"""
     pass
 
 
-# Function to calculate the Haversine distance between two points
-# Source: https://louwersj.medium.com/calculate-geographic-distances-in-python-with-the-haversine-method-ed99b41ff04b
-def haversine_distance(lat1, lon1, lat2, lon2):
-    R = 6371  # Earth radius in kilometers
+@router.post("/{mid}/skip", status_code=status.HTTP_200_OK)
+def skip_match(mid: int, confirmation: MeetingConfirmation):
+    """Skips the given profile"""
+    pass
 
-    dlat = radians(lat2 - lat1)
-    dlon = radians(lon2 - lon1)
-
-    a = sin(dlat / 2) ** 2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlon / 2) ** 2
-    c = 2 * atan2(sqrt(a), sqrt(1 - a))
-
-    distance = R * c
-    return distance
-
-
-def find_matches_within_radius(user_profiles, user, max_distance):
-    matches = []
-
-    for other_user in user_profiles:
-        if user.user_id != other_user.user_id:
-            distance = haversine_distance(
-                user.latitude, user.longitude, other_user.latitude, other_user.longitude
-            )
-
-            if distance <= max_distance:
-                matches.append(other_user)
-
-    return matches
