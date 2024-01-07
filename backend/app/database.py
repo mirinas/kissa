@@ -3,6 +3,7 @@ Database operations module.
 
 This module provides functions to interact with the user database.
 """
+from itertools import count
 from typing import Optional
 
 from pymongo import MongoClient
@@ -52,7 +53,7 @@ class Database:
             return user 
         return None
 
-    def get_user_by_id(self, user_id: str):
+    def get_user_by_id(self, user_id: str) -> dict | None:
         if not ObjectId.is_valid(user_id):
             print('User id is not valid', user_id)
             return None
@@ -72,7 +73,7 @@ class Database:
             print("Error registering user: " + str(e))
             return None
 
-    def update_user(self, user_id: str, user_dict: dict):
+    def update_user(self, user_id: str, user_dict: dict) -> dict | None:
         try:
             oid = ObjectId(user_id)
 
@@ -88,6 +89,9 @@ class Database:
         except Exception as e:
             print("Error updating user: " + str(e))
             return None
+
+    def get_all_users(self):
+        list(self.profile_collection.find())
 
     def delete_user(self, user_id: str) -> bool:
         try:
@@ -130,6 +134,61 @@ class Database:
         except Exception as e:
             print("Error when deleting file: " + str(e))
             return False
+
+    def create_match(self, match_dict: dict) -> str | None:
+        try:
+            match_dict = documentize(match_dict)
+            match_dict.pop('_id')
+            return str(self.match_collection.insert_one(match_dict).inserted_id)
+        except Exception as e:
+            print("Error creating match: " + str(e))
+            return None
+
+    def get_match(self, match_id: str) -> dict | None:
+        if not ObjectId.is_valid(match_id):
+            print('Match id is not valid', match_id)
+            return None
+        oid = ObjectId(match_id)
+        match = self.match_collection.find_one({'_id': oid})
+        if match:
+            match = pythonize(dict(match))
+            return match
+        return None
+
+    def add_messages(self, messages: list[dict], match_id: str) -> bool:
+        match = self.get_match(match_id)
+        match['messages'].append(messages)
+        try:
+            oid = ObjectId(match_id)
+
+            update = dict()
+            update['$set'] = {'messages': match['messages']}
+            if self.match_collection.update_one({'_id': oid}, update, upsert=False).acknowledged:
+                return True
+            else:
+                return False
+        except Exception as e:
+            print("Error adding messages: " + str(e))
+            return False
+
+    def confirm_meeting(self, user_id: str, match_id: str) -> list[str] | None:
+        match = self.get_match(match_id)
+        confirmations = match['meeting_confirmation']
+        if user_id in confirmations:
+            return confirmations
+        try:
+            oid = ObjectId(match_id)
+
+            update = dict()
+            update['$set'] = {'meeting_confirmation': confirmations}
+            if self.match_collection.update_one({'_id': oid}, update, upsert=False).acknowledged:
+
+                return self.get_match(match_id)['meeting_confirmation']
+            else:
+                return None
+        except Exception as e:
+            print("Error adding messages: " + str(e))
+            return None
 
     # Only use for testing purposes
     def clear_database(self):
