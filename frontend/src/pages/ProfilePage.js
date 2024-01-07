@@ -2,8 +2,6 @@ import {useOutletContext} from "react-router-dom";
 import {useEffect, useState} from "react";
 import '../styles/ProfilePage.css'
 import HSlider from "../components/HSlider";
-import {API_ENDPOINT} from "../globals";
-import axios from 'axios';
 
 export default function ProfilePage() {
     const {setSelected} = useOutletContext();

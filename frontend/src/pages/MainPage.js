@@ -16,12 +16,13 @@ export default function MainPage() {
 
     const {setSelected} = useOutletContext();
     const [loading, setLoading] = useState(false);
-    const [profile, setProfile] = useState('');
+    const [profile, setProfile] = useState({});
 
     useEffect(() => {
         setSelected('main');
         loadSuggestion();
-    }, []);
+
+    }, [setSelected]);
 
 
     const handleSkip = () => {
