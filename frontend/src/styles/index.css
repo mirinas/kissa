@@ -3,7 +3,10 @@ body {
   --border-radius: 1em;
   --background: #fdeeee;
   --accent: indianred;
+  --accent2: #f12b6b;
+  --accent2light: #f25986;
   --foreground: #FFAAAA;
+  --foreground2: #F6C7C7;
 
   margin: 0;
   background: var(--background);

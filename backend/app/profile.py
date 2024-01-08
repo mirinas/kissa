@@ -3,6 +3,8 @@ Profile module.
 
 For handling profile data, such as profile changes.
 """
+
+
 from math import radians, sin, cos, sqrt, atan2
 
 from fastapi import APIRouter, HTTPException, File, UploadFile, status, Depends
