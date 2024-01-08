@@ -31,7 +31,9 @@ class UserData(BaseModel):
     name: str
     surname: str
     bio: str
-    location: str  # "lat, lon" Used to find matches nearby
+    preference: str  # gender of the other owner preference
+    age_range: List[int]  # age range [min, max] inclusive
+    location: List[float]  # "lat, lon" Used to find matches nearby
     profile_pic_url: str
     cat: CatData  # User's cat profile
 
@@ -75,6 +77,7 @@ class UserProfile(UserData):
     matches: List[str] = []     # List of IDs of matches
     matches_allowed: int = 3                # Number of matches allowed
     selections: List[str] = []  # Profiles that a user selected
+    skips: List[str] = []
     potentials: List[str] = []  # List of profiles nearby
     search_radius: float = 10.0              # Search radius in km, default is 10.0
 
@@ -93,7 +96,7 @@ class Match(BaseModel):
     oid: str
     user_1: str
     user_2: str
-    meeting_confirmation: list[str] # list of confirmation who confirmed the meeting
+    meeting_confirmation: list[str]  # list of confirmation who confirmed the meeting
     messages: list[Message]
 
 
@@ -105,13 +108,17 @@ class ConfirmSuggestion(BaseModel):
     oid: str
 
 
+class SkipSuggestion(BaseModel):
+    oid: str
+
+
 class ConfirmResponse(BaseModel):
     """
     Represents a confirmation of matching
     `match_id` is only set if match is bidirectional
     """
     matches_left: int
-    match_id: Optional[str]
+    match_id: str | None
 
 
 fake_cat = CatProfile(
@@ -133,12 +140,15 @@ user_profile = UserProfile(
     age=20,
     email='gn2g21@soton.ac.uk',
     dob='30/05/2003',
-    location="26.7674446, 81.109758",
+    location=[26.7674446, 81.109758],
+    age_range=[18, 25],
     gender="male",
+    preference='female',
     matches=["0", "1", "2"],
     matches_allowed=3,
     selections=["73", "22"],
     potentials=["9", "7"],
+    skips=[],
     search_radius=12.2,
     cat=fake_cat,
     profile_pic_url="test"
