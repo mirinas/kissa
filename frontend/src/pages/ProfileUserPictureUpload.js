@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Cookies from 'universal-cookie';
-import { API_ENDPOINT } from '../globals';
 
 function UserPictureUpload({ setState }) {
     const [previewImage, setPreviewImage] = useState(null);
@@ -13,7 +12,7 @@ function UserPictureUpload({ setState }) {
         const data = new FormData();
         data.append('file', uploadedImage);
 
-        fetch(API_ENDPOINT+"/pictures", 
+        fetch("http://localhost:8000/pictures", 
             { 
                 method: 'POST', 
                 headers: {

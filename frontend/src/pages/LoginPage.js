@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import Cookies from "universal-cookie";
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
-import { API_ENDPOINT } from '../globals';
 import '../styles/LoginRegister.css';
 
 
@@ -34,7 +33,7 @@ export default function LoginPage() {
 
         event.preventDefault();
         try {
-            const response = await fetch('http://0.0.0.0:8000/profiles/token', {
+            const response = await fetch('http://localhost:8000/profiles/token', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
