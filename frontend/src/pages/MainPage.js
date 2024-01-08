@@ -9,8 +9,6 @@ import axios from 'axios'
 import Loading from "../components/Loading";
 import {GiMale, GiFemale} from 'react-icons/gi'
 
-
-// TODO: DISPLAY MULTIPLE IMAGES
 // TODO: SHOW "It's a purrfect match..." screen
 
 
