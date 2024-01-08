@@ -1,42 +1,36 @@
-import React, { useState } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import './styles/App.css';
+import JoinLayout from "./pages/JoinLayout";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import MainLayout from "./pages/MainLayout";
+import MainPage from "./pages/MainPage";
+import MessagesPage from "./pages/MessagesPage";
+import NotFoundPage from "./pages/NotFoundPage";
+import RootPage from "./pages/RootPage";
+import ProfilePage from "./pages/ProfilePage";
 
-function App() {
-  const [message, setMessage] = useState('');
+export default function App() {
+    return (
+        <BrowserRouter>
+            <Routes>
+                {/* ASK TO LOGIN OR REGISTER */}
+                <Route index element={<RootPage />}/>
 
-  const API_ENDPOINT = process.env.REACT_APP_KISSA_API_ENDPOINT || 'http://localhost:8080';
+                {/* PAGES FOR LOGIN AND REGISTER */}
+                <Route path='/acc/' element={<JoinLayout />}>
+                    <Route path='login' element={<LoginPage />}/>
+                    <Route path='register' element={<RegisterPage />}/>
+                </Route>
 
-  const handleClick = async () => {
-    try {
-      const response = await fetch(`${API_ENDPOINT}/`);
-      const data = await response.json();
-      setMessage(data.message);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
-
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload. Deploy tested.
-        </p>
-        <button onClick={handleClick}>Fetch API</button>
-        <p>{message}</p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+                {/* MAIN PAGES */}
+                <Route path='/app/' element={<MainLayout />}>
+                    <Route index element={<MainPage />}/>
+                    <Route path='messages' element={<MessagesPage />}/>
+                    <Route path='profile' element={<ProfilePage />}/>
+                </Route>
+                <Route path="/*" element={<NotFoundPage />}/>
+            </Routes>
+        </BrowserRouter>
+    );
 }
-
-export default App;

@@ -1,0 +1,119 @@
+h3, span {
+    margin: unset;
+    vertical-align: bottom;
+}
+svg {
+    vertical-align: bottom;
+    margin-right: 0.5em;
+}
+
+.profile-view {
+    display: flex;
+    flex-direction: column;
+
+    background: white;
+    border-radius: var(--border-radius);
+}
+
+.profile-view img {
+    width: 100%;
+    max-height: 65vh;
+    border-radius: inherit;
+    object-fit: cover;
+}
+
+.loading {
+    visibility: hidden;
+}
+
+.match-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(2);
+}
+
+
+
+.description span, .description svg {
+    font-size: 0.8em;
+    margin-top: 0;
+}
+
+.description {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.description p {
+    flex: 1;
+}
+
+.description > * {
+    margin: 0.5em;
+}
+
+.match-options {
+    padding-top: 1em;
+    display: flex;
+    margin: 0;
+    gap: 1px;
+}
+
+.match-options button {
+    flex: 1;
+    padding: 0.5em;
+    color: var(--background);
+    font-weight: bold;
+    font-style: italic;
+    background: var(--accent);
+    cursor: pointer;
+
+    border: unset;
+    font-size: unset;
+    font-family: inherit;
+}
+
+.match-options button:first-child {
+    border-top-left-radius: var(--border-radius);
+    border-bottom-left-radius: var(--border-radius);
+}
+
+.match-options button:last-child {
+    border-top-right-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+}
+
+.error-message {
+    position: absolute;
+    top: 70%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    text-align: center;
+    color: var(--accent);
+    font-weight: bold;
+}
+
+
+@media (min-width: 900px) {
+
+    .profile-view img {
+        width: auto;
+        height: 100%;
+        max-height: unset;
+        max-width: 60%;
+    }
+
+    .profile-view {
+        max-height: 80vh;
+        flex-direction: row;
+        height: 100%;
+    }
+
+    .match-options {
+        flex: 0;
+        margin-left: 0.5em;
+    }
+}
