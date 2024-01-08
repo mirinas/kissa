@@ -6,7 +6,6 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      - PYTHONUNBUFFERED=1
       - secret-key-token=${SECRETKEYTOKEN}
     ports:
       - "8080:8080"

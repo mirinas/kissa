@@ -39,7 +39,8 @@ async def root():
     return {
         "api_version": "v1.0",
         "status": "live",
-        "documentation_url": "https://kissa-api.jollymoss-4112728e.uksouth.azurecontainerapps.io/docs"
+        "documentation_url": "https://kissa-api.jollymoss-4112728e.uksouth.azurecontainerapps.io/docs",
+        "secret": SECRET_KEY_TOKEN
     }
 
 # Authentication routes for login and registering
