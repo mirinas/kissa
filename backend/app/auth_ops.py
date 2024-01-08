@@ -20,7 +20,7 @@ import os
 
 SECRET_KEY_TOKEN = os.environ['SECRET_KEY_TOKEN']
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+ACCESS_TOKEN_EXPIRE_MINUTES = 120
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/profiles/token")
 user_db = Database()

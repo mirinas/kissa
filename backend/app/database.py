@@ -100,11 +100,37 @@ class Database:
         # GraphFS stores owner_id using the 'metadata' tag
         file_id = self.fs.put(file_data, metadata={'owner_id': owner_id})
         return file_id
+    
+    def update_user_profile_pic(self, user_id: str, image_id: str):
+        try:
+            oid = ObjectId(user_id)
+            update = {'$set': {'profile_pic_url': str(image_id)}}
+            result = self.profile_collection.update_one({'_id': oid}, update)
+
+            return result.acknowledged
+        except Exception as e:
+            print("Error updating user profile picture: " + str(e))
+            return None
+    
+    def update_cat_profile_images(self, user_id: str, image_id: str):
+        try:
+            user = self.get_user_by_id(user_id)
+            if user and 'cat' in user:
+                cat_images = user['cat'].get('image_ids', [])
+                cat_images.append(str(image_id))
+                update = {'$set': {'cat.image_ids': cat_images}}
+                result = self.profile_collection.update_one({'_id': user_id}, update)
+                return result.acknowledged
+            return False
+        except Exception as e:
+            print("Error updating cat profile images: " + str(e))
+            return None
 
     def get_file(self, _id):
         try:
             file_id = ObjectId(_id)
             file = self.fs.get(file_id)
+
             return file
         except gridfs.errors.NoFile:
             return None
@@ -115,10 +141,10 @@ class Database:
             file_id = ObjectId(_id)
             self.fs.delete(file_id)
 
-            # Remove database entry
+            # Remove entry in profile
             self.profile_collection.update_many(
-                {"cat.image_ids": file_id},
-                {"$pull": {"cat_profile.image_ids": file_id}}
+                {"cat.image_ids": str(file_id)},
+                {"$pull": {"cat.image_ids": str(file_id)}}
             )
 
             return True
