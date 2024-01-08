@@ -85,6 +85,17 @@ svg {
     border-bottom-right-radius: var(--border-radius);
 }
 
+.error-message {
+    position: absolute;
+    top: 70%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    text-align: center;
+    color: var(--accent);
+    font-weight: bold;
+}
+
 
 @media (min-width: 900px) {
 

@@ -1,6 +1,8 @@
 import {useOutletContext} from "react-router-dom";
 import '../styles/MainPage.css'
-import cat from '../media/cat.avif'
+import cat1 from '../media/cat.avif'
+import cat2 from '../media/cat2.avif'
+import cat3 from '../media/cat3.avif'
 import {useEffect, useState} from "react";
 import {API_ENDPOINT, devLogin} from "../globals";
 import axios from 'axios'
@@ -14,13 +16,18 @@ import {GiMale, GiFemale} from 'react-icons/gi'
 
 export default function MainPage() {
 
+    const cats = [cat1, cat2, cat3];
+
     const {setSelected} = useOutletContext();
-    const [loading, setLoading] = useState(false);
     const [profile, setProfile] = useState({});
+    const [pictureIndex, setPictureIndex] = useState(0);
+
+    const [loading, setLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
         setSelected('main');
-        loadSuggestion();
+        // loadSuggestion();
 
     }, [setSelected]);
 
@@ -50,34 +57,35 @@ export default function MainPage() {
 
 
     const loadSuggestion = () => {
-        //TODO: remove
-        setProfile({
-            owner_id: 0,
-            sex: true,
-            breed: 'Siamese'
-        });
-        return;
-
         setLoading(true);
         devLogin().then(token => {
             axios.get(API_ENDPOINT + '/match/suggest', {
                 headers: {'Authorization': 'bearer ' + token}
             })
                 .then(res => {
-                    res.data.breed = 'Siamese';
-                    res.data.sex = true;
-                    setProfile(res.data);
-                    setLoading(false);
+                    setPictureIndex(0);
+                    setProfile(res.data ? res.data : {});
+                    setLoading(!res.data);
+                    setErrorMessage('No potential matches left :(');
                 });
         });
     }
 
 
+    const switchImage = e => {
+        const center = e.currentTarget.offsetWidth / 2;
+        if(e.nativeEvent.offsetX < center) setPictureIndex(Math.max(0, pictureIndex - 1))
+        else setPictureIndex(Math.min(pictureIndex + 1, cats.length - 1))
+    }
+
+
     return (
         <>
+            { !profile.owner_id && <div className={'error-message'} >{ errorMessage }</div> }
             { loading && <Loading className={'match-loading'}/> }
+
             <div className={loading ? ' loading' : 'profile-view'}>
-                <img alt={'Cat'} src={cat}/>
+                <img alt={'Cat'} src={ cats[pictureIndex] } onClick={switchImage}/>
                 <div className={'description'}>
 
                     <div>
