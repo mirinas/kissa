@@ -16,10 +16,9 @@ from starlette import status
 from models import LoginCredentials, Token, RegisterUser, UserProfile
 from passlib.context import CryptContext
 from database import Database
-from vault import KeyVault
+import os
 
-
-SECRET_KEY_TOKEN = KeyVault().get_secret("SECRET-KEY-TOKEN")
+SECRET_KEY_TOKEN = os.environ['secret-key-token']
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

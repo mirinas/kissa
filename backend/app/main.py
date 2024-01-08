@@ -11,6 +11,11 @@ from profile import router as profile_router
 from pictures import router as picture_router
 from match import router as match_router
 
+import os
+
+SECRET_KEY_TOKEN = os.environ['secret-key-token']
+print('Secret key token: ' + SECRET_KEY_TOKEN)
+
 app = FastAPI()
 
 # CORS settings
