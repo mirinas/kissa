@@ -16,9 +16,9 @@ from starlette import status
 from models import LoginCredentials, Token, RegisterUser, UserProfile
 from passlib.context import CryptContext
 from database import Database
-import os
 
-SECRET_KEY_TOKEN = os.environ['SECRET_KEY_TOKEN']
+
+SECRET_KEY = "1cd38e0a7004b1694efbf1908bfc32ea0f858bb170e14b73ecc5fc1b412ecd20"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -35,7 +35,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
         expire = datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY_TOKEN, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
     return encoded_jwt
 
@@ -81,7 +81,7 @@ async def get_current_user(token: str = Security(oauth2_scheme)) -> UserProfile:
     )
 
     try:
-        payload = jwt.decode(token, SECRET_KEY_TOKEN, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("sub")
         if user_id is None:
             raise credentials_exception

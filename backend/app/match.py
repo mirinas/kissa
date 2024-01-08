@@ -189,7 +189,7 @@ async def confirm_meeting(mid: str, confirmation: MeetingConfirmation,
     if confirmations is None:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Error confirming the meeting')
 
-    if len(confirmations) == 2:
+    if len(confirmations) is 2:
         confirmations.remove(current_user.oid)
         # --- Update other user
         other_user = db.get_user_by_id(confirmations[0])
