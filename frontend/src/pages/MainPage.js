@@ -26,8 +26,14 @@ export default function MainPage() {
 
 
     const handleSkip = () => {
-        // TODO: call `match/skip` instead of reloading the same suggestion
-        loadSuggestion();
+        devLogin().then(token => {
+            axios.post(API_ENDPOINT + '/match/skip', {oid: profile.owner_id},
+                {headers: {'Authorization': 'bearer ' + token}})
+                .then(res => {
+                    console.log(res.data);
+                    loadSuggestion();
+                });
+        });
     }
 
 
@@ -44,6 +50,14 @@ export default function MainPage() {
 
 
     const loadSuggestion = () => {
+        //TODO: remove
+        setProfile({
+            owner_id: 0,
+            sex: true,
+            breed: 'Siamese'
+        });
+        return;
+
         setLoading(true);
         devLogin().then(token => {
             axios.get(API_ENDPOINT + '/match/suggest', {

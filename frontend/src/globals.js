@@ -5,18 +5,20 @@ export const API_ENDPOINT = process.env.REACT_APP_KISSA_API_ENDPOINT || 'http://
 // TODO: REMOVE THIS FUNCTION BEFORE LAST DEPLOYMENT
 export async function devLogin() {
     const loginData = {
-        "username": "augustas@example.com",
+        "username": "augustas@doesnotexist.com",
         "password": "string"
     }
 
     const registerData = {
-        "email": "augustas@example.com",
+        "email": "augustas@doesnotexist.com",
         "dob": "string",
         "gender": "string",
         "name": "string",
         "surname": "string",
         "bio": "string",
-        "location": "string",
+        "preference": "string",
+        "age_range": [18, 40],
+        "location": [0, 0],
         "profile_pic_url": "string",
         "cat": {
             "name": "string",
