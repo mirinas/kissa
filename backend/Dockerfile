@@ -9,4 +9,6 @@ COPY app poetry.lock pyproject.toml ./
 RUN poetry config virtualenvs.create false
 RUN poetry install --no-dev
 
+ENV PYTHONUNBUFFERED=1
+
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
