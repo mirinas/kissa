@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import { API_ENDPOINT } from '../globals'
 import Cookies from 'universal-cookie';
 
 function UserForm({ setState })
@@ -47,7 +48,7 @@ function UserForm({ setState })
             return;
         }
 
-        fetch("http://localhost:8000/profiles/register", {
+        fetch(API_ENDPOINT + "/profiles/register", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json', 
