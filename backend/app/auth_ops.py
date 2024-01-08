@@ -18,7 +18,7 @@ from passlib.context import CryptContext
 from database import Database
 import os
 
-SECRET_KEY_TOKEN = os.environ['secret-key-token']
+SECRET_KEY_TOKEN = os.environ['SECRET_KEY_TOKEN']
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

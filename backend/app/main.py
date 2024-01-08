@@ -13,8 +13,16 @@ from match import router as match_router
 
 import os
 
-SECRET_KEY_TOKEN = os.environ['secret-key-token']
+SECRET_KEY_TOKEN = os.environ['SECRET_KEY_TOKEN']
+COSMOS_DB_URI = os.environ['COSMOS_DB_URI']
+COSMOS_DB_NAME = os.environ['COSMOS_DB_NAME']
+COSMOS_DB_PROFILE_COLLECTION = os.environ['COSMOS_DB_PROFILE_COLLECTION']
+COSMOS_DB_MATCH_COLLECTION = os.environ['COSMOS_DB_MATCH_COLLECTION']
 print('Secret key token: ' + SECRET_KEY_TOKEN)
+print('Secret key token: ' + COSMOS_DB_URI)
+print('Secret key token: ' + COSMOS_DB_NAME)
+print('Secret key token: ' + COSMOS_DB_PROFILE_COLLECTION)
+print('Secret key token: ' + COSMOS_DB_MATCH_COLLECTION)
 
 app = FastAPI()
 
