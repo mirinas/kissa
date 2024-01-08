@@ -3,44 +3,16 @@ User authentication routes module.
 
 This module contains authentication logic, password hashing, and JWT/JSON token handling.
 """
-
-import uuid
-from fastapi import Security
-from pydantic import ValidationError
-from datetime import datetime, timedelta
-from jose import JWTError, jwt
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from fastapi import Depends, HTTPException, status
-from passlib.context import CryptContext
+from bson import ObjectId
+from fastapi import Depends
 from fastapi import APIRouter, HTTPException, status
-from models import LoginCredentials, Token, UserInDB, UserProfile
-from passlib.context import CryptContext
-from database import UserDatabase 
+from auth_ops import *
 
-SECRET_KEY = "1cd38e0a7004b1694efbf1908bfc32ea0f858bb170e14b73ecc5fc1b412ecd20"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-user_db = UserDatabase()
-router = APIRouter()
+user_db = Database()
+router = APIRouter(prefix='/profiles', tags=['auth'])
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/profiles/token")
-
-def create_access_token(data: dict, expires_delta: timedelta = None):
-    to_encode = data.copy()
-
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-
-    return encoded_jwt
-
-@router.post("/profiles/token", response_model=Token)
+@router.post("/token", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     login_credentials = LoginCredentials(email=form_data.username, password=form_data.password)
     user = await authenticate_user(login_credentials)
@@ -55,83 +27,48 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     # If user in database, grant token with set expiration
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.email}, expires_delta=access_token_expires
+        data={"sub": user.oid}, expires_delta=access_token_expires
     )
 
-    return {"access_token": access_token, "token_type": "bearer"}
+    return Token(access_token=access_token, token_type="bearer")
 
-async def authenticate_user(login_credentials: LoginCredentials):
-    user = get_user(login_credentials.email)
 
-    # Return 'None' instead of False as per fastAPI docs
-    if not user:
-        return None 
-
-    # the password retrieved here from database is hashed, and gets verified
-    if not pwd_context.verify(login_credentials.password, user.hashed_password):
-        return None
-
-    return user
-
-def get_user(email: str):
-    user_dict = user_db.get_user_by_email(email)
-
-    if user_dict:
-        return UserInDB(**user_dict)
-    else:
-        print("User not found.")
-        return None
-
-@router.post("/profiles/register")
-async def register(user_data: UserProfile):
-    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    hashed_password = pwd_context.hash(user_data.hashed_password)
+@router.post("/register", status_code=status.HTTP_201_CREATED)
+async def register(user_data: RegisterUser):
+    h_pass = pwd_context.hash(user_data.password)
 
     # Convert the Pydantic model to a dictionary, to store hash password
     user_dict = user_data.dict()
-    user_dict['hashed_password'] = hashed_password
+    user_dict['hashed_password'] = h_pass
+    # Remove `password` field
+    user_dict.pop('password', None)
 
-    # Give cat profile a randomly generated id, different from user so we can upload images directly to cat profile
-    random_owner_id = str(uuid.uuid4())
-    if 'cat_profile' in user_dict and user_dict['cat_profile'] is not None:
-        user_dict['cat_profile']['owner_id'] = random_owner_id
+    exist = user_db.get_user_by_email(user_data.email)
+    if exist:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='User already exists with given email'
+        )
 
-    # Give user a backup id for testing purposes, can be removed later
-    random_user_id = str(uuid.uuid4())
-    user_dict['id'] = random_user_id 
+    # we also generate object id here
+    user = UserProfile(**user_dict, oid=str(ObjectId()))
 
-    user_created = user_db.create_user(user_dict)
+    created_id = user_db.create_user(user.dict())
 
-    if user_created:
-        return {"message": "User created successfully"}
+    if created_id is not None:
+        # If user in database, grant token with set expiration
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={"sub": created_id}, expires_delta=access_token_expires
+        )
+        return Token(access_token=access_token, token_type="bearer")
     else:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, 
             detail="Error creating user"
         )
 
-# Once the user is provided a token, use this function to access routes with user authentication
-async def get_current_user(token: str = Security(oauth2_scheme)) -> UserInDB:
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
 
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get("sub")
-        if email is None:
-            raise credentials_exception
-    except (JWTError, ValidationError):
-        raise credentials_exception
-
-    user = get_user(email)
-    if user is None:
-        raise credentials_exception
-
-    return user
-
-@router.get("/users/me")
-async def read_users_me(current_user: UserInDB = Depends(get_current_user)):
+@router.get("/me", response_model=UserProfile, response_model_exclude={'hashed_password'})
+async def read_users_me(current_user: UserProfile = Depends(get_current_user)):
     return current_user

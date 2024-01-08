@@ -4,6 +4,7 @@ Models module.
 This module provides all the schema models and their types in the form of pydantic models
 """
 
+
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 import base64
@@ -14,41 +15,58 @@ class Token(BaseModel):
     token_type: str
 
 
-class TokenData(BaseModel):
-    user_id: str | None = None
-
-
-class Picture(BaseModel):
-    id: str
-    data: str 
-    owner: str
+class CatData(BaseModel):
+    """Cat data model"""
+    name: str
+    age: int
+    breed: str
+    sex: bool  # false = male, true = female
+    bio: str
+    image_ids: List[str] = []  # list of image ids
 
 
 class UserData(BaseModel):
     email: EmailStr
-    dob: str # date of birth
+    dob: str  # date of birth
     gender: str
     name: str
     surname: str
-    location: str # "lat, lon" Used to find matches nearby
-    profile_pic_url: str
-
-
-class CatProfile(BaseModel):
-    owner_id: str
-    name: str
-    age: int
-    breed: str
-    sex: bool # false = male, true = female
     bio: str
-    image_ids: List[str] = [] # list of image ids
+    preference: str  # gender of the other owner preference
+    age_range: List[int]  # age range [min, max] inclusive
+    location: List[float]  # "lat, lon" Used to find matches nearby
+    profile_pic_url: str
+    cat: CatData  # User's cat profile
 
 
-# This model is used for returning a user from database
-class UserInDB(UserData):
-    email: EmailStr
-    hashed_password: str
-    cat_profile: CatProfile
+class CatPatch(BaseModel):
+    """Cat patch model"""
+    name: str = None
+    age: int = None
+    breed: str = None
+    sex: bool = None
+    bio: str = None
+    image_ids: List[str] = None
+
+
+# This model can assign attributes to default None as it allows for
+# partial patching of db entries
+class UserPatch(BaseModel):
+    """User patch model"""
+    email: Optional[EmailStr] = None
+    dob: Optional[str] = None
+    gender: Optional[str] = None
+    name: Optional[str] = None
+    surname: Optional[str] = None
+    bio: Optional[str] = None
+    location: Optional[str] = None
+    profile_pic_url: Optional[str] = None
+    cat: Optional[CatPatch] = None
+
+
+class CatProfile(CatData):
+    """Cat profile that is returned separately from the owner"""
+    owner_id: str
 
 
 class LoginCredentials(BaseModel):
@@ -57,14 +75,18 @@ class LoginCredentials(BaseModel):
 
 
 class UserProfile(UserData):
-    id: str
-    matches: Optional[List[str]] = None     # List of IDs of matches
-    matches_allowed: int = 3                # Number of matches allowed
-    selections: Optional[List[str]] = None  # Profiles that a user selected
-    potentials: Optional[List[str]] = None  # List of profiles nearby
-    search_radius: float = 10.0             # Search radius in km, default is 10.0
-    cat_profile: CatProfile                 # User's cat profile
+    oid: str
     hashed_password: str                    # Hashed password
+    matches: List[str] = []     # List of IDs of matches
+    matches_allowed: int = 3                # Number of matches allowed
+    selections: List[str] = []  # Profiles that a user selected
+    skips: List[str] = []
+    potentials: List[str] = []  # List of profiles nearby
+    search_radius: float = 10.0              # Search radius in km, default is 10.0
+
+
+class RegisterUser(UserData):
+    password: str
 
 
 class Message(BaseModel):
@@ -74,10 +96,10 @@ class Message(BaseModel):
 
 
 class Match(BaseModel):
-    id: str
+    oid: str
     user_1: str
     user_2: str
-    meeting_confirmation: list[str] # list of confirmation who confirmed the meeting
+    meeting_confirmation: list[str]  # list of confirmation who confirmed the meeting
     messages: list[Message]
 
 
@@ -86,15 +108,23 @@ class MeetingConfirmation(BaseModel):
 
 
 class ConfirmSuggestion(BaseModel):
-    id: str
+    oid: str
+
+
+class SkipSuggestion(BaseModel):
+    oid: str
 
 
 class ConfirmResponse(BaseModel):
+    """
+    Represents a confirmation of matching
+    `match_id` is only set if match is bidirectional
+    """
     matches_left: int
-    is_matched: bool
+    match_id: str | None
 
 
-fake_profile = CatProfile(
+fake_cat = CatProfile(
     owner_id="0",
     name="Fnuffy",
     age=11,
@@ -105,20 +135,24 @@ fake_profile = CatProfile(
 )
 
 user_profile = UserProfile(
-    id="abscd",
+    oid='some id',
     name="German",
     surname="test",
-    hashed_password="",
+    bio='I want to find love of my life',
+    hashed_password="H1H12D",
     age=20,
     email='gn2g21@soton.ac.uk',
     dob='30/05/2003',
-    location="26.7674446, 81.109758",
+    location=[26.7674446, 81.109758],
+    age_range=[18, 25],
     gender="male",
+    preference='female',
     matches=["0", "1", "2"],
     matches_allowed=3,
     selections=["73", "22"],
     potentials=["9", "7"],
+    skips=[],
     search_radius=12.2,
-    cat_profile = fake_profile,
+    cat=fake_cat,
     profile_pic_url="test"
 )

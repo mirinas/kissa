@@ -9,6 +9,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from auth import router as auth_router
 from profile import router as profile_router
 from pictures import router as picture_router
+from match import router as match_router
+
+import os
+
+SECRET_KEY_TOKEN = os.environ['SECRET_KEY_TOKEN']
+COSMOS_DB_URI = os.environ['COSMOS_DB_URI']
+COSMOS_DB_NAME = os.environ['COSMOS_DB_NAME']
+COSMOS_DB_PROFILE_COLLECTION = os.environ['COSMOS_DB_PROFILE_COLLECTION']
+COSMOS_DB_MATCH_COLLECTION = os.environ['COSMOS_DB_MATCH_COLLECTION']
 
 app = FastAPI()
 
@@ -27,12 +36,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/")
 async def root():
     return {
         "api_version": "v1.0",
         "status": "live",
-        "documentation_url": "https://kissa-api.jollymoss-4112728e.uksouth.azurecontainerapps.io/docs"
+        "documentation_url": "https://kissa-api.jollymoss-4112728e.uksouth.azurecontainerapps.io/docs",
+        "secret": SECRET_KEY_TOKEN
     }
 
 # Authentication routes for login and registering
@@ -41,5 +52,9 @@ app.include_router(auth_router)
 # Routes for profile actions
 app.include_router(profile_router)
 
+# Routes for match actions
+app.include_router(match_router)
+
 # Routes for picture actions
 app.include_router(picture_router)
+
