@@ -1,0 +1,1 @@
+perl cloc-1.98.pl --include-lang=Python,JavaScript --list-file=folderlist
