@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Cookies from 'universal-cookie';
+import { API_ENDPOINT } from '../globals';
 
 function CatPicturesUpload({ setState }) {
     const [previewCatImages, setPreviewCatImages] = useState([]);
@@ -15,7 +16,7 @@ function CatPicturesUpload({ setState }) {
             data.append('files', file);
         });
 
-        fetch("http://localhost:8000/pictures/cat", 
+        fetch(API_ENDPOINT+"/pictures/cat", 
             { 
                 method: 'POST', 
                 headers: {
