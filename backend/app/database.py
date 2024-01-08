@@ -11,6 +11,7 @@ from bson import ObjectId
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 import gridfs
+import os
 
 
 def documentize(d: dict) -> dict:
@@ -26,18 +27,10 @@ def pythonize(d: dict) -> dict:
 class Database:
     # Uses azures key vault
     def __init__(self):
-        #KEY_VAULT_URL = "https://kissa-vault.vault.azure.net/"
-        #credential = DefaultAzureCredential()
-        #client = SecretClient(vault_url=KEY_VAULT_URL, credential=credential)
-
-        #COSMOS_DB_URI = client.get_secret("COSMOS-DB-URI")
-        #COSMOS_DB_NAME = client.get_secret("COSMOS-DB-NAME")
-        #COSMOS_DB_COLLECTION = client.get_secret("COSMOS-DB-COLLECTION")
-
-        COSMOS_DB_URI = "mongodb://kissa-db-dpwvhfkg:7i661s7SDxYdbRP3PTGLQEaCUGiaQea0zyqvrNelWu1ZBJByuROpU5D6AbUUcIYZYkl7NaG1IE7VACDbloh7Iw==@kissa-db-dpwvhfkg.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@kissa-db-dpwvhfkg@"
-        COSMOS_DB_NAME = "kissa-db"
-        COSMOS_DB_PROFILE_COLLECTION = "kissa-db-profile-collection"
-        COSMOS_DB_MATCH_COLLECTION = "kissa-db-match-collection"
+        COSMOS_DB_URI = os.environ['COSMOS_DB_URI']
+        COSMOS_DB_NAME = os.environ['COSMOS_DB_NAME']
+        COSMOS_DB_PROFILE_COLLECTION = os.environ['COSMOS_DB_PROFILE_COLLECTION']
+        COSMOS_DB_MATCH_COLLECTION = os.environ['COSMOS_DB_MATCH_COLLECTION']
         
         client = MongoClient(COSMOS_DB_URI)
         self.db = client[COSMOS_DB_NAME]

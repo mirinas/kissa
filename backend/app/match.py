@@ -20,7 +20,7 @@ db = Database()
 
 
 @router.get("/suggest", status_code=status.HTTP_200_OK)
-async def get_suggestion(current_user: UserProfile = Depends(get_current_user)) -> CatProfile:
+async def get_suggestion(current_user: UserProfile = Depends(get_current_user)) -> CatProfile | None:
     """
     Get next matched cat profile for user
     :param current_user: authenticated user
@@ -31,6 +31,8 @@ async def get_suggestion(current_user: UserProfile = Depends(get_current_user)) 
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='You have reached your matches limit. '
                                                                           'Go meet someone')
 
+    if len(current_user.potentials) == 0:
+        return None
     suggestion = current_user.potentials.pop()
     cat_profile = await get_cat_profile(suggestion)
 
@@ -187,7 +189,7 @@ async def confirm_meeting(mid: str, confirmation: MeetingConfirmation,
     if confirmations is None:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Error confirming the meeting')
 
-    if len(confirmations) is 2:
+    if len(confirmations) == 2:
         confirmations.remove(current_user.oid)
         # --- Update other user
         other_user = db.get_user_by_id(confirmations[0])
