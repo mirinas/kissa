@@ -1,0 +1,26 @@
+
+.cat-carousel img {
+    flex-shrink: 0;
+    object-fit: cover;
+    object-position: top;
+    border-radius: 1em;
+}
+
+.cat-carousel {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.5em;
+    padding: 4px;
+
+    overflow-x: scroll;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.cat-carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.cat-carousel .selected {
+    outline: 4px solid var(--accent);
+}

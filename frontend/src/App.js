@@ -6,9 +6,9 @@ import RegisterPage from "./pages/RegisterPage";
 import MainLayout from "./pages/MainLayout";
 import MainPage from "./pages/MainPage";
 import MessagesPage from "./pages/MessagesPage";
-import SettingsPage from "./pages/SettingsPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import RootPage from "./pages/RootPage";
+import ProfilePage from "./pages/ProfilePage";
 
 export default function App() {
     return (
@@ -27,7 +27,7 @@ export default function App() {
                 <Route path='/app/' element={<MainLayout />}>
                     <Route index element={<MainPage />}/>
                     <Route path='messages' element={<MessagesPage />}/>
-                    <Route path='settings' element={<SettingsPage />}/>
+                    <Route path='profile' element={<ProfilePage />}/>
                 </Route>
                 <Route path="/*" element={<NotFoundPage />}/>
             </Routes>
