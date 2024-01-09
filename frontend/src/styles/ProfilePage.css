@@ -50,6 +50,7 @@ section .opened {
 
 .user-description, section input {
     width: 100%;
+    margin: 0;
     background: transparent;
     border: none;
     box-sizing: border-box;

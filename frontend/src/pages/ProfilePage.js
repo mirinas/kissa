@@ -1,62 +1,110 @@
 import {useOutletContext} from "react-router-dom";
-import {useEffect, useState} from "react";
+import {useEffect, useReducer, useState} from "react";
 import '../styles/ProfilePage.css'
 import HSlider from "../components/HSlider";
+import {API_ENDPOINT, devLogin} from "../globals";
+import axios from "axios";
+import Loading from "../components/Loading";
 
 export default function ProfilePage() {
     const {setSelected} = useOutletContext();
-    useEffect(() => setSelected('profile'), [setSelected]);
-
     const openedState = useState('Preferences');
-    const rangeState = useState(20);
+    const [loading, setLoading] = useState(false);
+
+    const [id, setId] = useState('');
+    const rangeState = useState(2);
+    const ageState = useState([18, 18]);
     const matchingPrefsState = useState(
-        {'males': true, 'females': false, 'others': false}
+        {'male': true, 'female': false, 'other': false}
     );
 
+    const [bio, setBio] = useState('');
 
+    useEffect(() => setSelected('profile'), [setSelected]);
+    useEffect(() => {
+        setLoading(true);
+        devLogin().then(token => {
+            axios.get(API_ENDPOINT + '/profiles/me', {headers: {'Authorization': 'bearer ' + token}})
+                .then(res => {
+                    rangeState[1](res.data.search_radius);
+                    ageState[1](res.data.age_range);
+                    setBio(res.data.bio);
+
+                    const newMatchingPrefs = {...matchingPrefsState};
+                    newMatchingPrefs[res.data.preference] = true;
+                    matchingPrefsState[1](newMatchingPrefs);
+                    setId(res.data.oid);
+
+                    setLoading(false);
+                });
+        });
+    }, []);
+
+    const handleRange = () => {
+        patchProfile(id, {
+            search_radius: rangeState[0]
+        });
+    }
+
+    const handleAge = () => {
+        patchProfile(id, {
+            age_range: ageState[0]
+        });
+    }
+
+    if(loading) return <Loading />
     return (
         <div className={'preferences-view'}>
             <Section title={'Preferences'} openedState={openedState}>
                 <h5>Matching range</h5>
-                <HSlider state={rangeState} min={2} max={50} label={'km'}/>
+                <HSlider state={rangeState} min={2} max={50} label={'km'} onBlur={handleRange}/>
+                <h5>Age preference</h5>
+                <HSlider state={ageState} min={18} max={90} count={2} onBlur={handleAge}/>
                 <h5>Interested in</h5>
                 <form>
-                    <Checkbox label={'Males'} state={matchingPrefsState}/>
-                    <Checkbox label={'Females'} state={matchingPrefsState}/>
-                    <Checkbox label={'Others'} state={matchingPrefsState}/>
+                    <Checkbox label={'Males'} value={'male'} state={matchingPrefsState}/>
+                    <Checkbox label={'Females'} value={'female'} state={matchingPrefsState}/>
+                    <Checkbox label={'Others'} value={'other'} state={matchingPrefsState}/>
                 </form>
             </Section>
             <Section title={'Your details'} openedState={openedState}>
-                <h5>Languages</h5>
-                <input placeholder={'Languages spoken'}/>
                 <h5>Your description</h5>
-                <textarea placeholder={'I like cats...'} className={'scrollable user-description'}/>
+                <textarea placeholder={'I like cats...'} className={'scrollable user-description'} defaultValue={bio}/>
             </Section>
-            <Section title={'Your cats'} openedState={openedState}>
+            <Section title={'Your cat'} openedState={openedState}>
+
             </Section>
         </div>
     );
 }
 
+function patchProfile(id, data) {
+    devLogin().then(token => {
+        axios.patch(API_ENDPOINT + '/profiles/' + id, data,
+            {headers: {'Authorization': 'bearer ' + token}})
+            .then(res => console.log(res));
+    });
+}
 
-function Checkbox({label, state}) {
+
+function Checkbox({label, value, state}) {
     const [prefs, setPrefs] = state;
-    const labelLC = String(label).toLowerCase();
 
-    // TODO: make at least one checkbox required
     const handleClick = e => {
         const newPrefs = {...prefs};
         const box = e.target;
-        box.classList.toggle('checked');
-        newPrefs[labelLC] = box.classList.contains('checked');
 
-        console.log(newPrefs);
+        if(Object.values(prefs).filter(e => e).length === 1 &&
+            box.classList.contains('checked')) return;
+
+        box.classList.toggle('checked');
+        newPrefs[value] = box.classList.contains('checked');
         setPrefs(newPrefs);
     }
 
     return (
         <div className={'checkbox'}>
-            <div className={'box' + (prefs[labelLC] ? ' checked' : '')} onClick={handleClick}/>
+            <div className={'box' + (prefs[value] ? ' checked' : '')} onClick={handleClick}/>
             <label>{label}</label>
         </div>
     )
