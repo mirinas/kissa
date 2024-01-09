@@ -56,7 +56,7 @@ class UserData(BaseModel):
         if location[0] < -90 or location[0] > 90:
             raise ValueError('Invalid latitude')
 
-        if location[0] < -180 or location[0] > 180:
+        if location[1] < -180 or location[1] > 180:
             raise ValueError('Invalid longitude')
         return location
 
@@ -106,7 +106,7 @@ class UserPatch(BaseModel):
         if location[0] < -90 or location[0] > 90:
             raise ValueError('Invalid latitude')
 
-        if location[0] < -190 or location[0] > 180:
+        if location[1] < -190 or location[1] > 180:
             raise ValueError('Invalid longitude')
         return location
 
