@@ -3,11 +3,15 @@ Models module.
 
 This module provides all the schema models and their types in the form of pydantic models
 """
+import datetime
 
-
-from pydantic import BaseModel, EmailStr
+from pydantic import (
+    BaseModel,
+    field_validator,
+    Field,
+    EmailStr
+)
 from typing import Optional, List
-import base64
 
 
 class Token(BaseModel):
@@ -28,24 +32,52 @@ class CatData(BaseModel):
 class UserData(BaseModel):
     email: EmailStr
     dob: str  # date of birth
-    gender: str
-    name: str
-    surname: str
-    bio: str
-    preference: str  # gender of the other owner preference
+    gender: str = Field(default='', min_length=1, max_length=100)
+    name: str = Field(default='', min_length=1, max_length=100)
+    surname: str = Field(default='', min_length=1, max_length=100)
+    bio: str = Field(default='', min_length=0, max_length=300)
+    preference: str = Field(default='', min_length=1, max_length=100)  # gender of the other owner preference
     age_range: List[int]  # age range [min, max] inclusive
     location: List[float]  # "lat, lon" Used to find matches nearby
     profile_pic_url: str
     cat: CatData  # User's cat profile
 
+    @field_validator('dob')
+    @classmethod
+    def validate_dob(cls, dob: str):
+        datetime.datetime.strptime(dob, '%d/%m/%Y')
+        return dob
+
+    @field_validator('location')
+    @classmethod
+    def validate_location(cls, location: List[float]):
+        if len(location) != 2:
+            raise ValueError('Invalid location format')
+        if location[0] < -90 or location[0] > 90:
+            raise ValueError('Invalid latitude')
+
+        if location[0] < -180 or location[0] > 180:
+            raise ValueError('Invalid longitude')
+        return location
+
+    @field_validator('age_range')
+    @classmethod
+    def validate_age(cls, age_range: List[int]):
+        if len(age_range) != 2:
+            raise ValueError('Invalid age range format')
+
+        if age_range[0] < 18:
+            raise ValueError('Age range start must be above or equal to 18')
+        return age_range
+
 
 class CatPatch(BaseModel):
     """Cat patch model"""
-    name: str = None
-    age: int = None
-    breed: str = None
-    sex: bool = None
-    bio: str = None
+    name: str = Field(default='', min_length=1, max_length=100)
+    age: int = Field(default=0, gt=0)
+    breed: str = Field(default='', min_length=1, max_length=100)
+    sex: bool = Field(default='', min_length=1, max_length=100)
+    bio: str = Field(default='', min_length=1, max_length=300)
     image_ids: List[str] = None
 
 
@@ -54,14 +86,41 @@ class CatPatch(BaseModel):
 class UserPatch(BaseModel):
     """User patch model"""
     email: Optional[EmailStr] = None
-    dob: Optional[str] = None
     gender: Optional[str] = None
-    name: Optional[str] = None
-    surname: Optional[str] = None
-    bio: Optional[str] = None
-    location: Optional[str] = None
+    name: Optional[str] = Field(default=None, min_length=1, max_length=100)
+    surname: Optional[str] = Field(default=None, min_length=1, max_length=100)
+    bio: Optional[str] = Field(default='', min_length=1, max_length=100)
+    location: Optional[List[float]] = None
+    age_range: Optional[List[int]] = None
     profile_pic_url: Optional[str] = None
     cat: Optional[CatPatch] = None
+    search_radius: Optional[float] = Field(default=None, gt=0, lt=100)
+
+    @field_validator('location')
+    @classmethod
+    def validate_location(cls, location: Optional[List[float]]):
+        if location is None:
+            return None
+        if len(location) != 2:
+            raise ValueError('Invalid location format')
+        if location[0] < -90 or location[0] > 90:
+            raise ValueError('Invalid latitude')
+
+        if location[0] < -190 or location[0] > 180:
+            raise ValueError('Invalid longitude')
+        return location
+
+    @field_validator('age_range')
+    @classmethod
+    def validate_age(cls, age_range: Optional[List[int]]):
+        if age_range is None:
+            return None
+        if len(age_range) != 2:
+            raise ValueError('Invalid age range format')
+
+        if age_range[0] < 18:
+            raise ValueError('Age range start must be above or equal to 18')
+        return age_range
 
 
 class CatProfile(CatData):
@@ -82,11 +141,11 @@ class UserProfile(UserData):
     selections: List[str] = []  # Profiles that a user selected
     skips: List[str] = []
     potentials: List[str] = []  # List of profiles nearby
-    search_radius: float = 10.0              # Search radius in km, default is 10.0
+    search_radius: float = Field(default=10.0, gt=0, lt=100)  # Search radius in km, default is 10.0
 
 
 class RegisterUser(UserData):
-    password: str
+    password: str = Field(default='', min_length=6, max_length=16)
 
 
 class Message(BaseModel):
