@@ -17,10 +17,15 @@ import base64
 router = APIRouter(prefix="/pictures", tags=['pictures'])
 user_db = Database()
 
+allowed_imgs = ['png', 'jpg', 'jpeg', 'bmp']
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def upload_picture(file: UploadFile = File(...), current_user: UserProfile = Depends(get_current_user)):
     """Store the image in GridFS and update the user profile"""
+
+    print("Image format: " + (file.filename).split('.')[-1])
+    if not (file.filename).split('.')[-1] in allowed_imgs:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Image not in correct format")
 
     contents = await file.read()
     file_id = user_db.upload_file(contents, current_user.oid)
@@ -41,6 +46,10 @@ async def upload_cat_pictures(files: List[UploadFile] = File(...), current_user:
     file_ids = []
 
     for file in files:
+        print("Image format: " + (file.filename).split('.')[-1])
+        if not (file.filename).split('.')[-1] in allowed_imgs:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Image not in correct format")
+        
         contents = await file.read()
         file_id = user_db.upload_file(contents, current_user.oid)
 

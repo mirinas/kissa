@@ -40,11 +40,47 @@ async def register(user_data: RegisterUser):
     # Convert the Pydantic model to a dictionary, to store hash password
     user_dict = user_data.dict()
     user_dict['hashed_password'] = h_pass
-    # Remove `password` field
     user_dict.pop('password', None)
+    user_dict.pop('confirm', None)
 
-    exist = user_db.get_user_by_email(user_data.email)
-    if exist:
+    if not pass_matches(user_data.password, user_data.confirm):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Passwords must match'
+        )
+    
+    if not validate_password(user_data.password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Password must be at least 8 characters, contain a number, contain a symbol, contain an upper and lower and No white space'
+        )
+
+    if not validate_email(user_data.email):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Email not valid, please enter another'
+        )
+
+    if not validate_dob(user_data.dob):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='You must be at least 18 years old to sign up'
+        )
+
+    if not validate_cat_age(user_data.cat.age):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Cat age must not be 0'
+        )
+
+    result, missing_field = no_empty_fields(user_data)
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Please provide ' + missing_field
+        )
+
+    if get_user_by_email(user_data.email):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='User already exists with given email'
@@ -52,7 +88,6 @@ async def register(user_data: RegisterUser):
 
     # we also generate object id here
     user = UserProfile(**user_dict, oid=str(ObjectId()))
-
     created_id = user_db.create_user(user.dict())
 
     if created_id is not None:

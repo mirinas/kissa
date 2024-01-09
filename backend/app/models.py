@@ -86,7 +86,9 @@ class UserProfile(UserData):
 
 
 class RegisterUser(UserData):
+    email: str
     password: str
+    confirm: str
 
 
 class Message(BaseModel):

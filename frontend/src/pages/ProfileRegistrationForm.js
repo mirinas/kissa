@@ -20,10 +20,32 @@ function UserForm({ setState })
     const [catBreed, setCatBreed] = useState('');
     const [catGender, setCatGender] = useState('');
     const [catBio, setCatBio] = useState('');
+    const [disabled, setDisabled] = useState('');
+    const [error, setError] = useState('');
    
     const cookie = new Cookies();
     const expiryCheckInterval = 6000;
+
     const navigate = useNavigate();
+
+    // Fast API sends error messages with the 'detail' prefix
+    // react uses 'msg'
+    function getErrorMessage(error) {
+        if ('detail' in error) {
+            return error.detail;
+        } else if ('msg' in error) {
+            return error.msg;
+        }
+    }
+
+    function renderError(error) {
+        if (Array.isArray(error)) {
+            return "You must fill in all values"
+        }
+        else {
+            return <p>{error}</p>;
+        }
+    }
 
     const isExpired = (exp) => {
         const currentTime = Math.floor(Date.now()/1000);
@@ -40,13 +62,8 @@ function UserForm({ setState })
     }
 
     const handleRegister = async (event) => {
-
+        setDisabled(true);
         event.preventDefault();
-
-        if (password !== passwordConfirm) {
-            console.error("Passwords do not match");
-            return;
-        }
 
         fetch(API_ENDPOINT + "/profiles/register", {
             method: 'POST',
@@ -56,6 +73,7 @@ function UserForm({ setState })
             body: JSON.stringify({
                 'email': email,
                 'password': password,
+                'confirm': passwordConfirm,
                 'name': name,
                 'surname': surname,
                 'dob': dob,
@@ -81,10 +99,14 @@ function UserForm({ setState })
             console.log("\n");
 
             if (!response.ok) {
+                setDisabled(false);
                 const errorData = await response.json();
+                setError(getErrorMessage(errorData));
+
                 console.error("Server returned an error: ", errorData);
                 throw new Error(`HTTP error! status: ${response.status}`);
-            } else {
+            } 
+            else {
                 if (cookie) {
                     console.log("\nClient has been assigned a cookie: ");
 
@@ -120,6 +142,10 @@ function UserForm({ setState })
 
     return (
     <div>
+        <div >
+            {error && <p className='smalltext error-box'>{renderError(error)}</p>}
+        </div>
+
         <form onSubmit={handleRegister}>
             <div>
                 <h2 className='smalltext'>How can we call you?</h2>
@@ -237,7 +263,7 @@ function UserForm({ setState })
                 </div>
 
                 <div className='smalltext'>
-                    <button className="btn_kissa" onClick={handleRegister}>Next</button>
+                    <button className="btn_kissa" onClick={handleRegister} disabled={disabled}>Next</button>
                 </div>
 
             </div>
