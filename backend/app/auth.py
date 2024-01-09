@@ -40,7 +40,7 @@ async def register(user_data: RegisterUser):
     h_pass = pwd_context.hash(user_data.password)
 
     # Convert the Pydantic model to a dictionary, to store hash password
-    user_dict = user_data.dict()
+    user_dict = user_data.model_dump()
     user_dict['hashed_password'] = h_pass
     # Remove `password` field
     user_dict.pop('password', None)
@@ -60,7 +60,7 @@ async def register(user_data: RegisterUser):
     potentials_ids = find_matches_within_radius(user, all_users)
     user.potentials = potentials_ids
 
-    created_id = user_db.create_user(user.dict())
+    created_id = user_db.create_user(user.model_dump())
 
     if created_id is not None:
         # If user in database, grant token with set expiration

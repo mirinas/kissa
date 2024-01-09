@@ -61,7 +61,7 @@ async def confirm_suggestion(confirmation: ConfirmSuggestion,
             meeting_confirmation=list(),
             messages=list()
         )
-        match_id = db.create_match(match.dict())
+        match_id = db.create_match(match.model_dump())
         if match_id is None:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Error creating a match')
 
