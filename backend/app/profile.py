@@ -48,7 +48,7 @@ async def get_cat_profile(pid: str, current_user: UserProfile = Depends(get_curr
     :return: cat profile with owner id
     """
     user = await get_user_profile(pid, current_user)
-    cat_dict = user.cat.dict()
+    cat_dict = user.cat.model_dump()
     cat = CatProfile(**cat_dict, owner_id=user.oid)
     return cat
 
@@ -73,7 +73,7 @@ async def update_profile(pid: str, profile: UserPatch,
         user = UserProfile(**user)
         all_users = list(map(lambda x: UserProfile(**x), user_db.get_all_users()))
         potentials_ids = find_matches_within_radius(user, all_users)
-        profile = profile.dict()
+        profile = profile.model_dump()
         profile['potentials'] = potentials_ids
     updated_user = user_db.update_user(pid, profile)
     if updated_user is None:
