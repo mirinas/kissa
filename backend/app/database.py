@@ -83,8 +83,9 @@ class Database:
             print("Error updating user: " + str(e))
             return None
 
-    def get_all_users(self):
-        list(self.profile_collection.find())
+    def get_all_users(self) -> list[dict]:
+        all_users = list(self.profile_collection.find())
+        return list(map(lambda user: pythonize(user), all_users))
 
     def delete_user(self, user_id: str) -> bool:
         try:
@@ -222,8 +223,8 @@ class Database:
         for entry in self.match_collection.find():
             self.match_collection.delete_one(entry)
 
-        for file in self.fs.find():
-            self.fs.delete(file._id)
+        # for file in self.fs.find():
+        #     self.fs.delete(file._id)
 
         print('Database cleared.')
         print(f"Profiles entries: {len(list(self.profile_collection.find()))}")

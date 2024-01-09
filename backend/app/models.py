@@ -59,7 +59,8 @@ class UserPatch(BaseModel):
     name: Optional[str] = None
     surname: Optional[str] = None
     bio: Optional[str] = None
-    location: Optional[str] = None
+    location: Optional[List[float]] = None
+    age_range: Optional[List[int]] = None
     profile_pic_url: Optional[str] = None
     cat: Optional[CatPatch] = None
 

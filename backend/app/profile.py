@@ -31,7 +31,7 @@ async def get_user_profile(pid: str, current_user: UserProfile = Depends(get_cur
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
 
-    res = list(filter(lambda u: u.uid == pid, current_user.potentials))
+    res = list(filter(lambda oid:  oid == pid, current_user.potentials))
     if len(res) == 0 and current_user.oid != pid:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail='You do not have permission to request this profile data')
@@ -71,10 +71,11 @@ async def update_profile(pid: str, profile: UserPatch,
 
     if profile.location is not None:
         user = UserProfile(**user)
-        matches_ids = find_matches_within_radius(user, user_db.get_all_users())
+        all_users = list(map(lambda x: UserProfile(**x), user_db.get_all_users()))
+        potentials_ids = find_matches_within_radius(user, all_users)
         profile = profile.dict()
-        profile['potentials'] = matches_ids
-    updated_user = user_db.update_user(pid, profile.dict())
+        profile['potentials'] = potentials_ids
+    updated_user = user_db.update_user(pid, profile)
     if updated_user is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail='Patch request was not successful')
@@ -117,15 +118,17 @@ def haversine_distance(lat1, lon1, lat2, lon2):
 
 
 def current_age(dob_str: str) -> int:
-    dob = datetime.strptime(dob_str, '%m/%d/%Y')
+    dob = datetime.datetime.strptime(dob_str, '%d/%m/%Y')
     today = datetime.date.today()
     age = relativedelta.relativedelta(today, dob).years
     return age
 
 
 def find_matches_within_radius(user: UserProfile, user_profiles: list[UserProfile]):
-    matches = []
+    if len(user_profiles) == 0:
+        return []
 
+    matches_found = []
     max_distance = user.search_radius
 
     for other_user in user_profiles:
@@ -138,9 +141,9 @@ def find_matches_within_radius(user: UserProfile, user_profiles: list[UserProfil
             if distance <= max_distance and user.preference == other_user.gender and other_user.oid not in user.skips\
                     and user.age_range[0] <= user_age <= user.age_range[1]\
                     and other_user not in user.selections:
-                matches.append(other_user)
+                matches_found.append(other_user)
 
-    return list(map(lambda u: u.oid, matches))
+    return list(map(lambda u: u.oid, matches_found))
 
 
 if __name__ == "__main__":

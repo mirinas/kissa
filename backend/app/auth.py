@@ -7,10 +7,12 @@ from bson import ObjectId
 from fastapi import Depends
 from fastapi import APIRouter, HTTPException, status
 from auth_ops import *
+from profile import find_matches_within_radius
 
 
 user_db = Database()
 router = APIRouter(prefix='/profiles', tags=['auth'])
+
 
 @router.post("/token", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -52,6 +54,11 @@ async def register(user_data: RegisterUser):
 
     # we also generate object id here
     user = UserProfile(**user_dict, oid=str(ObjectId()))
+
+    # and find matches
+    all_users = list(map(lambda x: UserProfile(**x), user_db.get_all_users()))
+    potentials_ids = find_matches_within_radius(user, all_users)
+    user.potentials = potentials_ids
 
     created_id = user_db.create_user(user.dict())
 
