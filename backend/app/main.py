@@ -16,6 +16,8 @@ app = FastAPI()
 # CORS settings
 origins = [
     "http://localhost",
+    "http://127.0.0.1",
+    "http://127.0.0.1:3000",
     "http://localhost:3000",  # Local
     "https://kissa-web.jollymoss-4112728e.uksouth.azurecontainerapps.io"  # Remote
 ]
