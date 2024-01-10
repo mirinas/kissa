@@ -28,6 +28,16 @@ function UserForm({ setState })
 
     const navigate = useNavigate();
 
+    const handleDateChange = (e) => {
+        const rawDate = new Date(e.target.value);
+        const day = String(rawDate.getDate()).padStart(2, '0');
+        const month = String(rawDate.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+        const year = rawDate.getFullYear().toString().substr(-2);
+        const formattedDate = `${day}/${month}/${year}`;
+        setDob(formattedDate);
+    };
+
+
     // Fast API sends error messages with the 'detail' prefix
     // react uses 'msg'
     function getErrorMessage(error) {
@@ -62,7 +72,7 @@ function UserForm({ setState })
     }
 
     const handleRegister = async (event) => {
-        setDisabled(true);
+        //setDisabled(true);
         event.preventDefault();
 
         fetch(API_ENDPOINT + "/profiles/register", {
@@ -212,7 +222,7 @@ function UserForm({ setState })
                 <div>
                     <h2 className='smalltext'>When were you born?</h2>
                     <div className='smalltext'>
-                        <input type="date" placeholder="dd/mm/yy" value={dob} onChange={(e) => setDob(e.target.value)} />
+                        <input type="date" value={dob} onChange={handleDateChange} />
                     </div>
                 </div>
 

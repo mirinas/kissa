@@ -7,10 +7,12 @@ from bson import ObjectId
 from fastapi import Depends
 from fastapi import APIRouter, HTTPException, status
 from auth_ops import *
+from profile import find_matches_within_radius
 
 
 user_db = Database()
 router = APIRouter(prefix='/profiles', tags=['auth'])
+
 
 @router.post("/token", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -38,47 +40,49 @@ async def register(user_data: RegisterUser):
     h_pass = pwd_context.hash(user_data.password)
 
     # Convert the Pydantic model to a dictionary, to store hash password
-    user_dict = user_data.dict()
+    user_dict = user_data.model_dump()
     user_dict['hashed_password'] = h_pass
+    user_dict['location'] = [0.0, 0.0]
+    user_dict['age_range'] = [18, 25]
     user_dict.pop('password', None)
     user_dict.pop('confirm', None)
-
-    if not pass_matches(user_data.password, user_data.confirm):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='Passwords must match'
-        )
-    
-    if not validate_password(user_data.password):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='Password must be at least 8 characters, contain a number, contain a symbol, contain an upper and lower and no white space'
-        )
-
-    if not validate_email(user_data.email):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='Email not valid, please enter another'
-        )
-
-    if not validate_dob(user_data.dob):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='You must be at least 18 years old to sign up'
-        )
-
-    if not validate_cat_age(user_data.cat.age):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='Cat age must not be 0'
-        )
-
-    result, missing_field = no_empty_fields(user_data)
-    if not result:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='Please provide ' + missing_field
-        )
+#
+#    if not pass_matches(user_data.password, user_data.confirm):
+#        raise HTTPException(
+#            status_code=status.HTTP_400_BAD_REQUEST,
+#            detail='Passwords must match'
+#        )
+#    
+#    if not validate_password(user_data.password):
+#        raise HTTPException(
+#            status_code=status.HTTP_400_BAD_REQUEST,
+#            detail='Password must be at least 8 characters, contain a number, contain a symbol, contain an upper and lower and no white space'
+#        )
+#
+#    if not validate_email(user_data.email):
+#        raise HTTPException(
+#            status_code=status.HTTP_400_BAD_REQUEST,
+#            detail='Email not valid, please enter another'
+#        )
+#
+#    if not validate_dob(user_data.dob):
+#        raise HTTPException(
+#            status_code=status.HTTP_400_BAD_REQUEST,
+#            detail='You must be at least 18 years old to sign up'
+#        )
+#
+#    if not validate_cat_age(user_data.cat.age):
+#        raise HTTPException(
+#            status_code=status.HTTP_400_BAD_REQUEST,
+#            detail='Cat age must not be 0'
+#        )
+#
+#    result, missing_field = no_empty_fields(user_data)
+#    if not result:
+#        raise HTTPException(
+#            status_code=status.HTTP_400_BAD_REQUEST,
+#            detail='Please provide ' + missing_field
+#        )
 
     if get_user_by_email(user_data.email):
         raise HTTPException(
@@ -88,7 +92,13 @@ async def register(user_data: RegisterUser):
 
     # we also generate object id here
     user = UserProfile(**user_dict, oid=str(ObjectId()))
-    created_id = user_db.create_user(user.dict())
+
+    # and find matches
+    all_users = list(map(lambda x: UserProfile(**x), user_db.get_all_users()))
+    potentials_ids = find_matches_within_radius(user, all_users)
+    user.potentials = potentials_ids
+
+    created_id = user_db.create_user(user.model_dump())
 
     if created_id is not None:
         # If user in database, grant token with set expiration
