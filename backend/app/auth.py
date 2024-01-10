@@ -52,7 +52,7 @@ async def register(user_data: RegisterUser):
     if not validate_password(user_data.password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail='Password must be at least 8 characters, contain a number, contain a symbol, contain an upper and lower and No white space'
+            detail='Password must be at least 8 characters, contain a number, contain a symbol, contain an upper and lower and no white space'
         )
 
     if not validate_email(user_data.email):

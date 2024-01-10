@@ -98,12 +98,7 @@ async def get_current_user(token: str = Security(oauth2_scheme)) -> UserProfile:
     return user
 
 def validate_password(password):
-    # At least 1 digit
-    # At least 1 lower
-    # At least 1 upper
-    # At least 1 special
-    # At least 8 chars
-    # No white space
+    # At least 1 digit, At least 1 lower, At least 1 upper, At least 1 special, At least 8 chars, No white space
     return bool(re.match(r"(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^!*&+=])(?=\S+$).{8,}", password))
 
 def pass_matches(password, confirm):
@@ -113,7 +108,14 @@ def validate_email(email):
     return bool(re.match(r"[^@]+@[^@]+\.[^@]+", email))
 
 def validate_dob(dob):
-    return int(dob.split("-")[0]) <= 2005
+    dob_day = int(dob.split("-")[2])
+    dob_month = int(dob.split("-")[1])
+    dob_year = int(dob.split("-")[0])
+    
+    today = datetime.today()
+    age = today.year - dob_year - ((today.month, today.day) < (dob_month, dob_day))
+
+    return age >= 18
 
 def validate_cat_age(age):
     return age > 0

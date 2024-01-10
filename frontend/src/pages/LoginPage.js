@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import {useOutletContext} from "react-router-dom";
 import { Link } from 'react-router-dom';
 import Cookies from "universal-cookie";
 import { useNavigate } from 'react-router-dom';
@@ -14,6 +15,9 @@ export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [disabled, setDisabled] = useState(false);
+    const {setSelected} = useOutletContext();
+    
+    useEffect(() => setSelected('login'), [setSelected]);
 
     const navigate = useNavigate();
 
