@@ -177,3 +177,8 @@ textarea {
     border: 10px solid #c75050;
     margin-bottom: 5px;
 }
+
+.error-box {
+	background-color: #ffa8a8;
+    border-radius: 15px;
+}

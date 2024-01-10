@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import {useOutletContext} from "react-router-dom";
 import { Link } from 'react-router-dom';
 import Cookies from "universal-cookie";
 import { useNavigate } from 'react-router-dom';
@@ -13,6 +14,10 @@ const expiryCheckInterval = 6000;
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [disabled, setDisabled] = useState(false);
+    const {setSelected} = useOutletContext();
+    
+    useEffect(() => setSelected('login'), [setSelected]);
 
     const navigate = useNavigate();
 
@@ -31,7 +36,8 @@ export default function LoginPage() {
     }
 
     const handleLogin = async (event) => {
-
+        setDisabled(true);
+        
         event.preventDefault();
         try {
             const response = await fetch(API_ENDPOINT + '/profiles/token', {
@@ -46,6 +52,7 @@ export default function LoginPage() {
             });
 
             if (!response.ok) {
+                console.log(response);
                 throw new Error('Login failed');
             }
             else {
@@ -75,6 +82,7 @@ export default function LoginPage() {
             }
         } catch (error) {
             console.error('Login Error:', error);
+            setDisabled(false);
             // show error on browser for user?
         }
     };
@@ -95,10 +103,10 @@ export default function LoginPage() {
                         </div>
 
                         <div id="buttons">
-                            <button type="submit" className="btn_kissa">Login</button>
+                            <button type="submit" className="btn_kissa" disabled={disabled}>Login</button>
                             <br />
                             <Link to="/acc/register">
-                                <button type="button" className="btn_kissa light">Join us</button>
+                                <button type="button" className="btn_kissa">Join us</button>
                             </Link>
                         </div>
                     </form>
