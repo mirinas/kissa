@@ -146,6 +146,7 @@ def find_matches_within_radius(user: UserProfile, user_profiles: list[UserProfil
 
     return list(map(lambda u: u.oid, matches_found))
 
+
 if __name__ == "__main__":
     from models import user_profile
 

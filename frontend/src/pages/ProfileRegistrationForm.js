@@ -22,20 +22,23 @@ function UserForm({ setState })
     const [catBio, setCatBio] = useState('');
     const [disabled, setDisabled] = useState('');
     const [error, setError] = useState('');
+    const [formattedDate, setFormattedDate] = useState('');
    
     const cookie = new Cookies();
     const expiryCheckInterval = 6000;
 
     const navigate = useNavigate();
 
-    const handleDateChange = (e) => {
-        const rawDate = new Date(e.target.value);
-        const day = String(rawDate.getDate()).padStart(2, '0');
-        const month = String(rawDate.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
-        const year = rawDate.getFullYear().toString().substr(-2);
-        const formattedDate = `${day}/${month}/${year}`;
-        setDob(formattedDate);
+    const convertToDisplayFormat = (isoDate) => {
+        const [year, month, day] = isoDate.split("-");
+        return `${day}/${month}/${year}`;
     };
+
+    const handleDateChange = (e) => {
+        setDob(e.target.value); // Keep the state in 'YYYY-MM-DD' format
+    };
+
+
 
 
     // Fast API sends error messages with the 'detail' prefix
@@ -86,7 +89,7 @@ function UserForm({ setState })
                 'confirm': passwordConfirm,
                 'name': name,
                 'surname': surname,
-                'dob': dob,
+                'dob': convertToDisplayFormat(dob),
                 'bio': bio,
                 'gender': gender,
                 'profile_pic_url': '',
