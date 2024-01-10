@@ -38,7 +38,7 @@ export default function ProfilePage() {
                     setLoading(false);
                 });
         });
-    }, [ageState, rangeState, matchingPrefsState]);
+    }, []);
 
     const handleRange = () => {
         patchProfile(id, {
