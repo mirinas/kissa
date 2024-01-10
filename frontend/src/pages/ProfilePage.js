@@ -1,5 +1,5 @@
 import {useOutletContext} from "react-router-dom";
-import {useEffect, useReducer, useState} from "react";
+import {useEffect, useState} from "react";
 import '../styles/ProfilePage.css'
 import HSlider from "../components/HSlider";
 import {API_ENDPOINT, devLogin} from "../globals";
@@ -38,7 +38,7 @@ export default function ProfilePage() {
                     setLoading(false);
                 });
         });
-    }, []);
+    }, [ageState, rangeState, matchingPrefsState]);
 
     const handleRange = () => {
         patchProfile(id, {
