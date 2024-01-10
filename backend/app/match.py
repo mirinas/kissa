@@ -33,8 +33,8 @@ async def get_suggestion(current_user: UserProfile = Depends(get_current_user)) 
 
     if len(current_user.potentials) == 0:
         return None
-    suggestion = current_user.potentials.pop()
-    cat_profile = await get_cat_profile(suggestion)
+    suggestion = current_user.potentials[-1]
+    cat_profile = await get_cat_profile(suggestion, current_user)
 
     return cat_profile
 
