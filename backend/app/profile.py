@@ -75,7 +75,7 @@ async def update_profile(pid: str, profile: UserPatch,
         potentials_ids = find_matches_within_radius(user, all_users)
         profile = profile.model_dump()
         profile['potentials'] = potentials_ids
-    updated_user = user_db.update_user(pid, profile)
+    updated_user = user_db.update_user(pid, profile.model_dump(exclude_none=True))
     if updated_user is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail='Patch request was not successful')
