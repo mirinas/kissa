@@ -3,6 +3,8 @@ Models module.
 
 This module provides all the schema models and their types in the form of pydantic models
 """
+
+
 import datetime
 
 from pydantic import (
@@ -55,7 +57,7 @@ class CatData(BaseModel):
 
 
 class UserData(BaseModel):
-    email: str 
+    email: EmailStr 
     dob: str  # date of birth
     gender: str = Field(..., min_length=1, max_length=100)
     name: str = Field(..., min_length=1, max_length=100)
@@ -88,7 +90,7 @@ class CatPatch(BaseModel):
 # partial patching of db entries
 class UserPatch(BaseModel):
     """User patch model"""
-    email: Optional[str] = None
+    email: Optional[EmailStr] = None
     gender: Optional[str] = None
     name: Optional[str] = Field(default=None, min_length=1, max_length=100)
     surname: Optional[str] = Field(default=None, min_length=1, max_length=100)
@@ -105,7 +107,7 @@ class CatProfile(CatData):
 
 
 class LoginCredentials(BaseModel):
-    email: str
+    email: EmailStr
     password: str
 
 
