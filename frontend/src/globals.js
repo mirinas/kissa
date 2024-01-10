@@ -31,18 +31,16 @@ export async function devLogin() {
         "password": "string"
     }
 
-    // const rand = Math.round(Math.random() * 1000);
-    // await axios.post(API_ENDPOINT + '/profiles/register',
-    //     {...registerData, email: `female${rand}@email.com`, gender: 'female', preference: 'male'})
-    //     .then(res => console.log(res.data));
+    const rand = Math.round(Math.random() * 1000);
+    await axios.post(API_ENDPOINT + '/profiles/register',
+        {...registerData, email: `female${rand}@email.com`, gender: 'female', preference: 'male'})
+        .then(res => console.log(res.data));
 
     const res = await axios.post(API_ENDPOINT + '/profiles/token', loginData, {
         headers: {'Content-Type': 'application/x-www-form-urlencoded'}
     }).catch(() => {
         return axios.post(API_ENDPOINT + '/profiles/register', registerData);
     });
-
-    // const res = await axios.post(API_ENDPOINT + '/profiles/register', registerData);
 
     return res.data.access_token;
 }

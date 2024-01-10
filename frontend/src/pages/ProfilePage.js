@@ -42,7 +42,8 @@ export default function ProfilePage() {
 
     const handleRange = () => {
         patchProfile(id, {
-            search_radius: rangeState[0]
+            // search_radius: rangeState[0]
+            name: 'Augustas2'
         });
     }
 
