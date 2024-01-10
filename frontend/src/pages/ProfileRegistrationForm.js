@@ -22,7 +22,7 @@ function UserForm({ setState })
     const [catBio, setCatBio] = useState('');
     const [disabled, setDisabled] = useState('');
     const [error, setError] = useState('');
-    const [formattedDate, setFormattedDate] = useState('');
+    const [preference, setPreference] = useState();
    
     const cookie = new Cookies();
     const expiryCheckInterval = 6000;
@@ -37,9 +37,6 @@ function UserForm({ setState })
     const handleDateChange = (e) => {
         setDob(e.target.value); // Keep the state in 'YYYY-MM-DD' format
     };
-
-
-
 
     // Fast API sends error messages with the 'detail' prefix
     // react uses 'msg'
@@ -95,7 +92,7 @@ function UserForm({ setState })
                 'profile_pic_url': '',
                 'location': [],
                 'age_range': [],
-                'preference': '',
+                'preference': preference,
                 'cat': {
                     'name': catName,
                     'age': catAge,
@@ -178,8 +175,8 @@ function UserForm({ setState })
                         <input 
                             type="radio" 
                             name="gender" 
-                            value="Male" 
-                            checked={gender === 'Male'} 
+                            value="male" 
+                            checked={gender === 'male'} 
                             onChange={(e) => setGender(e.target.value)}
                         />
                         <span className="checkmark"></span>
@@ -189,8 +186,8 @@ function UserForm({ setState })
                         <input 
                             type="radio" 
                             name="gender" 
-                            value="Female" 
-                            checked={gender === 'Female'} 
+                            value="female" 
+                            checked={gender === 'female'} 
                             onChange={(e) => setGender(e.target.value)}
                         />
                         <span className="checkmark"></span>
@@ -207,6 +204,44 @@ function UserForm({ setState })
                         <span className="checkmark"></span>
                     </label>
                 </div>
+
+                <h2 className='smalltext'>You are interested in</h2>
+                <div className='smalltext'>
+                    <label className="radio">
+                        Male
+                        <input 
+                            type="radio" 
+                            name="preference" 
+                            value="male" 
+                            checked={preference === 'male'} 
+                            onChange={(e) => setPreference(e.target.value)}
+                        />
+                        <span className="checkmark"></span>
+                    </label>
+                    <label className="radio">
+                        Female
+                        <input 
+                            type="radio" 
+                            name="preference" 
+                            value="female" 
+                            checked={preference === 'female'} 
+                            onChange={(e) => setPreference(e.target.value)}
+                        />
+                        <span className="checkmark"></span>
+                    </label>
+                    <label className="radio">
+                        Other
+                        <input 
+                            type="radio" 
+                            name="preference" 
+                            value="Other" 
+                            checked={preference === 'Other'} 
+                            onChange={(e) => setPreference(e.target.value)}
+                        />
+                        <span className="checkmark"></span>
+                    </label>
+                </div>
+
 
                 <div>
                     <h2 className='smalltext'>Why do you want to join us?</h2>
