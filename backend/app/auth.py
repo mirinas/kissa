@@ -42,8 +42,6 @@ async def register(user_data: RegisterUser):
     # Convert the Pydantic model to a dictionary, to store hash password
     user_dict = user_data.model_dump()
     user_dict['hashed_password'] = h_pass
-    user_dict['location'] = [0.0, 0.0]
-    user_dict['age_range'] = [18, 25]
     user_dict.pop('password', None)
     user_dict.pop('confirm', None)
 #

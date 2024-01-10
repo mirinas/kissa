@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { API_ENDPOINT } from '../globals'
@@ -23,6 +23,8 @@ function UserForm({ setState })
     const [disabled, setDisabled] = useState('');
     const [error, setError] = useState('');
     const [preference, setPreference] = useState();
+    const [lat, setLat] = useState('');
+    const [lon, setLon] = useState('');
    
     const cookie = new Cookies();
     const expiryCheckInterval = 6000;
@@ -37,6 +39,28 @@ function UserForm({ setState })
     const handleDateChange = (e) => {
         setDob(e.target.value); // Keep the state in 'YYYY-MM-DD' format
     };
+
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(showPosition);
+        } else {
+            console.log("Geolocation is not supported by this browser.");
+        }
+    }
+
+    function showPosition(position) {
+        setLat(position.coords.latitude);
+        setLon(position.coords.longitude);
+    }
+
+    useEffect(() => {
+        getLocation();
+    }, []);
+
+    useEffect(() => {
+        console.log("Latitude: ", lat);
+        console.log("Longitude: ", lon);
+    }, [lat, lon]);
 
     // Fast API sends error messages with the 'detail' prefix
     // react uses 'msg'
@@ -90,8 +114,8 @@ function UserForm({ setState })
                 'bio': bio,
                 'gender': gender,
                 'profile_pic_url': '',
-                'location': [],
-                'age_range': [],
+                'location': [lat, lon],
+                'age_range': [18, 25],
                 'preference': preference,
                 'cat': {
                     'name': catName,
@@ -110,6 +134,7 @@ function UserForm({ setState })
 
             if (!response.ok) {
                 setDisabled(false);
+
                 const errorData = await response.json();
                 setError(getErrorMessage(errorData));
 
@@ -118,6 +143,7 @@ function UserForm({ setState })
             } 
             else {
                 if (cookie) {
+                    getLocation();
                     console.log("\nClient has been assigned a cookie: ");
 
                     const data = await response.json();
