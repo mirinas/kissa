@@ -14,6 +14,7 @@ export default function ProfilePage() {
     const [id, setId] = useState('');
     const rangeState = useState(2);
     const ageState = useState([18, 18]);
+    const [cat, setCat] = useState({});
     const matchingPrefsState = useState(
         {'male': true, 'female': false, 'other': false}
     );
@@ -34,6 +35,7 @@ export default function ProfilePage() {
                     newMatchingPrefs[res.data.preference] = true;
                     matchingPrefsState[1](newMatchingPrefs);
                     setId(res.data.oid);
+                    setCat(res.data.cat);
 
                     setLoading(false);
                 });
@@ -41,16 +43,19 @@ export default function ProfilePage() {
     }, []);
 
     const handleRange = () => {
-        patchProfile(id, {
-            // search_radius: rangeState[0]
-            name: 'Augustas2'
-        });
+        patchProfile(id, {search_radius: rangeState[0]});
     }
 
     const handleAge = () => {
-        patchProfile(id, {
-            age_range: ageState[0]
-        });
+        patchProfile(id, {age_range: ageState[0]});
+    }
+
+    const handleBio = () => {
+        patchProfile(id, {bio});
+    }
+
+    const handleCat = () => {
+
     }
 
     if(loading) return <Loading />
@@ -70,10 +75,15 @@ export default function ProfilePage() {
             </Section>
             <Section title={'Your details'} openedState={openedState}>
                 <h5>Your description</h5>
-                <textarea placeholder={'I like cats...'} className={'scrollable user-description'} defaultValue={bio}/>
+                <textarea placeholder={'I like cats...'} className={'scrollable user-description'} defaultValue={bio} onBlur={handleBio}/>
             </Section>
             <Section title={'Your cat'} openedState={openedState}>
-
+                <h5>Cat name</h5>
+                <input placeholder={'Name of your cat'} defaultValue={cat.name} onBlur={handleCat} />
+                <h5>Breed</h5>
+                <input placeholder={'Breed of your cat'} defaultValue={cat.breed} onBlur={handleCat} />
+                <h5>Cat bio</h5>
+                <textarea placeholder={'Cute cat description...'} className={'scrollable user-description'} defaultValue={cat.bio} onBlur={handleCat}/>
             </Section>
         </div>
     );

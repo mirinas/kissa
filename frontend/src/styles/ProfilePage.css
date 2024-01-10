@@ -62,7 +62,7 @@ section .opened {
 
 .user-description {
     text-align: justify;
-    min-height: 12em;
+    min-height: 6em;
     resize: none;
 }
 
