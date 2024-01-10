@@ -56,7 +56,7 @@ export default function MainPage() {
 
     const loadSuggestion = () => {
         setLoading(true);
-        // devLogin().then(token => {
+        devLogin().then(token => {
             axios.get(API_ENDPOINT + '/match/suggest', {
                 headers: {'Authorization': 'bearer ' + token}
             })
@@ -66,7 +66,7 @@ export default function MainPage() {
                     setLoading(!res.data);
                     setErrorMessage('No potential matches left :(');
                 });
-        // })
+        });
     }
 
 
