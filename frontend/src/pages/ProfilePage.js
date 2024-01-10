@@ -45,7 +45,13 @@ export default function ProfilePage() {
     }, []);
 
     const handleRange = () => {
-        patchProfile(id, {search_radius: rangeState[0]});
+        // patchProfile(id, {search_radius: rangeState[0].toFixed(1)});
+
+        devLogin().then(token => {
+            axios.get(API_ENDPOINT + `/profiles/${id}/cat`, {
+                headers: {'Authorization': 'bearer ' + token}
+            })
+                .then(res => console.log(res.data));});
     }
 
     const handleAge = () => {

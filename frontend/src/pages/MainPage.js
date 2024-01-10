@@ -7,7 +7,9 @@ import {useEffect, useState} from "react";
 import axios from 'axios'
 import Loading from "../components/Loading";
 import {GiMale, GiFemale} from 'react-icons/gi'
-import {API_ENDPOINT, devLogin} from "../globals";
+import {API_ENDPOINT} from "../globals";
+import Cookies from "universal-cookie";
+
 
 // TODO: SHOW "It's a purrfect match..." screen
 
@@ -15,6 +17,8 @@ import {API_ENDPOINT, devLogin} from "../globals";
 export default function MainPage() {
 
     const cats = [cat1, cat2, cat3];
+    const cookie = new Cookies();
+    const token = cookie.get('access_token');
 
     const {setSelected} = useOutletContext();
     const [profile, setProfile] = useState({});
@@ -31,42 +35,36 @@ export default function MainPage() {
 
 
     const handleSkip = () => {
-        devLogin().then(token => {
-            axios.post(API_ENDPOINT + '/match/skip', {oid: profile.owner_id},
-                {headers: {'Authorization': 'bearer ' + token}})
-                .then(res => {
-                    console.log(res.data);
-                    loadSuggestion();
-                });
-        });
+        axios.post(API_ENDPOINT + '/match/skip', {oid: profile.owner_id},
+            {headers: {'Authorization': 'bearer ' + token}})
+            .then(res => {
+                console.log(res.data);
+                loadSuggestion();
+            });
     }
 
 
     const handleMatch = () => {
-        devLogin().then(token => {
-            axios.post(API_ENDPOINT + '/match/confirm', {oid: profile.owner_id},
-                {headers: {'Authorization': 'bearer ' + token}})
-                .then(res => {
-                    console.log(res.data);
-                    loadSuggestion();
-                });
-        });
+        axios.post(API_ENDPOINT + '/match/confirm', {oid: profile.owner_id},
+            {headers: {'Authorization': 'bearer ' + token}})
+            .then(res => {
+                console.log(res.data);
+                loadSuggestion();
+            });
     }
 
 
     const loadSuggestion = () => {
         setLoading(true);
-        devLogin().then(token => {
-            axios.get(API_ENDPOINT + '/match/suggest', {
-                headers: {'Authorization': 'bearer ' + token}
-            })
-                .then(res => {
-                    setPictureIndex(0);
-                    setProfile(res.data ? res.data : {});
-                    setLoading(!res.data);
-                    setErrorMessage('No potential matches left :(');
-                });
-        });
+        axios.get(API_ENDPOINT + '/match/suggest', {
+            headers: {'Authorization': 'bearer ' + token}
+        })
+            .then(res => {
+                setPictureIndex(0);
+                setProfile(res.data ? res.data : {});
+                setLoading(!res.data);
+                setErrorMessage('No potential matches left :(');
+            });
     }
 
 
