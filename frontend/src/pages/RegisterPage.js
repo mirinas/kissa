@@ -7,8 +7,8 @@ import UserPictureUpload from './ProfileUserPictureUpload'
 import '../styles/LoginRegister.css';
 
 export default function RegisterPage() {
-    const {setSelected} = useOutletContext();
-    useEffect(() => setSelected('register'), [setSelected]);
+    // const {setSelected} = useOutletContext();
+    // useEffect(() => setSelected('register'), [setSelected]);
 
     const navigate = useNavigate();
     const [state, setState] = useState(1);

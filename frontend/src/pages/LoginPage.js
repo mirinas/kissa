@@ -15,9 +15,9 @@ export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [disabled, setDisabled] = useState(false);
-    const {setSelected} = useOutletContext();
-    
-    useEffect(() => setSelected('login'), [setSelected]);
+
+    // const {setSelected} = useOutletContext();
+    // useEffect(() => setSelected('login'), [setSelected]);
 
     const navigate = useNavigate();
 

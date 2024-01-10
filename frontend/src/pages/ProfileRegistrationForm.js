@@ -113,7 +113,7 @@ function UserForm({ setState })
                 'dob': convertToDisplayFormat(dob),
                 'bio': bio,
                 'gender': gender,
-                'profile_pic_url': '',
+                'profile_pic_url': 'picture',
                 'location': [lat, lon],
                 'age_range': [18, 25],
                 'preference': preference,
