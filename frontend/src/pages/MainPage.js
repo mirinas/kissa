@@ -7,7 +7,7 @@ import {useEffect, useState} from "react";
 import axios from 'axios'
 import Loading from "../components/Loading";
 import {GiMale, GiFemale} from 'react-icons/gi'
-import {API_ENDPOINT} from "../globals";
+import {API_ENDPOINT, devLogin} from "../globals";
 import Cookies from "universal-cookie";
 
 
@@ -56,15 +56,17 @@ export default function MainPage() {
 
     const loadSuggestion = () => {
         setLoading(true);
-        axios.get(API_ENDPOINT + '/match/suggest', {
-            headers: {'Authorization': 'bearer ' + token}
-        })
-            .then(res => {
-                setPictureIndex(0);
-                setProfile(res.data ? res.data : {});
-                setLoading(!res.data);
-                setErrorMessage('No potential matches left :(');
-            });
+        // devLogin().then(token => {
+            axios.get(API_ENDPOINT + '/match/suggest', {
+                headers: {'Authorization': 'bearer ' + token}
+            })
+                .then(res => {
+                    setPictureIndex(0);
+                    setProfile(res.data ? res.data : {});
+                    setLoading(!res.data);
+                    setErrorMessage('No potential matches left :(');
+                });
+        // })
     }
 
 

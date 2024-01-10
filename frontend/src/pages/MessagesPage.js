@@ -2,6 +2,7 @@ import {useOutletContext} from "react-router-dom";
 import {useEffect} from "react";
 import '../styles/MessagesPage.css';
 import {API_ENDPOINT, devLogin} from "../globals";
+import axios from 'axios';
 
 export default function MessagesPage() {
     const {setSelected} = useOutletContext();
@@ -22,12 +23,12 @@ export default function MessagesPage() {
         );
     });
 
-    useEffect(() => {
-        devLogin().then(token => {
-            axios.get(API_ENDPOINT + '/profiles/me')
-                .then();
-        });
-    }, []);
+    // useEffect(() => {
+    //     devLogin().then(token => {
+    //         axios.get(API_ENDPOINT + '/profiles/me')
+    //             .then();
+    //     });
+    // }, []);
 
     return (
         <>
