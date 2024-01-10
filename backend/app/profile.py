@@ -31,8 +31,11 @@ async def get_user_profile(pid: str, current_user: UserProfile = Depends(get_cur
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
 
-    res = list(filter(lambda oid:  oid == pid, current_user.potentials))
-    if len(res) == 0 and current_user.oid != pid:
+    res = list(filter(lambda oid: oid == pid, current_user.potentials))
+    print(res)
+    print(pid)
+    print(current_user.potentials)
+    if len(res) == 0:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail='You do not have permission to request this profile data')
 
