@@ -10,6 +10,7 @@ export default function ProfilePage() {
     const {setSelected} = useOutletContext();
     const openedState = useState('Preferences');
     const [loading, setLoading] = useState(false);
+    const [pictureIndex, setPictureIndex] = useState(0);
 
     const [id, setId] = useState('');
     const rangeState = useState(2);
@@ -36,6 +37,7 @@ export default function ProfilePage() {
                     matchingPrefsState[1](newMatchingPrefs);
                     setId(res.data.oid);
                     setCat(res.data.cat);
+                    setPictureIndex(0);
 
                     setLoading(false);
                 });
@@ -57,6 +59,26 @@ export default function ProfilePage() {
     const handleCat = () => {
 
     }
+
+    const switchImage = e => {
+        const center = e.currentTarget.offsetWidth / 2;
+        if(e.nativeEvent.offsetX < center) setPictureIndex(Math.max(0, pictureIndex - 1))
+        else setPictureIndex(Math.min(pictureIndex + 1, cat.image_ids.length - 1))
+    }
+
+
+    const uploadImages = e => {
+        const images = Array.from(e.target.files);
+
+        const data = new FormData();
+        images.forEach(f => {
+            data.append('files', f);
+        });
+
+        // use data to POST in /pictures/cat endpoint
+        // patch IDs received to the profile
+    }
+
 
     if(loading) return <Loading />
     return (
@@ -84,6 +106,8 @@ export default function ProfilePage() {
                 <input placeholder={'Breed of your cat'} defaultValue={cat.breed} onBlur={handleCat} />
                 <h5>Cat bio</h5>
                 <textarea placeholder={'Cute cat description...'} className={'scrollable user-description'} defaultValue={cat.bio} onBlur={handleCat}/>
+                {(cat.image && cat.image_ids.length > 0) &&
+                    <img alt={'Cat'} src={ cat.image_ids[pictureIndex] } onClick={switchImage}/>}
             </Section>
         </div>
     );
