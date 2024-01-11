@@ -52,7 +52,7 @@ class CatData(BaseModel):
     breed: str
     sex: bool  # false = male, true = female
     bio: str
-    image_ids: List[str] = []  # list of image ids
+    image_ids: List[str] = Field([], min_length=0, max_length=5)  # list of image ids
 
 
 class UserData(BaseModel):
@@ -88,7 +88,7 @@ class CatPatch(BaseModel):
     breed: str = Field(default=None, min_length=1, max_length=100)
     sex: bool = Field(default=None, min_length=0, max_length=100)
     bio: str = Field(default=None, min_length=0, max_length=300)
-    image_ids: List[str] = None
+    image_ids: List[str] = Field(None, min_length=0, max_length=5)
 
 
 # This model can assign attributes to default None as it allows for
