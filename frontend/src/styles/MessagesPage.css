@@ -17,6 +17,7 @@
     object-fit: cover;
     object-position: top;
     border-radius: 1em;
+    cursor: pointer;
 }
 
 .no-matches {

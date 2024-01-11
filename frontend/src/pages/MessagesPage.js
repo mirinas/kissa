@@ -1,7 +1,7 @@
 import {useOutletContext} from "react-router-dom";
 import {useEffect, useState} from "react";
 import '../styles/MessagesPage.css';
-import {API_ENDPOINT, getMyProfile} from "../globals";
+import {API_ENDPOINT, fetchImageData, getMyProfile} from "../globals";
 import axios from 'axios';
 import Cookies from "universal-cookie";
 
@@ -11,44 +11,42 @@ export default function MessagesPage() {
     const token = cookie.get('access_token');
     const {setSelected} = useOutletContext();
 
-    const [matches, setMatches] = useState([]);
-    const [matchIndex, setMatchIndex] = useState(0);
+    const [id, setId] = useState('');
+    const [messages, setMessages] = useState([]);
+    const [matches, setMatches] = useState([{}]);
+    const [selectedMatch, setSelectedMatch] = useState('');
 
     useEffect(() => {
         setSelected('messages');
 
         getMyProfile(token).then(res => {
-            res.data.matches.forEach(async (mid, i) => {
+            setId(res.data.oid);
 
+            res.data.matches.forEach(async (mid, i) => {
                 const match = await axios.get(API_ENDPOINT + '/match/' + mid, {
                     headers: {'Authorization': 'bearer ' + token}
                 });
 
-                console.log(match);
+                if(i === 0) switchCat(match.data.oid);
 
-                const messages = [];
-                if(i === 0) {
-                    // get messages
-                }
+                const matchedUserId = match.data.user_1 === res.data.oid ? match.data.user_2 : match.data.user_1;
+                const matchedUser = await axios.get(API_ENDPOINT + '/profiles/' + matchedUserId, {
+                    headers: {'Authorization': 'bearer ' + token}
+                });
+
+                const {image_ids} = matchedUser.data.cat;
+                if(image_ids.length === 0) return;
+
+                const imageData = await axios.get(API_ENDPOINT + '/pictures/' + image_ids[0], {
+                    headers: {'Authorization': 'bearer ' + token}
+                });
+                setMatches(matches.concat([{image: imageData.data, profile: matchedUser, mid: mid}]));
             });
         });
+
     }, []);
 
-    // const matches = [
-    //     'https://i.etsystatic.com/26335741/r/il/c644eb/3162142982/il_570xN.3162142982_8bqs.jpg',
-    //     'https://i1.wp.com/www.irishaspetportraits.co.uk/wp-content/uploads/2021/02/toby-large-res.jpg?fit=732%2C1024&ssl=1',
-    //     'https://www.warrenphotographic.co.uk/photography/bigs/37974-Tabby-cat-portrait-white-background.jpg',
-    //     'https://i.etsystatic.com/26335741/r/il/c644eb/3162142982/il_570xN.3162142982_8bqs.jpg',
-    //     'https://i1.wp.com/www.irishaspetportraits.co.uk/wp-content/uploads/2021/02/toby-large-res.jpg?fit=732%2C1024&ssl=1',
-    //     'https://www.warrenphotographic.co.uk/photography/bigs/37974-Tabby-cat-portrait-white-background.jpg'
-    // ].map((url, i) => {
-    //     let cname = 'scrollable';
-    //     if(i === 0) cname += ' selected';
-    //     return (
-    //         <img key={i} alt={'match' + i} src={url} width={100} height={100} className={cname}/>
-    //     );
-    // });
-
+    // NO MATCHES
     if(matches.length === 0) {
         return (
             <>
@@ -58,11 +56,44 @@ export default function MessagesPage() {
         );
     }
 
+
+
+    const switchCat = mid => {
+        setSelectedMatch(mid);
+        axios.get(API_ENDPOINT + `/match/${mid}/messages`, {
+            headers: {'Authorization': 'bearer ' + token}
+        })
+            .then(res => {
+                setMessages(res.data);
+            });
+    }
+
+    const cats = [...new Set(matches)].map(match => {
+        if(!match.image) return <></>
+
+        let cname = 'scrollable';
+        if(match.mid === selectedMatch) cname += ' selected';
+        return (
+            <img key={match.mid} alt={match.mid} src={ `data:image/jpeg;base64,${match.image}` } width={100} height={100}
+                 className={cname} onClick={() => switchCat(match.mid)}/>
+        );
+    });
+
+    messages.map((m, i) => {
+        console.log(m);
+        const cname = m.from_u === id ? 'me' : 'match';
+        return <p key={i} className={'message ' + cname}>{m.message}</p>
+    });
+
     return (
         <>
             <div className={'cat-carousel'}>
-                { matches }
+                { cats }
             </div>
+            <div className={'message-container'}>
+                { messages }
+            </div>
+
         </>
     );
 }
