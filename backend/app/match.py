@@ -108,7 +108,7 @@ async def confirm_suggestion(confirmation: ConfirmSuggestion,
 
     return ConfirmResponse(
         match_id=None,
-        matches_left=current_user.matches
+        matches_left=current_user.matches_allowed
     )
 
 
@@ -131,7 +131,7 @@ async def skip_suggestion(confirmation: ConfirmSuggestion,
 
     return ConfirmResponse(
         match_id=None,
-        matches_left=current_user.matches
+        matches_left=current_user.matches_allowed
     )
 
 
