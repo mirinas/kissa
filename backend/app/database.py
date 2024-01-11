@@ -3,15 +3,11 @@ Database operations module.
 
 This module provides functions to interact with the user database.
 """
-from itertools import count
 from typing import Optional
 
 from pymongo import MongoClient
 from bson import ObjectId
-from azure.identity import DefaultAzureCredential
-from azure.keyvault.secrets import SecretClient
 import gridfs
-import os
 
 
 def documentize(d: dict) -> dict:

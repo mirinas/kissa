@@ -42,3 +42,18 @@ Navigate to backend folder and run:
 terraform init
 terraform apply
 ```
+
+However, since the both frontend and backend are docker containerised.
+It can be deployed on the fresh Azure cloud service.
+Make sure you also set the environmental variables for the backend:
+```
+SECRET_KEY
+
+COSMOS_DB_URI
+
+COSMOS_DB_NAME
+
+COSMOS_DB_PROFILE_COLLECTION
+
+COSMOS_DB_MATCH_COLLECTION
+```
