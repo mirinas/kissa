@@ -143,7 +143,7 @@ async def get_match(mid: str,
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
     match.pop('messages')
     match = Match(**match)
-    if current_user.oid != match.user_1 and current_user.oid != match.user_2:
+    if current_user != match.user_1 and current_user != match.user_2:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail='You do not have permission to request this match data')
 
@@ -166,7 +166,7 @@ async def get_messages(mid: str,
     if match is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
     match = Match(**match)
-    if current_user.oid != match.user_1 and current_user.oid != match.user_2:
+    if current_user != match.user_1 and current_user != match.user_2:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail='You do not have permission to request this match data')
 

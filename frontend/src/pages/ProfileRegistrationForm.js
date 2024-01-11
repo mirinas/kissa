@@ -66,20 +66,23 @@ function UserForm({ setState })
     // Fast API sends error messages with the 'detail' prefix
     // react uses 'msg'
     function getErrorMessage(error) {
-        if ('detail' in error) {
-            return error.detail;
-        } else if ('msg' in error) {
-            return error.msg;
+
+        if (error.detail && Array.isArray(error.detail)) {
+            return error.detail.map(err => err.msg);
         }
     }
 
-    function renderError(error) {
-        if (Array.isArray(error)) {
-            return "You must fill in all values"
+    function renderError(errors) {
+        if (!errors || errors.length === 0) {
+            return null;
         }
-        else {
-            return <p>{error}</p>;
-        }
+        return (
+            <div className='error-messages'>
+                {errors.map((error, index) => (
+                    <p key={index} className='error-message'>{error}</p>
+                ))}
+            </div>
+        );
     }
 
     const isExpired = (exp) => {
@@ -99,7 +102,7 @@ function UserForm({ setState })
 
         if (password !== passwordConfirm) {
             console.error("Passwords do not match");
-            setError("Passwords do not match");
+            setError(getErrorMessage({'detail': [{'type': 'password_match', 'msg': "Passwords do not match"}]}));
             return;
         }
         fetch(API_ENDPOINT + "/profiles/register", {
@@ -137,11 +140,10 @@ function UserForm({ setState })
 
             if (!response.ok) {
                 setDisabled(false);
-
                 const errorData = await response.json();
-                setError(getErrorMessage(errorData));
-
+                const errorMessages = getErrorMessage(errorData);
                 console.error("Server returned an error: ", errorData);
+                setError(errorMessages);
                 throw new Error(`HTTP error! status: ${response.status}`);
             } 
             else {
@@ -176,7 +178,6 @@ function UserForm({ setState })
         })
         .catch((err) => {
             console.error('Registration Error:', err);
-            setError(err.message);
         });
     };
 
@@ -344,9 +345,6 @@ function UserForm({ setState })
                 <div className='smalltext'>
                     <button className="btn_kissa" onClick={handleRegister} disabled={disabled}>Next</button>
                 </div>
-
-                <p className='smalltext'>{error}</p>
-
             </div>
         </form>
     </div>    
