@@ -39,6 +39,7 @@ async def upload_picture(file: UploadFile = File(...), current_user: UserProfile
 
     return {"file_id": str(file_id)}
 
+
 @router.post("/cat", status_code=status.HTTP_201_CREATED)
 async def upload_cat_pictures(files: List[UploadFile] = File(...), current_user: UserProfile = Depends(get_current_user)):
     """Store multiple images in GridFS and update the user's cat profile"""
@@ -64,6 +65,7 @@ async def upload_cat_pictures(files: List[UploadFile] = File(...), current_user:
 
     return {"file_ids": file_ids}
 
+
 @router.get("/{pid}", status_code=status.HTTP_200_OK)
 async def get_picture(pid: str, current_user: UserProfile = Depends(get_current_user)):
     """Returns a base64 image from the database"""
@@ -77,7 +79,7 @@ async def get_picture(pid: str, current_user: UserProfile = Depends(get_current_
 
     # we only allow to access file only if the owner appears to be the caller or in the caller's list of potentials
     if owner_id != current_user.oid:
-        res = list(filter(lambda x: x.owner_id == owner_id, current_user.potentials))
+        res = list(filter(lambda oid: oid == owner_id, current_user.potentials))
         if len(res) == 0:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are not allowed to access this file")
 
