@@ -79,8 +79,9 @@ async def get_picture(pid: str, current_user: UserProfile = Depends(get_current_
 
     # we only allow to access file only if the owner appears to be the caller or in the caller's list of potentials
     if owner_id != current_user.oid:
-        res = list(filter(lambda oid: oid == owner_id, current_user.potentials))
-        if len(res) == 0:
+        p_res = list(filter(lambda oid: oid == owner_id, current_user.potentials))
+        s_res = list(filter(lambda oid: oid == owner_id, current_user.selections))
+        if len(p_res) == 0 and len(s_res) == 0:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are not allowed to access this file")
 
     return base64.b64encode(file.read()).decode()
