@@ -69,11 +69,11 @@ class UserData(BaseModel):
     profile_pic_url: str
     cat: CatData  # User's cat profile
 
-    @field_validator('dob')
-    @classmethod
-    def validate_dob(cls, dob: str):
-        datetime.datetime.strptime(dob, '%d/%m/%Y')
-        return dob
+#@field_validator('dob')
+#@classmethod
+#def validate_dob(cls, dob: str):
+#    datetime.datetime.strptime(dob, '%d/%m/%Y')
+#    return dob
 
 
 class CatPatch(BaseModel):
@@ -92,13 +92,14 @@ class UserPatch(BaseModel):
     """User patch model"""
     email: Optional[EmailStr] = None
     gender: Optional[str] = None
-    name: Optional[str] = Field(default=None, min_length=1, max_length=100)
-    surname: Optional[str] = Field(default=None, min_length=1, max_length=100)
-    bio: Optional[str] = Field(default='', min_length=0, max_length=100)
+    name: Optional[str] = Field(default = None, min_length=1, max_length=100)
+    surname: Optional[str] = Field(default = None, min_length=1, max_length=100)
+    bio: Optional[str] = Field(default = None, min_length=0, max_length=100)
     location: Optional[List[float]] = None
     age_range: Optional[List[int]] = None
     profile_pic_url: Optional[str] = None
     cat: Optional[CatPatch] = None
+    preference: Optional[str] = None
     search_radius: Optional[float] = Field(default=None, gt=0, lt=100)
 
 class CatProfile(CatData):
