@@ -11,7 +11,7 @@ from fastapi import APIRouter, HTTPException, File, UploadFile, status, Depends
 from database import Database
 from auth_ops import get_current_user
 from models import CatProfile, UserProfile, user_profile, fake_cat, ConfirmResponse, ConfirmSuggestion, UserData, UserPatch
-import datetime
+from datetime import datetime
 from dateutil import relativedelta
 
 router = APIRouter(prefix="/profiles", tags=['profiles'])
@@ -84,6 +84,7 @@ async def update_profile(pid: str, profile: UserPatch,
         profile_dict['potentials'] = potentials_ids
 
     updated_user = user_db.update_user(pid, profile_dict)
+    
     if updated_user is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail='Patch request was not successful')
@@ -126,11 +127,12 @@ def haversine_distance(lat1, lon1, lat2, lon2):
 
 
 def current_age(dob_str: str) -> int:
-    dob = datetime.datetime.strptime(dob_str, '%d/%m/%Y')
-    today = datetime.date.today()
-    age = relativedelta.relativedelta(today, dob).years
-    return age
+    dob = datetime.strptime(dob_str, '%d/%m/%Y')
 
+    today = datetime.today()
+    age = relativedelta.relativedelta(today, dob).years
+
+    return age
 
 def find_matches_within_radius(user: UserProfile, user_profiles: list[UserProfile]):
     if len(user_profiles) == 0:

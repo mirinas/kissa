@@ -4,19 +4,21 @@ import cat1 from '../media/cat.avif'
 import cat2 from '../media/cat2.avif'
 import cat3 from '../media/cat3.avif'
 import {useEffect, useState} from "react";
-import {API_ENDPOINT, devLogin} from "../globals";
 import axios from 'axios'
 import Loading from "../components/Loading";
 import {GiMale, GiFemale} from 'react-icons/gi'
+import {API_ENDPOINT, devLogin} from "../globals";
+import Cookies from "universal-cookie";
 
 
-// TODO: DISPLAY MULTIPLE IMAGES
 // TODO: SHOW "It's a purrfect match..." screen
 
 
 export default function MainPage() {
 
     const cats = [cat1, cat2, cat3];
+    const cookie = new Cookies();
+    const token = cookie.get('access_token');
 
     const {setSelected} = useOutletContext();
     const [profile, setProfile] = useState({});
@@ -27,32 +29,28 @@ export default function MainPage() {
 
     useEffect(() => {
         setSelected('main');
-        // loadSuggestion();
+        loadSuggestion();
 
     }, [setSelected]);
 
 
     const handleSkip = () => {
-        devLogin().then(token => {
-            axios.post(API_ENDPOINT + '/match/skip', {oid: profile.owner_id},
-                {headers: {'Authorization': 'bearer ' + token}})
-                .then(res => {
-                    console.log(res.data);
-                    loadSuggestion();
-                });
-        });
+        axios.post(API_ENDPOINT + '/match/skip', {oid: profile.owner_id},
+            {headers: {'Authorization': 'bearer ' + token}})
+            .then(res => {
+                console.log(res.data);
+                loadSuggestion();
+            });
     }
 
 
     const handleMatch = () => {
-        devLogin().then(token => {
-            axios.post(API_ENDPOINT + '/match/confirm', {oid: profile.owner_id},
-                {headers: {'Authorization': 'bearer ' + token}})
-                .then(res => {
-                    console.log(res.data);
-                    loadSuggestion();
-                });
-        });
+        axios.post(API_ENDPOINT + '/match/confirm', {oid: profile.owner_id},
+            {headers: {'Authorization': 'bearer ' + token}})
+            .then(res => {
+                console.log(res.data);
+                loadSuggestion();
+            });
     }
 
 
