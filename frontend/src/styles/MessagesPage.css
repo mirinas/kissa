@@ -20,6 +20,22 @@
     cursor: pointer;
 }
 
+input {
+    position: absolute;
+    bottom: 15vw;
+    width: 80%;
+
+    margin: 0;
+    background: transparent;
+    border: none;
+    box-sizing: border-box;
+    font: inherit;
+    outline: none;
+    font-size: 0.9em;
+    font-style: italic;
+    border-bottom: 2px solid var(--accent);
+}
+
 .no-matches {
     max-width: 20vh;
     position: absolute;

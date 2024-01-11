@@ -68,6 +68,17 @@ export default function MessagesPage() {
             });
     }
 
+
+    const handleSend = e => {
+        if (e.key !== 'Enter') return;
+
+        e.target.value = '';
+        axios.post(API_ENDPOINT + `/match/${selectedMatch}/messages`, {
+            headers: {'Authorization': 'bearer ' + token}
+        }).catch(err => console.log(err.message));
+    }
+
+
     const cats = [...new Set(matches)].map(match => {
         if(!match.image) return <></>
 
@@ -93,7 +104,7 @@ export default function MessagesPage() {
             <div className={'message-container'}>
                 { messages }
             </div>
-
+            <input placeholder={'Type a message...'} onKeyDown={handleSend} />
         </>
     );
 }
