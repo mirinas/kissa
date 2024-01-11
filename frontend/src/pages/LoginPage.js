@@ -98,7 +98,7 @@ export default function LoginPage() {
                             <button type="submit" className="btn_kissa">Login</button>
                             <br />
                             <Link to="/acc/register">
-                                <button type="button" className="btn_kissa light">Join us</button>
+                                <button type="button" className="btn_kissa">Join us</button>
                             </Link>
                         </div>
                     </form>
