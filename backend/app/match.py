@@ -169,8 +169,10 @@ async def get_messages(mid: str,
     if current_user.oid != match.user_1 and current_user.oid != match.user_2:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail='You do not have permission to request this match data')
-
-    return match.messages[-list_len:]
+    if list_len is None:
+        return match.messages
+    else:
+        return match.messages[-list_len:]
 
 
 @router.post("/{mid}/messages", status_code=status.HTTP_201_CREATED)
