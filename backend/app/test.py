@@ -20,3 +20,4 @@ user_profile3.preference = 'male'
 
 matches = find_matches_within_radius(user_profile, [user_profile, user_profile2, user_profile3])
 assert matches == [user_profile2.oid, user_profile3.oid]
+
