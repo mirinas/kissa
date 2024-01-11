@@ -1,12 +1,23 @@
 import {useOutletContext} from "react-router-dom";
 import {useEffect} from "react";
 import '../styles/MessagesPage.css';
-import {API_ENDPOINT, devLogin} from "../globals";
+import {API_ENDPOINT, devLogin, getMyProfile} from "../globals";
 import axios from 'axios';
+import Cookies from "universal-cookie";
 
 export default function MessagesPage() {
+
+    const cookie = new Cookies();
+    const token = cookie.get('access_token');
     const {setSelected} = useOutletContext();
+
     useEffect(() => setSelected('messages'), [setSelected]);
+
+    useEffect(() => {
+        getMyProfile(token).then(res => {
+           console.log(res.data);
+        });
+    }, []);
 
     const matches = [
         'https://i.etsystatic.com/26335741/r/il/c644eb/3162142982/il_570xN.3162142982_8bqs.jpg',
