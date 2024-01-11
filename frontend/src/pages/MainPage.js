@@ -7,7 +7,7 @@ import {useEffect, useState} from "react";
 import axios from 'axios'
 import Loading from "../components/Loading";
 import {GiMale, GiFemale} from 'react-icons/gi'
-import {API_ENDPOINT, fetchImageData} from "../globals";
+import {API_ENDPOINT, fetchImageData, getMyProfile, patchMyProfile} from "../globals";
 import Cookies from "universal-cookie";
 
 
@@ -30,9 +30,10 @@ export default function MainPage() {
 
     useEffect(() => {
         setSelected('main');
-        loadSuggestion();
+        loadSuggestion()
+            .catch(err => console.error(err));
 
-    }, [setSelected]);
+    }, []);
 
 
     const handleSkip = () => {
@@ -40,7 +41,8 @@ export default function MainPage() {
             {headers: {'Authorization': 'bearer ' + token}})
             .then(res => {
                 console.log(res.data);
-                loadSuggestion();
+                loadSuggestion()
+                    .catch(err => console.error(err));
             });
     }
 
@@ -50,34 +52,46 @@ export default function MainPage() {
             {headers: {'Authorization': 'bearer ' + token}})
             .then(res => {
                 console.log(res.data);
-                loadSuggestion();
+                loadSuggestion()
+                    .catch(err => console.error(err));
             });
     }
 
 
-    const loadSuggestion = () => {
+    const loadSuggestion = async () => {
         setLoading(true);
-        axios.get(API_ENDPOINT + '/match/suggest', {
-            headers: {'Authorization': 'bearer ' + token}
-        })
-            .then(res => {
 
-                // If no potential matches left
-                if(res.data == null) {
-                    setProfile({});
-                    setLoading(true);
-                    setErrorMessage('No potential matches left :(');
-                    return;
-                }
+        // update location
+        const profile = await getMyProfile(token).then(res => res.data);
+        console.log(profile);
 
-                // Fetch images
-                fetchImageData(res.data.image_ids, token)
-                    .then(rs => setImages(rs.map(r => r.data)));
-
-                setPictureIndex(0);
-                setProfile(res.data);
-                setLoading(false);
+        await navigator.geolocation.getCurrentPosition(async pos => {
+            const {coords} = pos;
+            await patchMyProfile(profile.oid, token, {
+                location: [coords.latitude, coords.longitude]
             });
+        });
+        console.log('location updated');
+
+        const suggestion = await axios.get(API_ENDPOINT + '/match/suggest', {
+            headers: {'Authorization': 'bearer ' + token}
+        }).then(res => res.data);
+
+        // If no potential matches left
+        if(suggestion == null) {
+            setProfile({});
+            setLoading(true);
+            setErrorMessage('No potential matches left :(');
+            return;
+        }
+
+        // Fetch images
+        fetchImageData(suggestion.image_ids, token)
+            .then(rs => setImages(rs.map(r => r.data)));
+
+        setPictureIndex(0);
+        setProfile(suggestion);
+        setLoading(false);
     }
 
 

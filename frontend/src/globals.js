@@ -10,6 +10,18 @@ export function fetchImageData(ids, token) {
     }))
 }
 
+export function getMyProfile(token) {
+    return axios.get(API_ENDPOINT + '/profiles/me', {
+        headers: {'Authorization': 'bearer ' + token}
+    });
+}
+
+export function patchMyProfile(id, token, data) {
+    return axios.patch(API_ENDPOINT + '/profiles/' + id, data,
+        {headers: {'Authorization': 'bearer ' + token}})
+        .catch(err => console.error(err.message));
+}
+
 // TODO: REMOVE THIS FUNCTION BEFORE LAST DEPLOYMENT
 export async function devLogin() {
     const loginData = {

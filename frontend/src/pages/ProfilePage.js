@@ -5,8 +5,14 @@ import HSlider from "../components/HSlider";
 import {API_ENDPOINT, devLogin} from "../globals";
 import axios from "axios";
 import Loading from "../components/Loading";
+import Cookies from "universal-cookie";
+import {patchMyProfile} from '../globals';
 
 export default function ProfilePage() {
+
+    const cookie = new Cookies();
+    const token = cookie.get('access_token');
+
     const {setSelected} = useOutletContext();
     const openedState = useState('Preferences');
     const [loading, setLoading] = useState(false);
@@ -25,23 +31,24 @@ export default function ProfilePage() {
     useEffect(() => setSelected('profile'), [setSelected]);
     useEffect(() => {
         setLoading(true);
-        devLogin().then(token => {
-            axios.get(API_ENDPOINT + '/profiles/me', {headers: {'Authorization': 'bearer ' + token}})
-                .then(res => {
-                    rangeState[1](res.data.search_radius);
-                    ageState[1](res.data.age_range);
-                    setBio(res.data.bio);
+        axios.get(API_ENDPOINT + '/profiles/me', {headers: {'Authorization': 'bearer ' + token}})
+            .then(res => {
 
-                    const newMatchingPrefs = {...matchingPrefsState};
-                    newMatchingPrefs[res.data.preference] = true;
-                    matchingPrefsState[1](newMatchingPrefs);
-                    setId(res.data.oid);
-                    setCat(res.data.cat);
-                    setPictureIndex(0);
+                console.log(res.data);
 
-                    setLoading(false);
-                });
-        });
+                rangeState[1](res.data.search_radius);
+                ageState[1](res.data.age_range);
+                setBio(res.data.bio);
+
+                const newMatchingPrefs = {...matchingPrefsState};
+                newMatchingPrefs[res.data.preference] = true;
+                matchingPrefsState[1](newMatchingPrefs);
+                setId(res.data.oid);
+                setCat(res.data.cat);
+                setPictureIndex(0);
+
+                setLoading(false);
+            });
     }, []);
 
     const handleRange = () => {
@@ -55,11 +62,13 @@ export default function ProfilePage() {
     }
 
     const handleAge = () => {
-        patchProfile(id, {age_range: ageState[0]});
+        patchMyProfile(id, token, {age_range: ageState[0]})
+            .then(res => console.log(res.data));
     }
 
     const handleBio = () => {
-        patchProfile(id, {bio});
+        patchMyProfile(id, token, {bio})
+            .then(res => console.log(res.data));
     }
 
     const handleCat = () => {
@@ -117,14 +126,6 @@ export default function ProfilePage() {
             </Section>
         </div>
     );
-}
-
-function patchProfile(id, data) {
-    devLogin().then(token => {
-        axios.patch(API_ENDPOINT + '/profiles/' + id, data,
-            {headers: {'Authorization': 'bearer ' + token}})
-            .then(res => console.log(res));
-    });
 }
 
 
