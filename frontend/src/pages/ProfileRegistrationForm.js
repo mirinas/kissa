@@ -98,7 +98,7 @@ function UserForm({ setState })
 
         if (password !== passwordConfirm) {
             console.error("Passwords do not match");
-            setErrorMessage("Passwords do not match");
+            setError("Passwords do not match");
             return;
         }
         fetch(API_ENDPOINT + "/profiles/register", {
@@ -175,7 +175,7 @@ function UserForm({ setState })
         })
         .catch((err) => {
             console.error('Registration Error:', err);
-            setErrorMessage(err.message);
+            setError(err.message);
         });
     };
 
@@ -344,7 +344,7 @@ function UserForm({ setState })
                     <button className="btn_kissa" onClick={handleRegister} disabled={disabled}>Next</button>
                 </div>
 
-                <p className='smalltext'>{errorMessage}</p>
+                <p className='smalltext'>{error}</p>
 
             </div>
         </form>
