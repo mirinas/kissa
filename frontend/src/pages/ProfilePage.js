@@ -2,7 +2,7 @@ import {useOutletContext} from "react-router-dom";
 import {useEffect, useState} from "react";
 import '../styles/ProfilePage.css'
 import HSlider from "../components/HSlider";
-import {API_ENDPOINT, devLogin} from "../globals";
+import {API_ENDPOINT} from "../globals";
 import axios from "axios";
 import Loading from "../components/Loading";
 import Cookies from "universal-cookie";
@@ -52,16 +52,16 @@ export default function ProfilePage() {
     }
 
     const handleAge = () => {
-        patchMyProfile(id, token, {age_range: ageState[0]})
-            .then(res => console.log(res.data));
+        patchMyProfile(id, token, {age_range: ageState[0]});
     }
 
-    const handleBio = () => {
-        patchMyProfile(id, token, {bio})
-            .then(res => console.log(res.data));
+    const handleBio = e => {
+        const newBio = e.target.value;
+        setBio(newBio);
+        patchMyProfile(id, token, {bio: newBio});
     }
 
-    const handleCat = () => {
+    const handleCat = e => {
 
     }
 

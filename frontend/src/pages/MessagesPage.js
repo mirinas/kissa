@@ -1,7 +1,7 @@
 import {useOutletContext} from "react-router-dom";
 import {useEffect, useState} from "react";
 import '../styles/MessagesPage.css';
-import {API_ENDPOINT, devLogin, getMyProfile, patchMyProfile} from "../globals";
+import {API_ENDPOINT, getMyProfile} from "../globals";
 import axios from 'axios';
 import Cookies from "universal-cookie";
 
