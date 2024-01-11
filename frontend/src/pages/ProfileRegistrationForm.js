@@ -84,9 +84,6 @@ function UserForm({ setState })
     const isExpired = (exp) => {
         const currentTime = Math.floor(Date.now()/1000);
 
-        //console.log("Current time: " + currentTime);
-        //console.log("Expiry: " + exp);
-
         if (exp && currentTime > exp) {
             cookie.remove("access_token");
             navigate('/acc/login');
@@ -99,6 +96,11 @@ function UserForm({ setState })
         //setDisabled(true);
         event.preventDefault();
 
+        if (password !== passwordConfirm) {
+            console.error("Passwords do not match");
+            setErrorMessage("Passwords do not match");
+            return;
+        }
         fetch(API_ENDPOINT + "/profiles/register", {
             method: 'POST',
             headers: {
@@ -173,6 +175,7 @@ function UserForm({ setState })
         })
         .catch((err) => {
             console.error('Registration Error:', err);
+            setErrorMessage(err.message);
         });
     };
 
@@ -184,6 +187,7 @@ function UserForm({ setState })
 
         <form onSubmit={handleRegister}>
             <div>
+                <h2 className='bigtext'>Let's hear about you</h2>
                 <h2 className='smalltext'>How can we call you?</h2>
                 <div className='smalltext'>
                     <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
@@ -325,7 +329,7 @@ function UserForm({ setState })
                     </label>
                 </div>
 
-                <h2 className='smalltext'>What are the special traits?</h2>
+                <h2 className='smalltext'>What are it's special traits?</h2>
                 <div className='smalltext'>
                     <textarea 
                         placeholder="I want to meet other cats" 
@@ -339,6 +343,8 @@ function UserForm({ setState })
                 <div className='smalltext'>
                     <button className="btn_kissa" onClick={handleRegister} disabled={disabled}>Next</button>
                 </div>
+
+                <p className='smalltext'>{errorMessage}</p>
 
             </div>
         </form>

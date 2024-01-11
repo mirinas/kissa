@@ -84,6 +84,7 @@ async def update_profile(pid: str, profile: UserPatch,
         profile_dict['potentials'] = potentials_ids
 
     updated_user = user_db.update_user(pid, profile_dict)
+    
     if updated_user is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail='Patch request was not successful')
