@@ -22,9 +22,7 @@ export default function ProfilePage() {
     const rangeState = useState(2);
     const ageState = useState([18, 18]);
     const [cat, setCat] = useState({});
-    const matchingPrefsState = useState(
-        {'male': true, 'female': false, 'other': false}
-    );
+    const [pref, setPref] = useState('');
 
     const [bio, setBio] = useState('');
 
@@ -40,9 +38,7 @@ export default function ProfilePage() {
                 ageState[1](res.data.age_range);
                 setBio(res.data.bio);
 
-                const newMatchingPrefs = {...matchingPrefsState};
-                newMatchingPrefs[res.data.preference] = true;
-                matchingPrefsState[1](newMatchingPrefs);
+                setPref(res.data.preference);
                 setId(res.data.oid);
                 setCat(res.data.cat);
                 setPictureIndex(0);
@@ -52,13 +48,7 @@ export default function ProfilePage() {
     }, []);
 
     const handleRange = () => {
-        // patchProfile(id, {search_radius: rangeState[0].toFixed(1)});
-
-        devLogin().then(token => {
-            axios.get(API_ENDPOINT + `/profiles/${id}/cat`, {
-                headers: {'Authorization': 'bearer ' + token}
-            })
-                .then(res => console.log(res.data));});
+        patchMyProfile(id, token, {search_radius: rangeState[0].toFixed(1)});
     }
 
     const handleAge = () => {
@@ -73,6 +63,11 @@ export default function ProfilePage() {
 
     const handleCat = () => {
 
+    }
+
+    const handlePref = newPref => {
+        setPref(newPref);
+        patchMyProfile(id, token, {'preference': newPref});
     }
 
     const switchImage = e => {
@@ -105,9 +100,9 @@ export default function ProfilePage() {
                 <HSlider state={ageState} min={18} max={90} count={2} onBlur={handleAge}/>
                 <h5>Interested in</h5>
                 <form>
-                    <Checkbox label={'Males'} value={'male'} state={matchingPrefsState}/>
-                    <Checkbox label={'Females'} value={'female'} state={matchingPrefsState}/>
-                    <Checkbox label={'Others'} value={'other'} state={matchingPrefsState}/>
+                    <Checkbox label={'Males'} value={'male'} handlePref={handlePref} checked={pref === 'male'}/>
+                    <Checkbox label={'Females'} value={'female'} handlePref={handlePref} checked={pref === 'female'}/>
+                    <Checkbox label={'Others'} value={'other'} handlePref={handlePref} checked={pref === 'other'}/>
                 </form>
             </Section>
             <Section title={'Your details'} openedState={openedState}>
@@ -129,24 +124,10 @@ export default function ProfilePage() {
 }
 
 
-function Checkbox({label, value, state}) {
-    const [prefs, setPrefs] = state;
-
-    const handleClick = e => {
-        const newPrefs = {...prefs};
-        const box = e.target;
-
-        if(Object.values(prefs).filter(e => e).length === 1 &&
-            box.classList.contains('checked')) return;
-
-        box.classList.toggle('checked');
-        newPrefs[value] = box.classList.contains('checked');
-        setPrefs(newPrefs);
-    }
-
+function Checkbox({label, value, handlePref, checked}) {
     return (
         <div className={'checkbox'}>
-            <div className={'box' + (prefs[value] ? ' checked' : '')} onClick={handleClick}/>
+            <div className={'box' + (checked ? ' checked' : '')} onClick={() => handlePref(value)}/>
             <label>{label}</label>
         </div>
     )
