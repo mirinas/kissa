@@ -1,9 +1,30 @@
 
+.screen-message {
+    position: absolute;
+    top: 70%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    font-family: Garamond, serif;
+    font-size: 1.5em;
+    text-align: center;
+    color: var(--accent);
+    font-weight: bold;
+}
+
 .cat-carousel img {
     flex-shrink: 0;
     object-fit: cover;
     object-position: top;
     border-radius: 1em;
+}
+
+.no-matches {
+    max-width: 20vh;
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .cat-carousel {

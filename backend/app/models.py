@@ -41,6 +41,7 @@ def validate_age(cls, age_range: Optional[List[int]]):
         raise ValueError('Age range start must be above or equal to 18')
     return age_range
 
+
 class Token(BaseModel):
     access_token: str
     token_type: str
@@ -94,12 +95,14 @@ class UserPatch(BaseModel):
     gender: Optional[str] = None
     name: Optional[str] = Field(default=None, min_length=1, max_length=100)
     surname: Optional[str] = Field(default=None, min_length=1, max_length=100)
-    bio: Optional[str] = Field(default='', min_length=0, max_length=100)
+    bio: Optional[str] = Field(default=None, min_length=0, max_length=100)
+    preference: Optional[str] = Field(None, min_length=0, max_length=100)
     location: Optional[List[float]] = None
     age_range: Optional[List[int]] = None
     profile_pic_url: Optional[str] = None
     cat: Optional[CatPatch] = None
     search_radius: Optional[float] = Field(default=None, gt=0, lt=100)
+
 
 class CatProfile(CatData):
     """Cat profile that is returned separately from the owner"""
@@ -136,8 +139,8 @@ class Match(BaseModel):
     oid: str
     user_1: str
     user_2: str
-    meeting_confirmation: list[str]  # list of confirmation who confirmed the meeting
-    messages: list[Message]
+    meeting_confirmation: list[str] = []  # list of confirmation who confirmed the meeting
+    messages: list[Message] = []
 
 
 class MeetingConfirmation(BaseModel):

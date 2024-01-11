@@ -118,7 +118,7 @@ export default function MainPage() {
 
         return (
             <div className={'screen-message'} >
-                { "It's a purrfect match..." }
+                It's a purrfect match...
             </div>
         );
     }
@@ -127,14 +127,14 @@ export default function MainPage() {
     if(!matchesLeft) {
         return (
             <div className={'screen-message'} >
-                { 'You have reached your matches limit (3)' }
+                You have reached your matches limit (3)
             </div>
         );
     }
     if(!profile.owner_id) {
         return (
             <div className={'screen-message'} >
-                { 'No potential matches currently available' }
+                No potential matches currently available
             </div>
         );
     }
