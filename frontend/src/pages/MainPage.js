@@ -7,7 +7,7 @@ import {useEffect, useState} from "react";
 import axios from 'axios'
 import Loading from "../components/Loading";
 import {GiMale, GiFemale} from 'react-icons/gi'
-import {API_ENDPOINT, devLogin} from "../globals";
+import {API_ENDPOINT, fetchImageData} from "../globals";
 import Cookies from "universal-cookie";
 
 
@@ -16,15 +16,16 @@ import Cookies from "universal-cookie";
 
 export default function MainPage() {
 
-    const cats = [cat1, cat2, cat3];
     const cookie = new Cookies();
     const token = cookie.get('access_token');
-
     const {setSelected} = useOutletContext();
+
+    const cats = [cat1, cat2, cat3];
+    const [images, setImages] = useState([]);
     const [profile, setProfile] = useState({});
     const [pictureIndex, setPictureIndex] = useState(0);
 
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
@@ -56,17 +57,27 @@ export default function MainPage() {
 
     const loadSuggestion = () => {
         setLoading(true);
-        devLogin().then(token => {
-            axios.get(API_ENDPOINT + '/match/suggest', {
-                headers: {'Authorization': 'bearer ' + token}
-            })
-                .then(res => {
-                    setPictureIndex(0);
-                    setProfile(res.data ? res.data : {});
-                    setLoading(!res.data);
+        axios.get(API_ENDPOINT + '/match/suggest', {
+            headers: {'Authorization': 'bearer ' + token}
+        })
+            .then(res => {
+
+                // If no potential matches left
+                if(res.data == null) {
+                    setProfile({});
+                    setLoading(true);
                     setErrorMessage('No potential matches left :(');
-                });
-        });
+                    return;
+                }
+
+                // Fetch images
+                fetchImageData(res.data.image_ids, token)
+                    .then(rs => setImages(rs.map(r => r.data)));
+
+                setPictureIndex(0);
+                setProfile(res.data);
+                setLoading(false);
+            });
     }
 
 
@@ -76,14 +87,20 @@ export default function MainPage() {
         else setPictureIndex(Math.min(pictureIndex + 1, cats.length - 1))
     }
 
+    if(loading) {
+        return (
+            <>
+                <Loading className={'match-loading'}/>
+                { !profile.owner_id && <div className={'error-message'} >{ errorMessage }</div> }
+            </>
+        );
+    }
 
     return (
         <>
-            { !profile.owner_id && <div className={'error-message'} >{ errorMessage }</div> }
-            { loading && <Loading className={'match-loading'}/> }
-
-            <div className={loading ? ' loading' : 'profile-view'}>
-                <img alt={'Cat'} src={ cats[pictureIndex] } onClick={switchImage}/>
+            <div className={'profile-view'}>
+                <img alt={profile.name} src={ `data:image/jpeg;base64,${images[pictureIndex]}` } onClick={switchImage}
+                     onError={e => e.currentTarget.style.display = 'none'} onLoad={e => e.currentTarget.style.display = 'unset'}/>
                 <div className={'description'}>
 
                     <div>

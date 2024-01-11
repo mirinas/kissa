@@ -22,11 +22,6 @@ svg {
     object-fit: cover;
 }
 
-.loading {
-    visibility: hidden;
-}
-
-
 
 .description span, .description svg {
     font-size: 0.8em;

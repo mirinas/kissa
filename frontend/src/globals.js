@@ -2,6 +2,14 @@ import axios from 'axios';
 
 export const API_ENDPOINT = process.env.REACT_APP_KISSA_API_ENDPOINT || 'http://localhost:8080';
 
+export function fetchImageData(ids, token) {
+    return Promise.all(ids.map(id => {
+        return axios.get(API_ENDPOINT + '/pictures/' + id, {
+            headers: {'Authorization': 'bearer ' + token}
+        });
+    }))
+}
+
 // TODO: REMOVE THIS FUNCTION BEFORE LAST DEPLOYMENT
 export async function devLogin() {
     const loginData = {
