@@ -6,27 +6,32 @@ This module provides the entry point of the application, instantiates FastAPI ap
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware import Middleware
 from auth import router as auth_router
 from profile import router as profile_router
 from pictures import router as picture_router
 from match import router as match_router
 
-app = FastAPI()
-
 # CORS settings
 origins = [
-    "http://localhost",
-    "http://localhost:3000",  # Local
+    "http://localhost", # Local
+    "http://127.0.0.1", # Local
+    "http://localhost:3000", # Local
+    "http://127.0.0.1:3000", # Local
     "https://kissa-web.jollymoss-4112728e.uksouth.azurecontainerapps.io"  # Remote
 ]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+middleware = [
+    Middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS", "HEADER"],
+        allow_headers=["*"],
+    )
+]
+
+app = FastAPI(middleware=middleware)
 
 
 @app.get("/")

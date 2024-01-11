@@ -31,8 +31,11 @@ async def get_user_profile(pid: str, current_user: UserProfile = Depends(get_cur
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
 
-    res = list(filter(lambda oid:  oid == pid, current_user.potentials))
-    if len(res) == 0 and current_user.oid != pid:
+    res = list(filter(lambda oid: oid == pid, current_user.potentials))
+    print(res)
+    print(pid)
+    print(current_user.potentials)
+    if len(res) == 0:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail='You do not have permission to request this profile data')
 
@@ -69,13 +72,18 @@ async def update_profile(pid: str, profile: UserPatch,
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail='You do not have permission to patch this profile')
 
+    potentials_ids = None
     if profile.location is not None:
         user = UserProfile(**user)
         all_users = list(map(lambda x: UserProfile(**x), user_db.get_all_users()))
         potentials_ids = find_matches_within_radius(user, all_users)
-        profile = profile.model_dump()
-        profile['potentials'] = potentials_ids
-    updated_user = user_db.update_user(pid, profile)
+
+    profile_dict = profile.model_dump(exclude_none=True)
+
+    if potentials_ids is not None:
+        profile_dict['potentials'] = potentials_ids
+
+    updated_user = user_db.update_user(pid, profile_dict)
     if updated_user is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail='Patch request was not successful')
