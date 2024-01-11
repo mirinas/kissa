@@ -14,10 +14,10 @@ from match import router as match_router
 
 # CORS settings
 origins = [
-    "http://localhost",
-    "http://127.0.0.1",
-    "http://localhost:3000",  # Local
-    "http://127.0.0.1:3000",
+    "http://localhost", # Local
+    "http://127.0.0.1", # Local
+    "http://localhost:3000", # Local
+    "http://127.0.0.1:3000", # Local
     "https://kissa-web.jollymoss-4112728e.uksouth.azurecontainerapps.io"  # Remote
 ]
 
