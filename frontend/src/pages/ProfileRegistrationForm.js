@@ -90,7 +90,7 @@ function UserForm({ setState })
 
         if (exp && currentTime > exp) {
             cookie.remove("access_token");
-            navigate('/acc/login');
+            navigate('/login');
         
             console.log("Logged out, cookie has expired - please log in again.");
         }
