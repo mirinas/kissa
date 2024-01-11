@@ -31,50 +31,13 @@ function UserPictureUpload({ setState }) {
         }
     }
 
-    const compressImage = async (image) => {
-        return new Promise((resolve) => {
-            const MAX_SIZE_MB = 1;
-            const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
-            const img = new Image();
-
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                let width = img.width;
-                let height = img.height;
-
-                // Resize the image if it exceeds the MAX_SIZE_MB limit
-                if (img.size > MAX_SIZE_BYTES) {
-                    const scaleFactor = Math.sqrt(MAX_SIZE_BYTES / img.size);
-                    width = Math.floor(width * scaleFactor);
-                    height = Math.floor(height * scaleFactor);
-                }
-
-                canvas.width = width;
-                canvas.height = height;
-
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-
-                canvas.toBlob(
-                    (blob) => {
-                        resolve(new File([blob], 'compressed_image.jpg', { type: 'image/jpeg' }));
-                    },
-                    'image/jpeg',
-                    0.7
-                );
-            };
-
-            img.src = URL.createObjectURL(image);
-        });
-    };
-
     const handleUploadImage = () => {
         setDisabled(true);
-            
+
         const data = new FormData();
         data.append('file', uploadedImage);
 
-        fetch(API_ENDPOINT + "/pictures", 
+        fetch(API_ENDPOINT + "/pictures/", 
             { 
                 method: 'POST', 
                 headers: {
