@@ -20,7 +20,7 @@
     cursor: pointer;
 }
 
-input {
+.messages-input {
     position: absolute;
     bottom: 15vw;
     width: 80%;
