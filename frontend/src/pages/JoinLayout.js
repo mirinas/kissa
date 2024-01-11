@@ -1,6 +1,4 @@
-import {Link, Outlet} from "react-router-dom";
-import { LuMessagesSquare, LuCat, LuUser } from "react-icons/lu";
-import {useState} from "react";
+import { Outlet} from "react-router-dom";
 
 export default function JoinLayout() {
 

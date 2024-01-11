@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Outlet, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import '../styles/RootPage.css';
 
 export default function RootPage() {
