@@ -1,4 +1,4 @@
-import {useOutletContext} from "react-router-dom";
+import {useNavigate, useOutletContext} from "react-router-dom";
 import '../styles/MainPage.css'
 import cat1 from '../media/cat.avif'
 import cat2 from '../media/cat2.avif'
@@ -11,11 +11,9 @@ import {API_ENDPOINT, fetchImageData, getMyProfile, patchMyProfile} from "../glo
 import Cookies from "universal-cookie";
 
 
-// TODO: SHOW "It's a purrfect match..." screen
-
-
 export default function MainPage() {
 
+    const navigate = useNavigate();
     const cookie = new Cookies();
     const token = cookie.get('access_token');
     const {setSelected} = useOutletContext();
@@ -25,8 +23,9 @@ export default function MainPage() {
     const [profile, setProfile] = useState({});
     const [pictureIndex, setPictureIndex] = useState(0);
 
+    const [matchesLeft, setMatchesLeft] = useState(true);
+    const [matchStatus, setMatchStatus] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
         setSelected('main');
@@ -51,9 +50,15 @@ export default function MainPage() {
         axios.post(API_ENDPOINT + '/match/confirm', {oid: profile.owner_id},
             {headers: {'Authorization': 'bearer ' + token}})
             .then(res => {
-                console.log(res.data);
-                loadSuggestion()
-                    .catch(err => console.error(err));
+                // no match
+                if(res.data.match_id == null) {
+                    loadSuggestion()
+                        .catch(err => console.error(err));
+                    return;
+                }
+
+                // matched - redirect to messages
+                setMatchStatus(true);
             });
     }
 
@@ -71,17 +76,20 @@ export default function MainPage() {
                 location: [coords.latitude, coords.longitude]
             });
         });
-        console.log('location updated');
 
         const suggestion = await axios.get(API_ENDPOINT + '/match/suggest', {
             headers: {'Authorization': 'bearer ' + token}
-        }).then(res => res.data);
+        })
+            .then(res => res.data)
+            .catch(() => {
+                setMatchesLeft(false);
+                return null;
+            });
 
         // If no potential matches left
         if(suggestion == null) {
             setProfile({});
-            setLoading(true);
-            setErrorMessage('No potential matches left :(');
+            setLoading(false);
             return;
         }
 
@@ -101,12 +109,33 @@ export default function MainPage() {
         else setPictureIndex(Math.min(pictureIndex + 1, cats.length - 1))
     }
 
-    if(loading) {
+    if(matchStatus) {
+        document.querySelector('nav').style.visibility = 'hidden';
+        setTimeout(() => {
+            navigate('/app/messages');
+            document.querySelector('nav').style.visibility = 'visible';
+        }, 3000);
+
         return (
-            <>
-                <Loading className={'match-loading'}/>
-                { !profile.owner_id && <div className={'error-message'} >{ errorMessage }</div> }
-            </>
+            <div className={'screen-message'} >
+                { "It's a purrfect match..." }
+            </div>
+        );
+    }
+
+    if(loading) return <Loading />
+    if(!matchesLeft) {
+        return (
+            <div className={'screen-message'} >
+                { 'You have reached your matches limit (3)' }
+            </div>
+        );
+    }
+    if(!profile.owner_id) {
+        return (
+            <div className={'screen-message'} >
+                { 'No potential matches currently available' }
+            </div>
         );
     }
 
