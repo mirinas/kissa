@@ -7,7 +7,7 @@ from bson import ObjectId
 from fastapi import Depends
 from fastapi import APIRouter, HTTPException, status
 from auth_ops import *
-from utils import find_matches_within_radius
+from profile import find_matches_within_radius
 
 
 user_db = Database()

@@ -33,75 +33,34 @@ function UserPictureUpload({ setState }) {
 
     const handleUploadImage = () => {
         setDisabled(true);
-    
-        const compressImage = async (image) => {
-            return new Promise((resolve) => {
-                const MAX_SIZE_MB = 1;
-                const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
-                const img = new Image();
-    
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-    
-                    // Resize the image if it exceeds the MAX_SIZE_MB limit
-                    if (img.size > MAX_SIZE_BYTES) {
-                        const scaleFactor = Math.sqrt(MAX_SIZE_BYTES / img.size);
-                        width = Math.floor(width * scaleFactor);
-                        height = Math.floor(height * scaleFactor);
-                    }
-    
-                    canvas.width = width;
-                    canvas.height = height;
-    
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-    
-                    canvas.toBlob(
-                        (blob) => {
-                            resolve(new File([blob], 'compressed_image.jpg', { type: 'image/jpeg' }));
-                        },
-                        'image/jpeg',
-                        0.7
-                    );
-                };
-    
-                img.src = URL.createObjectURL(image);
-            });
-        };
-    
-        const uploadCompressedImage = async () => {
-            try {
-                const compressedImage = await compressImage(uploadedImage);
-                const data = new FormData();
-                data.append('file', compressedImage);
-    
-                const response = await fetch(API_ENDPOINT + "/pictures", {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`,
-                    },
-                    body: data,
-                });
-    
+
+        const data = new FormData();
+        data.append('file', uploadedImage);
+
+        fetch(API_ENDPOINT + "/pictures/", 
+            { 
+                method: 'POST', 
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+                body: data
+
+            }).then(async (response) => {
                 if (!response.ok) {
                     setDisabled(false);
                     const errorData = await response.json();
                     setError(getErrorMessage(errorData));
-    
+
                     console.error("Server returned an error: ", errorData);
                     throw new Error(`HTTP error! status: ${response.status}`);
-                } else {
+                }
+                else {
                     setState(3);
                 }
-            } catch (err) {
+            }).catch((err) => {
                 console.log("Image upload error: ", err);
-            }
-        };
-    
-        uploadCompressedImage();
-    };
+            });
+    }
 
     const handleSelectImage = (event) => {
         const file = event.target.files[0];

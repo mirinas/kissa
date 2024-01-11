@@ -40,7 +40,6 @@ def validate_age(cls, age_range: Optional[List[int]]):
         raise ValueError('Age range start must be above or equal to 18')
     return age_range
 
-
 class Token(BaseModel):
     access_token: str
     token_type: str
@@ -53,7 +52,7 @@ class CatData(BaseModel):
     breed: str
     sex: bool  # false = male, true = female
     bio: str
-    image_ids: List[str] = Field([], min_length=1, max_length=5)  # list of image ids
+    image_ids: List[str] = []  # list of image ids
 
 
 class UserData(BaseModel):
@@ -89,7 +88,7 @@ class CatPatch(BaseModel):
     breed: str = Field(default=None, min_length=1, max_length=100)
     sex: bool = Field(default=None, min_length=0, max_length=100)
     bio: str = Field(default=None, min_length=0, max_length=300)
-    image_ids: List[str] = Field(None, min_length=1, max_length=5)
+    image_ids: List[str] = None
 
 
 # This model can assign attributes to default None as it allows for
@@ -98,17 +97,15 @@ class UserPatch(BaseModel):
     """User patch model"""
     email: Optional[EmailStr] = None
     gender: Optional[str] = None
-    name: Optional[str] = Field(default=None, min_length=1, max_length=100)
-    surname: Optional[str] = Field(default=None, min_length=1, max_length=100)
-    bio: Optional[str] = Field(default=None, min_length=0, max_length=100)
-    preference: Optional[str] = Field(None, min_length=0, max_length=100)
+    name: Optional[str] = Field(default = None, min_length=1, max_length=100)
+    surname: Optional[str] = Field(default = None, min_length=1, max_length=100)
+    bio: Optional[str] = Field(default = None, min_length=0, max_length=100)
     location: Optional[List[float]] = None
     age_range: Optional[List[int]] = None
     profile_pic_url: Optional[str] = None
     cat: Optional[CatPatch] = None
     preference: Optional[str] = None
     search_radius: Optional[float] = Field(default=None, gt=0, lt=100)
-
 
 class CatProfile(CatData):
     """Cat profile that is returned separately from the owner"""
@@ -145,8 +142,8 @@ class Match(BaseModel):
     oid: str
     user_1: str
     user_2: str
-    meeting_confirmation: list[str] = []  # list of confirmation who confirmed the meeting
-    messages: list[Message] = []
+    meeting_confirmation: list[str]  # list of confirmation who confirmed the meeting
+    messages: list[Message]
 
 
 class MeetingConfirmation(BaseModel):
