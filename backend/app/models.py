@@ -41,6 +41,7 @@ def validate_age(cls, age_range: Optional[List[int]]):
         raise ValueError('Age range start must be above or equal to 18')
     return age_range
 
+
 class Token(BaseModel):
     access_token: str
     token_type: str
@@ -136,8 +137,8 @@ class Match(BaseModel):
     oid: str
     user_1: str
     user_2: str
-    meeting_confirmation: list[str]  # list of confirmation who confirmed the meeting
-    messages: list[Message]
+    meeting_confirmation: list[str] = []  # list of confirmation who confirmed the meeting
+    messages: list[Message] = []
 
 
 class MeetingConfirmation(BaseModel):
