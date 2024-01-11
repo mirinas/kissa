@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import {useOutletContext} from "react-router-dom";
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Cookies from "universal-cookie";
 import { useNavigate } from 'react-router-dom';

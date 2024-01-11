@@ -1,4 +1,4 @@
-import {useOutletContext} from "react-router-dom";
+import {useNavigate, useOutletContext} from "react-router-dom";
 import '../styles/MainPage.css'
 import cat1 from '../media/cat.avif'
 import cat2 from '../media/cat2.avif'
@@ -7,31 +7,32 @@ import {useEffect, useState} from "react";
 import axios from 'axios'
 import Loading from "../components/Loading";
 import {GiMale, GiFemale} from 'react-icons/gi'
-import {API_ENDPOINT, devLogin} from "../globals";
+import {API_ENDPOINT, fetchImageData, getMyProfile, patchMyProfile} from "../globals";
 import Cookies from "universal-cookie";
-
-
-// TODO: SHOW "It's a purrfect match..." screen
 
 
 export default function MainPage() {
 
-    const cats = [cat1, cat2, cat3];
+    const navigate = useNavigate();
     const cookie = new Cookies();
     const token = cookie.get('access_token');
-
     const {setSelected} = useOutletContext();
+
+    const cats = [cat1, cat2, cat3];
+    const [images, setImages] = useState([]);
     const [profile, setProfile] = useState({});
     const [pictureIndex, setPictureIndex] = useState(0);
 
-    const [loading, setLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
+    const [matchesLeft, setMatchesLeft] = useState(true);
+    const [matchStatus, setMatchStatus] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         setSelected('main');
-        loadSuggestion();
+        loadSuggestion()
+            .catch(err => console.error(err));
 
-    }, [setSelected]);
+    }, []);
 
 
     const handleSkip = () => {
@@ -39,7 +40,8 @@ export default function MainPage() {
             {headers: {'Authorization': 'bearer ' + token}})
             .then(res => {
                 console.log(res.data);
-                loadSuggestion();
+                loadSuggestion()
+                    .catch(err => console.error(err));
             });
     }
 
@@ -48,25 +50,56 @@ export default function MainPage() {
         axios.post(API_ENDPOINT + '/match/confirm', {oid: profile.owner_id},
             {headers: {'Authorization': 'bearer ' + token}})
             .then(res => {
-                console.log(res.data);
-                loadSuggestion();
+                // no match
+                if(res.data.match_id == null) {
+                    loadSuggestion()
+                        .catch(err => console.error(err));
+                    return;
+                }
+
+                // matched - redirect to messages
+                setMatchStatus(true);
             });
     }
 
 
-    const loadSuggestion = () => {
+    const loadSuggestion = async () => {
         setLoading(true);
-        devLogin().then(token => {
-            axios.get(API_ENDPOINT + '/match/suggest', {
-                headers: {'Authorization': 'bearer ' + token}
-            })
-                .then(res => {
-                    setPictureIndex(0);
-                    setProfile(res.data ? res.data : {});
-                    setLoading(!res.data);
-                    setErrorMessage('No potential matches left :(');
-                });
+
+        // update location
+        const profile = await getMyProfile(token).then(res => res.data);
+        console.log(profile);
+
+        await navigator.geolocation.getCurrentPosition(async pos => {
+            const {coords} = pos;
+            await patchMyProfile(profile.oid, token, {
+                location: [coords.latitude, coords.longitude]
+            });
         });
+
+        const suggestion = await axios.get(API_ENDPOINT + '/match/suggest', {
+            headers: {'Authorization': 'bearer ' + token}
+        })
+            .then(res => res.data)
+            .catch(() => {
+                setMatchesLeft(false);
+                return null;
+            });
+
+        // If no potential matches left
+        if(suggestion == null) {
+            setProfile({});
+            setLoading(false);
+            return;
+        }
+
+        // Fetch images
+        fetchImageData(suggestion.image_ids, token)
+            .then(rs => setImages(rs.map(r => r.data)));
+
+        setPictureIndex(0);
+        setProfile(suggestion);
+        setLoading(false);
     }
 
 
@@ -76,14 +109,41 @@ export default function MainPage() {
         else setPictureIndex(Math.min(pictureIndex + 1, cats.length - 1))
     }
 
+    if(matchStatus) {
+        document.querySelector('nav').style.visibility = 'hidden';
+        setTimeout(() => {
+            navigate('/app/messages');
+            document.querySelector('nav').style.visibility = 'visible';
+        }, 3000);
+
+        return (
+            <div className={'screen-message'} >
+                { "It's a purrfect match..." }
+            </div>
+        );
+    }
+
+    if(loading) return <Loading />
+    if(!matchesLeft) {
+        return (
+            <div className={'screen-message'} >
+                { 'You have reached your matches limit (3)' }
+            </div>
+        );
+    }
+    if(!profile.owner_id) {
+        return (
+            <div className={'screen-message'} >
+                { 'No potential matches currently available' }
+            </div>
+        );
+    }
 
     return (
         <>
-            { !profile.owner_id && <div className={'error-message'} >{ errorMessage }</div> }
-            { loading && <Loading className={'match-loading'}/> }
-
-            <div className={loading ? ' loading' : 'profile-view'}>
-                <img alt={'Cat'} src={ cats[pictureIndex] } onClick={switchImage}/>
+            <div className={'profile-view'}>
+                <img alt={profile.name} src={ `data:image/jpeg;base64,${images[pictureIndex]}` } onClick={switchImage}
+                     onError={e => e.currentTarget.style.display = 'none'} onLoad={e => e.currentTarget.style.display = 'unset'}/>
                 <div className={'description'}>
 
                     <div>
