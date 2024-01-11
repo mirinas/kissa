@@ -30,8 +30,22 @@ resource "azurerm_cosmosdb_mongo_database" "kissa_mongodb" {
   throughput          = 400
 }
 
-resource "azurerm_cosmosdb_mongo_collection" "kissa_mongodb_collection" {
-  name                = "kissa-db-collection"
+resource "azurerm_cosmosdb_mongo_collection" "kissa_mongodb_match_collection" {
+  name                = "kissa-db-match-collection"
+  resource_group_name = azurerm_cosmosdb_account.kissa_db_account.resource_group_name
+  account_name        = azurerm_cosmosdb_account.kissa_db_account.name
+  database_name       = azurerm_cosmosdb_mongo_database.kissa_mongodb.name
+
+  throughput          = 400
+
+  index {
+    keys   = ["_id"]
+    unique = true
+  }
+}
+
+resource "azurerm_cosmosdb_mongo_collection" "kissa_mongodb_profile_collection" {
+  name                = "kissa-db-profile-collection"
   resource_group_name = azurerm_cosmosdb_account.kissa_db_account.resource_group_name
   account_name        = azurerm_cosmosdb_account.kissa_db_account.name
   database_name       = azurerm_cosmosdb_mongo_database.kissa_mongodb.name

@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import {useOutletContext} from "react-router-dom";
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Cookies from "universal-cookie";
 import { useNavigate } from 'react-router-dom';
@@ -29,7 +28,7 @@ export default function LoginPage() {
 
         if (exp && currentTime > exp) {
             cookie.remove("access_token");
-            navigate('/acc/login');
+            navigate('/login');
         
             console.log("Logged out, cookie has expired - please log in again.");
         }
@@ -105,7 +104,7 @@ export default function LoginPage() {
                         <div id="buttons">
                             <button type="submit" className="btn_kissa" disabled={disabled}>Login</button>
                             <br />
-                            <Link to="/acc/register">
+                            <Link to="/register">
                                 <button type="button" className="btn_kissa">Join us</button>
                             </Link>
                         </div>

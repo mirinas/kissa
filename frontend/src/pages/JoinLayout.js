@@ -1,6 +1,4 @@
-import {Link, Outlet} from "react-router-dom";
-import { LuMessagesSquare, LuCat, LuUser } from "react-icons/lu";
-import {useState} from "react";
+import { Outlet} from "react-router-dom";
 
 export default function JoinLayout() {
 
@@ -15,8 +13,8 @@ export default function JoinLayout() {
             {/*        <Outlet context={{ setSelected }}/>*/}
             {/*    </main>*/}
             {/*    <nav>*/}
-            {/*        <Link className={selectedClass('login')} to={'/acc/login'}><LuUser /></Link>*/}
-            {/*        <Link className={selectedClass('register')} to={'/acc/profile'}><LuUser /></Link>*/}
+            {/*        <Link className={selectedClass('login')} to={'/login'}><LuUser /></Link>*/}
+            {/*        <Link className={selectedClass('register')} to={'/app/profile'}><LuUser /></Link>*/}
             {/*    </nav>*/}
             {/*</div>*/}
         </>
