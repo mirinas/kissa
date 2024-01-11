@@ -28,11 +28,6 @@ az login
 docker compose up --build
 ```
 
-2. Navigate to backend folder and run:
-```
-docker compose up --build
-```
-
 3. Navigate to frontend folder and run:
 ```
 docker compose up --build
