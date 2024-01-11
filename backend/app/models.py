@@ -4,8 +4,7 @@ Models module.
 This module provides all the schema models and their types in the form of pydantic models
 """
 
-
-import datetime
+from datetime import datetime
 
 from pydantic import (
     BaseModel,
@@ -69,11 +68,17 @@ class UserData(BaseModel):
     profile_pic_url: str
     cat: CatData  # User's cat profile
 
-#@field_validator('dob')
-#@classmethod
-#def validate_dob(cls, dob: str):
-#    datetime.datetime.strptime(dob, '%d/%m/%Y')
-#    return dob
+    @field_validator('dob')
+    @classmethod
+    def validate_dob(cls, dob: str):
+        today = datetime.today()
+        dob_parsed = datetime.strptime(dob, '%d/%m/%Y')
+        age = today.year - dob_parsed.year - ((today.month, today.day) < (dob_parsed.month, dob_parsed.day))
+    
+        if age < 18:
+            raise ValueError("User must be at least 18 years old")
+    
+        return dob
 
 
 class CatPatch(BaseModel):
