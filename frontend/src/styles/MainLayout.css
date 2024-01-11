@@ -7,7 +7,7 @@
 
 main {
     flex: 1;
-    padding: 1em;
+    padding: 0.5em;
 }
 
 nav {
@@ -22,7 +22,6 @@ nav {
 }
 
 nav a > * {
-    /*height: 2em;*/
     padding-top: 0.5em;
     padding-bottom: 0.2em;
     color: var(--accent);

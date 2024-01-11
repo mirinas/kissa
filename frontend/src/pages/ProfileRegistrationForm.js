@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { API_ENDPOINT } from '../globals'
@@ -20,16 +20,69 @@ function UserForm({ setState })
     const [catBreed, setCatBreed] = useState('');
     const [catGender, setCatGender] = useState('');
     const [catBio, setCatBio] = useState('');
+    const [disabled, setDisabled] = useState('');
+    const [error, setError] = useState('');
+    const [preference, setPreference] = useState();
+    const [lat, setLat] = useState('');
+    const [lon, setLon] = useState('');
    
     const cookie = new Cookies();
     const expiryCheckInterval = 6000;
+
     const navigate = useNavigate();
+
+    const convertToDisplayFormat = (isoDate) => {
+        const [year, month, day] = isoDate.split("-");
+        return `${day}/${month}/${year}`;
+    };
+
+    const handleDateChange = (e) => {
+        setDob(e.target.value); // Keep the state in 'YYYY-MM-DD' format
+    };
+
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(showPosition);
+        } else {
+            console.log("Geolocation is not supported by this browser.");
+        }
+    }
+
+    function showPosition(position) {
+        setLat(position.coords.latitude);
+        setLon(position.coords.longitude);
+    }
+
+    useEffect(() => {
+        getLocation();
+    }, []);
+
+    useEffect(() => {
+        console.log("Latitude: ", lat);
+        console.log("Longitude: ", lon);
+    }, [lat, lon]);
+
+    // Fast API sends error messages with the 'detail' prefix
+    // react uses 'msg'
+    function getErrorMessage(error) {
+        if ('detail' in error) {
+            return error.detail;
+        } else if ('msg' in error) {
+            return error.msg;
+        }
+    }
+
+    function renderError(error) {
+        if (Array.isArray(error)) {
+            return "You must fill in all values"
+        }
+        else {
+            return <p>{error}</p>;
+        }
+    }
 
     const isExpired = (exp) => {
         const currentTime = Math.floor(Date.now()/1000);
-
-        //console.log("Current time: " + currentTime);
-        //console.log("Expiry: " + exp);
 
         if (exp && currentTime > exp) {
             cookie.remove("access_token");
@@ -40,14 +93,14 @@ function UserForm({ setState })
     }
 
     const handleRegister = async (event) => {
-
+        //setDisabled(true);
         event.preventDefault();
 
         if (password !== passwordConfirm) {
             console.error("Passwords do not match");
+            setErrorMessage("Passwords do not match");
             return;
         }
-
         fetch(API_ENDPOINT + "/profiles/register", {
             method: 'POST',
             headers: {
@@ -56,15 +109,16 @@ function UserForm({ setState })
             body: JSON.stringify({
                 'email': email,
                 'password': password,
+                'confirm': passwordConfirm,
                 'name': name,
                 'surname': surname,
-                'dob': dob,
+                'dob': convertToDisplayFormat(dob),
                 'bio': bio,
                 'gender': gender,
-                'profile_pic_url': '',
-                'location': [],
-                'age_range': [],
-                'preference': '',
+                'profile_pic_url': 'picture',
+                'location': [lat, lon],
+                'age_range': [18, 25],
+                'preference': preference,
                 'cat': {
                     'name': catName,
                     'age': catAge,
@@ -81,11 +135,17 @@ function UserForm({ setState })
             console.log("\n");
 
             if (!response.ok) {
+                setDisabled(false);
+
                 const errorData = await response.json();
+                setError(getErrorMessage(errorData));
+
                 console.error("Server returned an error: ", errorData);
                 throw new Error(`HTTP error! status: ${response.status}`);
-            } else {
+            } 
+            else {
                 if (cookie) {
+                    getLocation();
                     console.log("\nClient has been assigned a cookie: ");
 
                     const data = await response.json();
@@ -115,13 +175,19 @@ function UserForm({ setState })
         })
         .catch((err) => {
             console.error('Registration Error:', err);
+            setErrorMessage(err.message);
         });
     };
 
     return (
     <div>
+        <div >
+            {error && <p className='smalltext error-box'>{renderError(error)}</p>}
+        </div>
+
         <form onSubmit={handleRegister}>
             <div>
+                <h2 className='bigtext'>Let's hear about you</h2>
                 <h2 className='smalltext'>How can we call you?</h2>
                 <div className='smalltext'>
                     <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
@@ -139,8 +205,8 @@ function UserForm({ setState })
                         <input 
                             type="radio" 
                             name="gender" 
-                            value="Male" 
-                            checked={gender === 'Male'} 
+                            value="male" 
+                            checked={gender === 'male'} 
                             onChange={(e) => setGender(e.target.value)}
                         />
                         <span className="checkmark"></span>
@@ -150,8 +216,8 @@ function UserForm({ setState })
                         <input 
                             type="radio" 
                             name="gender" 
-                            value="Female" 
-                            checked={gender === 'Female'} 
+                            value="female" 
+                            checked={gender === 'female'} 
                             onChange={(e) => setGender(e.target.value)}
                         />
                         <span className="checkmark"></span>
@@ -168,6 +234,44 @@ function UserForm({ setState })
                         <span className="checkmark"></span>
                     </label>
                 </div>
+
+                <h2 className='smalltext'>You are interested in</h2>
+                <div className='smalltext'>
+                    <label className="radio">
+                        Male
+                        <input 
+                            type="radio" 
+                            name="preference" 
+                            value="male" 
+                            checked={preference === 'male'} 
+                            onChange={(e) => setPreference(e.target.value)}
+                        />
+                        <span className="checkmark"></span>
+                    </label>
+                    <label className="radio">
+                        Female
+                        <input 
+                            type="radio" 
+                            name="preference" 
+                            value="female" 
+                            checked={preference === 'female'} 
+                            onChange={(e) => setPreference(e.target.value)}
+                        />
+                        <span className="checkmark"></span>
+                    </label>
+                    <label className="radio">
+                        Other
+                        <input 
+                            type="radio" 
+                            name="preference" 
+                            value="Other" 
+                            checked={preference === 'Other'} 
+                            onChange={(e) => setPreference(e.target.value)}
+                        />
+                        <span className="checkmark"></span>
+                    </label>
+                </div>
+
 
                 <div>
                     <h2 className='smalltext'>Why do you want to join us?</h2>
@@ -186,7 +290,7 @@ function UserForm({ setState })
                 <div>
                     <h2 className='smalltext'>When were you born?</h2>
                     <div className='smalltext'>
-                        <input type="date" placeholder="dd/mm/yy" value={dob} onChange={(e) => setDob(e.target.value)} />
+                        <input type="date" value={dob} onChange={handleDateChange} />
                     </div>
                 </div>
 
@@ -225,7 +329,7 @@ function UserForm({ setState })
                     </label>
                 </div>
 
-                <h2 className='smalltext'>What are the special traits?</h2>
+                <h2 className='smalltext'>What are it's special traits?</h2>
                 <div className='smalltext'>
                     <textarea 
                         placeholder="I want to meet other cats" 
@@ -237,8 +341,10 @@ function UserForm({ setState })
                 </div>
 
                 <div className='smalltext'>
-                    <button className="btn_kissa" onClick={handleRegister}>Next</button>
+                    <button className="btn_kissa" onClick={handleRegister} disabled={disabled}>Next</button>
                 </div>
+
+                <p className='smalltext'>{errorMessage}</p>
 
             </div>
         </form>

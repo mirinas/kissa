@@ -1,0 +1,110 @@
+.preferences-view {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+section {
+    min-height: 2.4em;
+    box-sizing: border-box;
+}
+
+section:first-child {
+    border-bottom-style: none;
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+}
+
+section:last-child {
+    border-top-style: none;
+    border-bottom-left-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+}
+
+section h4 {
+    cursor: pointer;
+    position: sticky;
+    top: 0;
+
+    padding: 0.5em 1em;
+    margin: 0;
+    background: var(--accent);
+    color: var(--background);
+}
+
+.section-body {
+    margin: 1em 0;
+}
+
+.section-body h5 {
+    margin: 1.5em 0 0.5em 0;
+}
+
+section .section-body {
+    display: none;
+}
+
+section .opened {
+    display: block;
+}
+
+.user-description, section input {
+    width: 100%;
+    margin: 0;
+    background: transparent;
+    border: none;
+    box-sizing: border-box;
+    font: inherit;
+    outline: none;
+    font-size: 0.9em;
+    font-style: italic;
+}
+
+.user-description {
+    text-align: justify;
+    min-height: 6em;
+    resize: none;
+}
+
+section input {
+    border-bottom: 2px solid var(--accent);
+}
+
+
+
+
+/* Checkbox */
+.checkbox .box, .checkbox label {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.checkbox .box {
+    height: 1em;
+    width: 1em;
+    margin-right: 0.5em;
+    border: 3px solid var(--accent);
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.checkbox .checked {
+    background: var(--foreground);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

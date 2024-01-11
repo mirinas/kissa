@@ -11,11 +11,11 @@ export default function MainLayout() {
     return (
         <>
             <div className={'main-pages'}>
-                <main>
+                <main className={'scrollable'}>
                     <Outlet context={{ setSelected }}/>
                 </main>
                 <nav>
-                    <Link className={selectedClass('settings')} to={'/app/settings'}><LuUser /></Link>
+                    <Link className={selectedClass('profile')} to={'/app/profile'}><LuUser /></Link>
                     <Link className={selectedClass('main')} to={'/app/'}><LuCat /></Link>
                     <Link className={selectedClass('messages')} to={'/app/messages'}><LuMessagesSquare /></Link>
                 </nav>

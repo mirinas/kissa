@@ -10,7 +10,6 @@ from auth_ops import get_current_user
 from models import CatProfile, UserProfile, UserPatch
 from utils import find_matches_within_radius
 
-
 router = APIRouter(prefix="/profiles", tags=['profiles'])
 user_db = Database()
 
@@ -81,6 +80,7 @@ async def update_profile(pid: str, profile: UserPatch,
         profile_dict['potentials'] = potentials_ids
 
     updated_user = user_db.update_user(pid, profile_dict)
+    
     if updated_user is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail='Patch request was not successful')
@@ -105,3 +105,4 @@ async def delete_profile(pid: str, current_user: UserProfile = Depends(get_curre
 
     if not user_db.delete_user(pid):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error during deletion")
+

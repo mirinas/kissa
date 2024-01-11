@@ -1,28 +1,21 @@
-import Cookies from 'universal-cookie';
-import { useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Outlet, Link } from 'react-router-dom';
+import '../styles/RootPage.css';
 
 export default function RootPage() {
-    const cookie = new Cookies();
-    const accessToken = cookie.get('access_token');
-    const navigate = useNavigate();
-
-    if (accessToken) {
-        setTimeout(() => navigate('/app/'), 0);
-        return null;
-    }
-
-    const goToLogin = () => {
-        navigate('/acc/login');
-    }
-
-    const goToRegister = () => {
-        navigate('/acc/register');
-    }
-
     return (
-        <div className='center_div'>
-            <button className="btn_kissa" onClick={goToLogin}>Login</button>
-            <button className="btn_kissa" onClick={goToRegister}>Join us</button>
+
+        <div className="landing_title">
+                <h1 className="cursive">Find your purrrfect match</h1>
+                <div className="buttons_center">
+                    <div className="buttons_backdrop">
+                        <Link to="/acc/login">
+                            <button className="btn_kissa">Log In</button>
+                        </Link>
+                        <Link to="/acc/register">
+                            <button className="btn_kissa">Join Us</button>
+                        </Link>
+                    </div>
+                </div>
         </div>
     );
 }

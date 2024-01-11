@@ -46,11 +46,9 @@ body {
 }
 
 .items {
-	position: fixed;
-	bottom: 200px;
-	text-align: center;
-	width: 100%;
-	margin-top: 100px; 
+	margin: 200px auto 0;
+    text-align: center;
+    width: 100%;
 }
 
 input[type="text"], input[type="email"], input[type="password"], input[type="date"] {
@@ -176,4 +174,9 @@ textarea {
     object-fit: cover; 
     border: 10px solid #c75050;
     margin-bottom: 5px;
+}
+
+.error-box {
+	background-color: #ffa8a8;
+    border-radius: 15px;
 }
