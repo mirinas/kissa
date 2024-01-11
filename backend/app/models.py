@@ -95,12 +95,14 @@ class UserPatch(BaseModel):
     gender: Optional[str] = None
     name: Optional[str] = Field(default=None, min_length=1, max_length=100)
     surname: Optional[str] = Field(default=None, min_length=1, max_length=100)
-    bio: Optional[str] = Field(default='', min_length=0, max_length=100)
+    bio: Optional[str] = Field(default=None, min_length=0, max_length=100)
+    preference: Optional[str] = Field(None, min_length=0, max_length=100)
     location: Optional[List[float]] = None
     age_range: Optional[List[int]] = None
     profile_pic_url: Optional[str] = None
     cat: Optional[CatPatch] = None
     search_radius: Optional[float] = Field(default=None, gt=0, lt=100)
+
 
 class CatProfile(CatData):
     """Cat profile that is returned separately from the owner"""
