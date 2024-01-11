@@ -37,7 +37,7 @@ function UserPictureUpload({ setState }) {
         const data = new FormData();
         data.append('file', uploadedImage);
 
-        fetch(API_ENDPOINT + "/pictures", 
+        fetch(API_ENDPOINT + "/pictures/", 
             { 
                 method: 'POST', 
                 headers: {
