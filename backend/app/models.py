@@ -142,8 +142,8 @@ class Match(BaseModel):
     oid: str
     user_1: str
     user_2: str
-    meeting_confirmation: list[str]  # list of confirmation who confirmed the meeting
-    messages: list[Message]
+    meeting_confirmation: list[str] = []  # list of confirmation who confirmed the meeting
+    messages: list[Message] = []
 
 
 class MeetingConfirmation(BaseModel):
