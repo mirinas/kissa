@@ -48,6 +48,10 @@ section .opened {
     display: block;
 }
 
+.message .me {
+    text-align: right;
+}
+
 .user-description, section input {
     width: 100%;
     margin: 0;

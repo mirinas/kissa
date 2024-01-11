@@ -32,8 +32,6 @@ export default function ProfilePage() {
         axios.get(API_ENDPOINT + '/profiles/me', {headers: {'Authorization': 'bearer ' + token}})
             .then(res => {
 
-                console.log(res.data);
-
                 rangeState[1](res.data.search_radius);
                 ageState[1](res.data.age_range);
                 setBio(res.data.bio);
