@@ -141,7 +141,7 @@ async def get_match(mid: str,
     match = db.get_match(mid)
     if match is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
-    match.pop('messages')
+    match['messages'] = []
     match = Match(**match)
     if current_user != match.user_1 and current_user != match.user_2:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
