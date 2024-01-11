@@ -13,8 +13,8 @@ export default function JoinLayout() {
             {/*        <Outlet context={{ setSelected }}/>*/}
             {/*    </main>*/}
             {/*    <nav>*/}
-            {/*        <Link className={selectedClass('login')} to={'/acc/login'}><LuUser /></Link>*/}
-            {/*        <Link className={selectedClass('register')} to={'/acc/profile'}><LuUser /></Link>*/}
+            {/*        <Link className={selectedClass('login')} to={'/login'}><LuUser /></Link>*/}
+            {/*        <Link className={selectedClass('register')} to={'/app/profile'}><LuUser /></Link>*/}
             {/*    </nav>*/}
             {/*</div>*/}
         </>
