@@ -28,8 +28,9 @@ function UserForm({ setState })
    
     const cookie = new Cookies();
     const expiryCheckInterval = 6000;
-
     const navigate = useNavigate();
+
+    const [errorMessage, setErrorMessage] = useState('');
 
     const convertToDisplayFormat = (isoDate) => {
         const [year, month, day] = isoDate.split("-");
