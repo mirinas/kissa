@@ -18,7 +18,7 @@ export default function App() {
                 <Route index element={<RootPage />}/>
 
                 {/* PAGES FOR LOGIN AND REGISTER */}
-                <Route path='/acc/' element={<JoinLayout />}>
+                <Route path='/' element={<JoinLayout />}>
                     <Route path='login' element={<LoginPage />}/>
                     <Route path='register' element={<RegisterPage />}/>
                 </Route>

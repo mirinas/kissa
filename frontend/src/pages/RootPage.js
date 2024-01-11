@@ -8,10 +8,10 @@ export default function RootPage() {
                 <h1 className="cursive">Find your purrrfect match</h1>
                 <div className="buttons_center">
                     <div className="buttons_backdrop">
-                        <Link to="/acc/login">
+                        <Link to="/login">
                             <button className="btn_kissa">Log In</button>
                         </Link>
-                        <Link to="/acc/register">
+                        <Link to="/register">
                             <button className="btn_kissa">Join Us</button>
                         </Link>
                     </div>
