@@ -53,7 +53,7 @@ async def confirm_suggestion(confirmation: ConfirmSuggestion,
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
 
     user = UserProfile(**user)
-    if current_user.oid in user.potentials:
+    if current_user.oid in user.selections:
         match = Match(
             oid=str(ObjectId()),
             user_1=current_user.oid,
