@@ -37,7 +37,7 @@ app = FastAPI(middleware=middleware)
 @app.get("/")
 async def root():
     return {
-        "api_version": "v1.1",
+        "api_version": "v1.2",
         "status": "live",
         "documentation_url": "https://kissa-api.jollymoss-4112728e.uksouth.azurecontainerapps.io/docs"
     }
