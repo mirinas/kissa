@@ -104,7 +104,7 @@ export default function MessagesPage() {
             <div className={'message-container'}>
                 { messages }
             </div>
-            <input placeholder={'Type a message...'} onKeyDown={handleSend} />
+            <input className="messages-input" placeholder={'Type a message...'} onKeyDown={handleSend} />
         </>
     );
 }
