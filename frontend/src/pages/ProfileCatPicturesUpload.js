@@ -32,82 +32,41 @@ function CatPicturesUpload({ setState }) {
     
     const handleUploadCatImages = () => {
         setDisabled(true);
-    
-        const compressImage = async (image) => {
-            return new Promise((resolve) => {
-                const MAX_SIZE_MB = 1;
-                const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
-                const img = new Image();
-    
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-    
-                    // Resize the image if it exceeds the MAX_SIZE_MB limit
-                    if (img.size > MAX_SIZE_BYTES) {
-                        const scaleFactor = Math.sqrt(MAX_SIZE_BYTES / img.size);
-                        width = Math.floor(width * scaleFactor);
-                        height = Math.floor(height * scaleFactor);
-                    }
-    
-                    canvas.width = width;
-                    canvas.height = height;
-    
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-    
-                    canvas.toBlob(
-                        (blob) => {
-                            resolve(new File([blob], 'compressed_image.jpg', { type: 'image/jpeg' }));
-                        },
-                        'image/jpeg',
-                        0.7
-                    );
-                };
-    
-                img.src = URL.createObjectURL(image);
-            });
-        };
-    
-        const uploadCompressedImages = async () => {
-            try {
-                const compressedCatImages = await Promise.all(
-                    uploadedCatImages.map(async (file) => await compressImage(file))
-                );
-    
-                const data = new FormData();
-                compressedCatImages.forEach((compressedImage, index) => {
-                    data.append(`files[${index}]`, compressedImage);
-                });
-    
-                const response = await fetch(API_ENDPOINT + "/pictures/cat", {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`,
-                    },
-                    body: data,
-                });
-    
+
+        const data = new FormData();
+        uploadedCatImages.forEach((file) => {
+            data.append('files', file);
+        });
+
+        fetch(API_ENDPOINT + "/pictures/cat", 
+            { 
+                method: 'POST', 
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+                body: data
+            })
+            .then(async (response) => {
                 if (!response.ok) {
                     setDisabled(false);
                     const errorData = await response.json();
                     setError(getErrorMessage(errorData));
-    
+
                     console.error("Server returned an error: ", errorData);
                     throw new Error(`HTTP error! status: ${response.status}`);
-                } else {
-                    setState(4);
-                    const imageResponse = await response.json();
-                    console.log("Image upload response: ", imageResponse);
                 }
-            } catch (err) {
+                else {
+                    setState(4);
+                    return response.json();
+                }
+            })
+            .then(imageResponse => {
+                console.log("Image upload response: ", imageResponse);
+            })
+            .catch((err) => {
                 setDisabled(false);
                 console.error("Image upload error: ", err);
-            }
-        };
-    
-        uploadCompressedImages();
+            });
     };
 
     const handleSelectImageCat = (event) => {
