@@ -57,9 +57,10 @@ export default function MessagesPage() {
     }
 
 
-
     const switchCat = mid => {
         setSelectedMatch(mid);
+        console.log("Retrieving messages from database...");
+
         axios.get(API_ENDPOINT + `/match/${mid}/messages`, {
             headers: {'Authorization': 'bearer ' + token}
         })
@@ -72,11 +73,19 @@ export default function MessagesPage() {
     const handleSend = e => {
         if (e.key !== 'Enter') return;
 
+        const messageContent = e.target.value;
+        console.log("Your message: " + messageContent);
+
+        axios.post(API_ENDPOINT + `/match/${selectedMatch}/messages`, [{
+            message: messageContent,
+            from_u: id,
+            datetime: '12/01/2024'
+        }], {
+            headers: {'Authorization': 'Bearer ' + token}
+        }).catch(err => console.log("Returned by server for message post request: " + err.message));
+        
         e.target.value = '';
-        axios.post(API_ENDPOINT + `/match/${selectedMatch}/messages`, {
-            headers: {'Authorization': 'bearer ' + token}
-        }).catch(err => console.log(err.message));
-    }
+    };
 
 
     const cats = [...new Set(matches)].map(match => {
@@ -90,10 +99,12 @@ export default function MessagesPage() {
         );
     });
 
-    messages.map((m, i) => {
+    const renderMessages = messages.map((m, i) => {
+        console.log("Message received: ");
         console.log(m);
+
         const cname = m.from_u === id ? 'me' : 'match';
-        return <p key={i} className={'message ' + cname}>{m.message}</p>
+        return <p key={i} className={'message ' + cname}>{m.datetime + ": " + m.message}</p>
     });
 
     return (
@@ -102,8 +113,9 @@ export default function MessagesPage() {
                 { cats }
             </div>
             <div className={'message-container'}>
-                { messages }
+                { renderMessages }
             </div>
+            <br/>
             <input className="messages-input" placeholder={'Type a message...'} onKeyDown={handleSend} />
         </>
     );

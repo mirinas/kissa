@@ -62,3 +62,9 @@
 .cat-carousel .selected {
     outline: 4px solid var(--accent);
 }
+
+.message-container {
+    overflow: auto; 
+    overflow-x: hidden; 
+    overflow-y: scroll; 
+}
