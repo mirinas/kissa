@@ -19,30 +19,34 @@ export default function MessagesPage() {
     useEffect(() => {
         setSelected('messages');
 
-        getMyProfile(token).then(res => {
-            setId(res.data.oid);
+        // temp
+        setId('me');
+        switchCat()
 
-            res.data.matches.forEach(async (mid, i) => {
-                const match = await axios.get(API_ENDPOINT + '/match/' + mid, {
-                    headers: {'Authorization': 'bearer ' + token}
-                });
-
-                if(i === 0) switchCat(match.data.oid);
-
-                const matchedUserId = match.data.user_1 === res.data.oid ? match.data.user_2 : match.data.user_1;
-                const matchedUser = await axios.get(API_ENDPOINT + '/profiles/' + matchedUserId, {
-                    headers: {'Authorization': 'bearer ' + token}
-                });
-
-                const {image_ids} = matchedUser.data.cat;
-                if(image_ids.length === 0) return;
-
-                const imageData = await axios.get(API_ENDPOINT + '/pictures/' + image_ids[0], {
-                    headers: {'Authorization': 'bearer ' + token}
-                });
-                setMatches(matches.concat([{image: imageData.data, profile: matchedUser, mid: mid}]));
-            });
-        });
+        // getMyProfile(token).then(res => {
+        //     setId(res.data.oid);
+        //
+        //     res.data.matches.forEach(async (mid, i) => {
+        //         const match = await axios.get(API_ENDPOINT + '/match/' + mid, {
+        //             headers: {'Authorization': 'bearer ' + token}
+        //         });
+        //
+        //         if(i === 0) switchCat(match.data.oid);
+        //
+        //         const matchedUserId = match.data.user_1 === res.data.oid ? match.data.user_2 : match.data.user_1;
+        //         const matchedUser = await axios.get(API_ENDPOINT + '/profiles/' + matchedUserId, {
+        //             headers: {'Authorization': 'bearer ' + token}
+        //         });
+        //
+        //         const {image_ids} = matchedUser.data.cat;
+        //         if(image_ids.length === 0) return;
+        //
+        //         const imageData = await axios.get(API_ENDPOINT + '/pictures/' + image_ids[0], {
+        //             headers: {'Authorization': 'bearer ' + token}
+        //         });
+        //         setMatches(matches.concat([{image: imageData.data, profile: matchedUser, mid: mid}]));
+        //     });
+        // });
 
     }, []);
 
@@ -59,21 +63,47 @@ export default function MessagesPage() {
 
 
     const switchCat = mid => {
-        setSelectedMatch(mid);
-        axios.get(API_ENDPOINT + `/match/${mid}/messages`, {
-            headers: {'Authorization': 'bearer ' + token}
-        })
-            .then(res => {
-                setMessages(res.data);
-            });
+        setMessages(
+            [
+                {
+                    "from_u": "me",
+                    "datetime": "10:23",
+                    "message": "Hello!"
+                },
+                {
+                    "from_u": "string",
+                    "datetime": "10:23",
+                    "message": "Hi"
+                },
+                {
+                    "from_u": "me",
+                    "datetime": "11:54",
+                    "message": "How are you?"
+                },
+                {
+                    "from_u": "string",
+                    "datetime": "12:21",
+                    "message": "I'm good"
+                },
+            ]
+        )
+
+        // setSelectedMatch(mid);
+        // axios.get(API_ENDPOINT + `/match/${mid}/messages`, {
+        //     headers: {'Authorization': 'bearer ' + token}
+        // })
+        //     .then(res => {
+        //         setMessages(res.data);
+        //     });
     }
 
 
     const handleSend = e => {
         if (e.key !== 'Enter') return;
 
+        setMessages(messages.concat([{from_u: id, datetime: new Date().getDate(), message: e.value}]));
         e.target.value = '';
-        axios.post(API_ENDPOINT + `/match/${selectedMatch}/messages`, {
+        axios.post(API_ENDPOINT + `/match/${selectedMatch}/messages`, messages, {
             headers: {'Authorization': 'bearer ' + token}
         }).catch(err => console.log(err.message));
     }
@@ -90,10 +120,12 @@ export default function MessagesPage() {
         );
     });
 
-    messages.map((m, i) => {
-        console.log(m);
+    const messagesRender = messages.map((m, i) => {
         const cname = m.from_u === id ? 'me' : 'match';
-        return <p key={i} className={'message ' + cname}>{m.message}</p>
+        return <div key={i} className={'message ' + cname}>
+            <span>{m.datetime}</span>
+            <p>{m.message}</p>
+        </div>
     });
 
     return (
@@ -102,7 +134,7 @@ export default function MessagesPage() {
                 { cats }
             </div>
             <div className={'message-container'}>
-                { messages }
+                { messagesRender }
             </div>
             <input placeholder={'Type a message...'} onKeyDown={handleSend} />
         </>

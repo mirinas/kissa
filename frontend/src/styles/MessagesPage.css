@@ -55,6 +55,44 @@ input {
     scrollbar-width: none;  /* Firefox */
 }
 
+.message-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.message {
+    padding: 0.4em;
+    border-radius: 0.5em;
+}
+
+.message > * {
+    min-width: 4em;
+    display: block;
+}
+
+.message span {
+    font-size: 0.5em;
+}
+
+.message p {
+    margin: 0;
+    font-size: 0.8em;
+    font-weight: 500;
+}
+
+.me {
+    align-self: end;
+    background: var(--accent);
+    color: white;
+    text-align: right;
+}
+
+.match {
+    align-self: start;
+    background: var(--foreground);
+}
+
+
 .cat-carousel::-webkit-scrollbar {
     display: none;
 }
@@ -62,3 +100,23 @@ input {
 .cat-carousel .selected {
     outline: 4px solid var(--accent);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
