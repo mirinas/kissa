@@ -18,6 +18,7 @@ export default function MessagesPage() {
 
     useEffect(() => {
         setSelected('messages');
+        console.log('started fetching match profiles');
 
         getMyProfile(token).then(res => {
             setId(res.data.oid);
@@ -33,6 +34,8 @@ export default function MessagesPage() {
                 const matchedUser = await axios.get(API_ENDPOINT + '/profiles/' + matchedUserId, {
                     headers: {'Authorization': 'bearer ' + token}
                 });
+
+                console.log(matchedUser.data.cat);
 
                 const {image_ids} = matchedUser.data.cat;
                 if(image_ids.length === 0) return;
@@ -98,7 +101,7 @@ export default function MessagesPage() {
 
 
     const cats = [...new Set(matches)].map(match => {
-        if(!match.image) return <></>
+        // if(!match.image) return <></>
 
         let cname = match.mid === selectedMatch ? 'selected' : '';
         return (
