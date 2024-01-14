@@ -174,7 +174,7 @@ async def get_messages(mid: str,
     print("\n")        
 
     if match['messages'] is None:
-        match['messages] = []
+        match['messages'] = []
     else:
         messages_flattened = [msg[0] for msg in messages]
         match['messages'] = list(map(lambda d: Message(**d), messages_flattened))
