@@ -90,8 +90,9 @@ async def confirm_suggestion(confirmation: ConfirmSuggestion,
         current_user_potentials.remove(user.oid)
         db.update_user(current_user.oid, {"selections": current_user_selections,
                                           "matches_allowed": current_user_matches_allowed,
-                                          "matches": current_user_matches,
-                                          "potentials": current_user_potentials})
+                                          "matches": current_user_matches})
+
+        db.update_user(current_user.oid, {"potentials": current_user_potentials})
 
         return ConfirmResponse(
             match_id=match_id,
@@ -103,8 +104,8 @@ async def confirm_suggestion(confirmation: ConfirmSuggestion,
 
         current_user_potentials = current_user.potentials
         current_user_potentials.remove(user.oid)
-        db.update_user(current_user.oid, {"selections": current_user_selections,
-                                          "potentials": current_user_potentials})
+        db.update_user(current_user.oid, {"selections": current_user_selections})
+        db.update_user(current_user.oid, {"potentials": current_user_potentials})
 
     return ConfirmResponse(
         match_id=None,
