@@ -73,16 +73,19 @@ export default function MessagesPage() {
     const handleSend = e => {
         if (e.key !== 'Enter') return;
 
-        const messageContent = e.target.value;
-        console.log("Your message: " + messageContent);
-
-        axios.post(API_ENDPOINT + `/match/${selectedMatch}/messages`, [{
-            message: messageContent,
+        const newMessage = [{
+            message: e.target.value,
             from_u: id,
-            datetime: '12/01/2024'
-        }], {
+            datetime: new Date().toLocaleString()
+        }]
+
+        axios.post(API_ENDPOINT + `/match/${selectedMatch}/messages`, newMessage, {
             headers: {'Authorization': 'Bearer ' + token}
-        }).catch(err => console.log("Returned by server for message post request: " + err.message));
+        })
+            .then(() => setMessages(messages.concat(newMessage)))
+            .catch(err => {
+            console.error("Returned by server for message post request: " + err.message);
+        });
         
         e.target.value = '';
     };
@@ -100,9 +103,6 @@ export default function MessagesPage() {
     });
 
     const renderMessages = messages.map((m, i) => {
-        console.log("Message received: ");
-        console.log(m);
-
         const cname = m.from_u === id ? 'me' : 'match';
         return <p key={i} className={'message ' + cname}>{m.datetime + ": " + m.message}</p>
     });
