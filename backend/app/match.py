@@ -163,8 +163,11 @@ async def get_messages(mid: str,
         list_len = None
 
     match = db.get_match(mid)
-    messages = match['messages']
-    match['messages'] = list(map(lambda d: Message(**d), messages))
+    if match['messages'] is None:
+        match['messages'] = []
+    else:
+        messages = list(match['messages'])
+        match['messages'] = list(map(lambda d: Message(**d), messages))
     if match is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
     match = Match(**match)
