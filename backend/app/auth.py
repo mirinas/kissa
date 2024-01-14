@@ -44,43 +44,6 @@ async def register(user_data: RegisterUser):
     user_dict['hashed_password'] = h_pass
     user_dict.pop('password', None)
     user_dict.pop('confirm', None)
-#
-#    if not pass_matches(user_data.password, user_data.confirm):
-#        raise HTTPException(
-#            status_code=status.HTTP_400_BAD_REQUEST,
-#            detail='Passwords must match'
-#        )
-#    
-#    if not validate_password(user_data.password):
-#        raise HTTPException(
-#            status_code=status.HTTP_400_BAD_REQUEST,
-#            detail='Password must be at least 8 characters, contain a number, contain a symbol, contain an upper and lower and no white space'
-#        )
-#
-#    if not validate_email(user_data.email):
-#        raise HTTPException(
-#            status_code=status.HTTP_400_BAD_REQUEST,
-#            detail='Email not valid, please enter another'
-#        )
-#
-#    if not validate_dob(user_data.dob):
-#        raise HTTPException(
-#            status_code=status.HTTP_400_BAD_REQUEST,
-#            detail='You must be at least 18 years old to sign up'
-#        )
-#
-#    if not validate_cat_age(user_data.cat.age):
-#        raise HTTPException(
-#            status_code=status.HTTP_400_BAD_REQUEST,
-#            detail='Cat age must not be 0'
-#        )
-#
-#    result, missing_field = no_empty_fields(user_data)
-#    if not result:
-#        raise HTTPException(
-#            status_code=status.HTTP_400_BAD_REQUEST,
-#            detail='Please provide ' + missing_field
-#        )
 
     if get_user_by_email(user_data.email):
         raise HTTPException(
@@ -94,6 +57,7 @@ async def register(user_data: RegisterUser):
     # and find matches
     all_users = list(map(lambda x: UserProfile(**x), user_db.get_all_users()))
     potentials_ids = find_matches_within_radius(user, all_users)
+    print('Found {} potentials while registering'.format(len(potentials_ids)))
     user.potentials = potentials_ids
 
     created_id = user_db.create_user(user.model_dump())
