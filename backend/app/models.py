@@ -130,7 +130,7 @@ class UserProfile(UserData):
 
 class RegisterUser(UserData):
     password: str = Field(default='', min_length=6, max_length=16)
-
+    
 
 class Message(BaseModel):
     from_u: str

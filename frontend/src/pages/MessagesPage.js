@@ -19,34 +19,30 @@ export default function MessagesPage() {
     useEffect(() => {
         setSelected('messages');
 
-        // temp
-        setId('me');
-        switchCat()
+        getMyProfile(token).then(res => {
+            setId(res.data.oid);
 
-        // getMyProfile(token).then(res => {
-        //     setId(res.data.oid);
-        //
-        //     res.data.matches.forEach(async (mid, i) => {
-        //         const match = await axios.get(API_ENDPOINT + '/match/' + mid, {
-        //             headers: {'Authorization': 'bearer ' + token}
-        //         });
-        //
-        //         if(i === 0) switchCat(match.data.oid);
-        //
-        //         const matchedUserId = match.data.user_1 === res.data.oid ? match.data.user_2 : match.data.user_1;
-        //         const matchedUser = await axios.get(API_ENDPOINT + '/profiles/' + matchedUserId, {
-        //             headers: {'Authorization': 'bearer ' + token}
-        //         });
-        //
-        //         const {image_ids} = matchedUser.data.cat;
-        //         if(image_ids.length === 0) return;
-        //
-        //         const imageData = await axios.get(API_ENDPOINT + '/pictures/' + image_ids[0], {
-        //             headers: {'Authorization': 'bearer ' + token}
-        //         });
-        //         setMatches(matches.concat([{image: imageData.data, profile: matchedUser, mid: mid}]));
-        //     });
-        // });
+            res.data.matches.forEach(async (mid, i) => {
+                const match = await axios.get(API_ENDPOINT + '/match/' + mid, {
+                    headers: {'Authorization': 'bearer ' + token}
+                });
+
+                if(i === 0) switchCat(match.data.oid);
+
+                const matchedUserId = match.data.user_1 === res.data.oid ? match.data.user_2 : match.data.user_1;
+                const matchedUser = await axios.get(API_ENDPOINT + '/profiles/' + matchedUserId, {
+                    headers: {'Authorization': 'bearer ' + token}
+                });
+
+                const {image_ids} = matchedUser.data.cat;
+                if(image_ids.length === 0) return;
+
+                const imageData = await axios.get(API_ENDPOINT + '/pictures/' + image_ids[0], {
+                    headers: {'Authorization': 'bearer ' + token}
+                });
+                setMatches(matches.concat([{image: imageData.data, profile: matchedUser, mid: mid}]));
+            });
+        });
 
     }, []);
 
@@ -61,69 +57,67 @@ export default function MessagesPage() {
     }
 
 
-
     const switchCat = mid => {
-        setMessages(
-            [
-                {
-                    "from_u": "me",
-                    "datetime": "10:23",
-                    "message": "Hello!"
-                },
-                {
-                    "from_u": "string",
-                    "datetime": "10:23",
-                    "message": "Hi"
-                },
-                {
-                    "from_u": "me",
-                    "datetime": "11:54",
-                    "message": "How are you?"
-                },
-                {
-                    "from_u": "string",
-                    "datetime": "12:21",
-                    "message": "I'm good"
-                },
-            ]
-        )
+        setSelectedMatch(mid);
+        console.log("Retrieving messages from database...");
 
-        // setSelectedMatch(mid);
-        // axios.get(API_ENDPOINT + `/match/${mid}/messages`, {
-        //     headers: {'Authorization': 'bearer ' + token}
-        // })
-        //     .then(res => {
-        //         setMessages(res.data);
-        //     });
+        axios.get(API_ENDPOINT + `/match/${mid}/messages`, {
+            headers: {'Authorization': 'bearer ' + token}
+        })
+            .then(res => {
+                setMessages(res.data);
+            });
     }
 
 
     const handleSend = e => {
         if (e.key !== 'Enter') return;
 
-        setMessages(messages.concat([{from_u: id, datetime: new Date().getDate(), message: e.value}]));
+        const newMessage = [{
+            message: e.target.value,
+            from_u: id,
+            datetime: String(new Date().getTime())
+        }]
+
+        axios.post(API_ENDPOINT + `/match/${selectedMatch}/messages`, newMessage, {
+            headers: {'Authorization': 'Bearer ' + token}
+        })
+            .then(() => {
+                setMessages(messages.concat(newMessage));
+                setTimeout(() => {
+                    container.scrollTo(0, container.scrollHeight);
+                }, 100);
+            })
+            .catch(err => {
+            console.error("Returned by server for message post request: " + err.message);
+        });
+
+        const container = document.querySelector('main');
         e.target.value = '';
-        axios.post(API_ENDPOINT + `/match/${selectedMatch}/messages`, messages, {
-            headers: {'Authorization': 'bearer ' + token}
-        }).catch(err => console.log(err.message));
-    }
+    };
 
 
     const cats = [...new Set(matches)].map(match => {
         if(!match.image) return <></>
 
-        let cname = 'scrollable';
-        if(match.mid === selectedMatch) cname += ' selected';
+        let cname = match.mid === selectedMatch ? 'selected' : '';
         return (
-            <img key={match.mid} alt={match.mid} src={ `data:image/jpeg;base64,${match.image}` } width={100} height={100}
-                 className={cname} onClick={() => switchCat(match.mid)}/>
+            <img alt={match.mid} src={ `data:image/jpeg;base64,${match.image}` } width={100} height={100}
+                 className={cname} onClick={() => switchCat(match.mid)} key={match.mid}/>
         );
     });
 
+    const removeLastPart = (text, sep) => text.split(sep).splice(0, 2).join(sep);
+
     const messagesRender = messages.map((m, i) => {
         const cname = m.from_u === id ? 'me' : 'match';
+        const dateObj = new Date(parseInt(m.datetime));
+        const date = dateObj.getTime() - new Date().getTime() < 24 * 60 * 60 * 1000 ?
+            removeLastPart(dateObj.toLocaleTimeString(), ':') :
+            removeLastPart(dateObj.toLocaleDateString(), '/')
+
         return <div key={i} className={'message ' + cname}>
-            <span>{m.datetime}</span>
+            <span>{date}</span>
             <p>{m.message}</p>
         </div>
     });
@@ -133,10 +127,18 @@ export default function MessagesPage() {
             <div className={'cat-carousel'}>
                 { cats }
             </div>
-            <div className={'message-container'}>
+            <div className={'message-container scrollable'}>
+                <br/>
+                <br/>
+                <br/>
                 { messagesRender }
+                <br/>
+                <br/>
+                <br/>
             </div>
-            <input placeholder={'Type a message...'} onKeyDown={handleSend} />
+            <div className={'input-container'}>
+                <input className="messages-input" placeholder={'Type a message...'} onKeyDown={handleSend} />
+            </div>
         </>
     );
 }
