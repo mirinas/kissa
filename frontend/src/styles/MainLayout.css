@@ -19,6 +19,7 @@ nav {
     display: flex;
     background: var(--accent);
     gap: 1px;
+    z-index: 100;
 }
 
 nav a > * {
