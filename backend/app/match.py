@@ -154,6 +154,9 @@ async def get_match(mid: str,
 async def get_messages(mid: str,
                        size: Annotated[str | None, Query(regex="^[0-9]*[1-9][0-9]*$")] = None,
                        current_user: UserProfile = Depends(get_current_user)) -> list[Message]:
+
+    print("ROUTE message GET request received for %r: " + current_user.email)        
+
     if size is not None:
         try:
             list_len = int(size)
@@ -163,18 +166,31 @@ async def get_messages(mid: str,
         list_len = None
 
     match = db.get_match(mid)
+    messages = match['messages']
+   
+  
+    print("\nROUTE GET messages: ")        
+    print(messages)        
+    print("\n")        
+
     if match['messages'] is None:
         match['messages'] = []
     else:
-        messages = list(match['messages'])
-        match['messages'] = list(map(lambda d: Message(**d), messages))
+        messages_flattened = [msg[0] for msg in messages]
+        match['messages'] = list(map(lambda d: Message(**d), messages_flattened))
+
+    
     if match is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+
     match = Match(**match)
+
     if current_user.oid != match.user_1 and current_user.oid != match.user_2:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail='You do not have permission to request this match data')
+
     if list_len is None:
+        print("Lenght of list is empty")
         return match.messages
     else:
         return match.messages[-list_len:]
@@ -182,8 +198,18 @@ async def get_messages(mid: str,
 
 @router.post("/{mid}/messages", status_code=status.HTTP_201_CREATED)
 async def post_message(mid: str, msgs: list[Message], current_user: UserProfile = Depends(get_current_user)):
+    print("\nROUTE received message: ")
+    print(msgs)
+    print("\n")
+
     await get_match(mid, current_user)
+
     msgs = list(map(lambda msg: msg.dict(), msgs))
+
+    print("\nROUTE messages to be added to user: ")
+    print(msgs)
+    print("\n")
+
     if db.add_messages(msgs, mid) is False:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error adding new messages")
 

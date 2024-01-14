@@ -164,14 +164,24 @@ class Database:
         if not ObjectId.is_valid(match_id):
             print('Match id is not valid', match_id)
             return None
+
         oid = ObjectId(match_id)
         match = self.match_collection.find_one({'_id': oid})
+
         if match:
             match = pythonize(dict(match))
+            print("DATABASE SUCCESS user %r was found!" % match_id)
             return match
+        else:
+            print("DATABASE FAIL user %r not found" % match_id)
+
         return None
 
     def add_messages(self, messages: list[dict], match_id: str) -> bool:
+        print("\nDATABASE received message: ")
+        print(messages)
+        print("\n")
+
         match = self.get_match(match_id)
         match['messages'].append(messages)
         try:

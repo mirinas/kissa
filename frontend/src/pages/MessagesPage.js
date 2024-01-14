@@ -18,6 +18,7 @@ export default function MessagesPage() {
 
     useEffect(() => {
         setSelected('messages');
+        console.log('started fetching match profiles');
 
         getMyProfile(token).then(res => {
             setId(res.data.oid);
@@ -33,6 +34,8 @@ export default function MessagesPage() {
                 const matchedUser = await axios.get(API_ENDPOINT + '/profiles/' + matchedUserId, {
                     headers: {'Authorization': 'bearer ' + token}
                 });
+
+                console.log(matchedUser.data.cat);
 
                 const {image_ids} = matchedUser.data.cat;
                 if(image_ids.length === 0) return;
@@ -57,9 +60,10 @@ export default function MessagesPage() {
     }
 
 
-
     const switchCat = mid => {
         setSelectedMatch(mid);
+        console.log("Retrieving messages from database...");
+
         axios.get(API_ENDPOINT + `/match/${mid}/messages`, {
             headers: {'Authorization': 'bearer ' + token}
         })
@@ -72,28 +76,53 @@ export default function MessagesPage() {
     const handleSend = e => {
         if (e.key !== 'Enter') return;
 
+        const newMessage = [{
+            message: e.target.value,
+            from_u: id,
+            datetime: String(new Date().getTime())
+        }]
+
+        axios.post(API_ENDPOINT + `/match/${selectedMatch}/messages`, newMessage, {
+            headers: {'Authorization': 'Bearer ' + token}
+        })
+            .then(() => {
+                setMessages(messages.concat(newMessage));
+                setTimeout(() => {
+                    container.scrollTo(0, container.scrollHeight);
+                }, 100);
+            })
+            .catch(err => {
+            console.error("Returned by server for message post request: " + err.message);
+        });
+
+        const container = document.querySelector('main');
         e.target.value = '';
-        axios.post(API_ENDPOINT + `/match/${selectedMatch}/messages`, {
-            headers: {'Authorization': 'bearer ' + token}
-        }).catch(err => console.log(err.message));
-    }
+    };
 
 
     const cats = [...new Set(matches)].map(match => {
-        if(!match.image) return <></>
+        // if(!match.image) return <></>
 
-        let cname = 'scrollable';
-        if(match.mid === selectedMatch) cname += ' selected';
+        let cname = match.mid === selectedMatch ? 'selected' : '';
         return (
-            <img key={match.mid} alt={match.mid} src={ `data:image/jpeg;base64,${match.image}` } width={100} height={100}
-                 className={cname} onClick={() => switchCat(match.mid)}/>
+            <img alt={match.mid} src={ `data:image/jpeg;base64,${match.image}` } width={100} height={100}
+                 className={cname} onClick={() => switchCat(match.mid)} key={match.mid}/>
         );
     });
 
-    messages.map((m, i) => {
-        console.log(m);
+    const removeLastPart = (text, sep) => text.split(sep).splice(0, 2).join(sep);
+
+    const messagesRender = messages.map((m, i) => {
         const cname = m.from_u === id ? 'me' : 'match';
-        return <p key={i} className={'message ' + cname}>{m.message}</p>
+        const dateObj = new Date(parseInt(m.datetime));
+        const date = dateObj.getTime() - new Date().getTime() < 24 * 60 * 60 * 1000 ?
+            removeLastPart(dateObj.toLocaleTimeString(), ':') :
+            removeLastPart(dateObj.toLocaleDateString(), '/')
+
+        return <div key={i} className={'message ' + cname}>
+            <span>{date}</span>
+            <p>{m.message}</p>
+        </div>
     });
 
     return (
@@ -101,10 +130,18 @@ export default function MessagesPage() {
             <div className={'cat-carousel'}>
                 { cats }
             </div>
-            <div className={'message-container'}>
-                { messages }
+            <div className={'message-container scrollable'}>
+                <br/>
+                <br/>
+                <br/>
+                { messagesRender }
+                <br/>
+                <br/>
+                <br/>
             </div>
-            <input className="messages-input" placeholder={'Type a message...'} onKeyDown={handleSend} />
+            <div className={'input-container'}>
+                <input className="messages-input" placeholder={'Type a message...'} onKeyDown={handleSend} />
+            </div>
         </>
     );
 }

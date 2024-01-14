@@ -1,4 +1,8 @@
 
+main {
+    overflow: hidden;
+}
+
 .screen-message {
     position: absolute;
     top: 70%;
@@ -20,19 +24,26 @@
     cursor: pointer;
 }
 
-.messages-input {
-    position: absolute;
-    bottom: 15vw;
-    width: 80%;
+.input-container {
+    position: fixed;
+    background: var(--foreground2);
+    width: 100vw;
+    bottom: 1.5em;
+    left: 0;
+    z-index: 1;
+    padding: 1em 0;
+}
 
-    margin: 0;
-    background: transparent;
+.messages-input {
+    width: calc(100vw - 2em);
+    margin: 0 1em;
+
     border: none;
     box-sizing: border-box;
+    background: var(--foreground2);
     font: inherit;
     outline: none;
     font-size: 0.9em;
-    font-style: italic;
     border-bottom: 2px solid var(--accent);
 }
 
@@ -48,12 +59,58 @@
     display: flex;
     flex-wrap: nowrap;
     gap: 0.5em;
-    padding: 4px;
+    padding: 0.5em;
+    width: 100vw;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: var(--foreground2);
 
     overflow-x: scroll;
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
 }
+
+.message-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    padding: 0.5em 2px;
+}
+
+.message {
+    padding: 0.4em;
+    border-radius: 0.5em;
+}
+
+.message > * {
+    min-width: 4em;
+    display: block;
+}
+
+.message span {
+    font-size: 0.5em;
+}
+
+.message p {
+    margin: 0;
+    font-size: 0.8em;
+    font-weight: 500;
+}
+
+.me {
+    align-self: end;
+    background: var(--accent);
+    color: white;
+    text-align: right;
+}
+
+.match {
+    align-self: start;
+    background: var(--foreground);
+}
+
 
 .cat-carousel::-webkit-scrollbar {
     display: none;
