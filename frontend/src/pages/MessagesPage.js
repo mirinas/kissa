@@ -13,52 +13,8 @@ export default function MessagesPage() {
 
     const [id, setId] = useState('');
     const [messages, setMessages] = useState([]);
-    const [matches, setMatches] = useState([{}]);
+    const [matches, setMatches] = useState([]); // Initialize as an empty array
     const [selectedMatch, setSelectedMatch] = useState('');
-
-    useEffect(() => {
-        setSelected('messages');
-        console.log('started fetching match profiles');
-
-        getMyProfile(token).then(res => {
-            setId(res.data.oid);
-
-            res.data.matches.forEach(async (mid, i) => {
-                const match = await axios.get(API_ENDPOINT + '/match/' + mid, {
-                    headers: {'Authorization': 'bearer ' + token}
-                });
-
-                if(i === 0) switchCat(match.data.oid);
-
-                const matchedUserId = match.data.user_1 === res.data.oid ? match.data.user_2 : match.data.user_1;
-                const matchedUser = await axios.get(API_ENDPOINT + '/profiles/' + matchedUserId, {
-                    headers: {'Authorization': 'bearer ' + token}
-                });
-
-                console.log(matchedUser.data.cat);
-
-                const {image_ids} = matchedUser.data.cat;
-                if(image_ids.length === 0) return;
-
-                const imageData = await axios.get(API_ENDPOINT + '/pictures/' + image_ids[0], {
-                    headers: {'Authorization': 'bearer ' + token}
-                });
-                setMatches(matches.concat([{image: imageData.data, profile: matchedUser, mid: mid}]));
-            });
-        });
-
-    }, []);
-
-    // NO MATCHES
-    if(matches.length === 0) {
-        return (
-            <>
-                <p className={'screen-message'}>You have not matched with anyone at the moment</p>
-                <img className={'no-matches'} alt={'nomatches'} src={'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/1af7b9bc-ab26-47dc-a812-59ce1f74e6f7/df4bcfd-33bcf25a-fe68-4b0e-b8c0-1ddca009f18f.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzFhZjdiOWJjLWFiMjYtNDdkYy1hODEyLTU5Y2UxZjc0ZTZmN1wvZGY0YmNmZC0zM2JjZjI1YS1mZTY4LTRiMGUtYjhjMC0xZGRjYTAwOWYxOGYucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.R35RaguMbjiu1VCyazZrjOgWaKeM_zeIAgzeLiCF3IM'} />
-            </>
-        );
-    }
-
 
     const switchCat = mid => {
         setSelectedMatch(mid);
@@ -71,6 +27,59 @@ export default function MessagesPage() {
                 setMessages(res.data);
             });
     }
+
+    useEffect(() => {
+        setSelected('messages');
+        console.log('started fetching match profiles');
+
+        getMyProfile(token).then(async res => {
+            setId(res.data.oid);
+
+            const fetchedMatches = [];
+            const uniqueMatches = new Set();
+
+            for (let mid of res.data.matches) {
+                const match = await axios.get(API_ENDPOINT + '/match/' + mid, {
+                    headers: {'Authorization': 'bearer ' + token}
+                });
+
+                if (uniqueMatches.has(match.data.oid)) continue;
+
+                uniqueMatches.add(match.data.oid);
+                if(fetchedMatches.length === 0) switchCat(match.data.oid);
+
+                const matchedUserId = match.data.user_1 === res.data.oid ? match.data.user_2 : match.data.user_1;
+                const matchedUser = await axios.get(API_ENDPOINT + '/profiles/' + matchedUserId, {
+                    headers: {'Authorization': 'bearer ' + token}
+                });
+
+                console.log(matchedUser.data.cat);
+
+                const {image_ids} = matchedUser.data.cat;
+                if (image_ids.length === 0) continue;
+
+                const imageData = await axios.get(API_ENDPOINT + '/pictures/' + image_ids[0], {
+                    headers: {'Authorization': 'bearer ' + token}
+                });
+
+                fetchedMatches.push({image: imageData.data, profile: matchedUser, mid: mid});
+            }
+
+            setMatches(fetchedMatches);
+        });
+
+    }, [token, setSelected]);
+
+    // NO MATCHES
+    if(matches.length === 0) {
+        return (
+            <>
+                <p className={'screen-message'}>You have not matched with anyone at the moment</p>
+                <img className={'no-matches'} alt={'nomatches'} src={'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/1af7b9bc-ab26-47dc-a812-59ce1f74e6f7/df4bcfd-33bcf25a-fe68-4b0e-b8c0-1ddca009f18f.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzFhZjdiOWJjLWFiMjYtNDdkYy1hODEyLTU5Y2UxZjc0ZTZmN1wvZGY0YmNmZC0zM2JjZjI1YS1mZTY4LTRiMGUtYjhjMC0xZGRjYTAwOWYxOGYucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.R35RaguMbjiu1VCyazZrjOgWaKeM_zeIAgzeLiCF3IM'} />
+            </>
+        );
+    }
+
 
 
     const handleSend = e => {
@@ -113,6 +122,7 @@ export default function MessagesPage() {
     const removeLastPart = (text, sep) => text.split(sep).splice(0, 2).join(sep);
 
     const messagesRender = messages.map((m, i) => {
+        console.log("\nMessage User ID:", m.from_u, "Your ID:", id);
         const cname = m.from_u === id ? 'me' : 'match';
         const dateObj = new Date(parseInt(m.datetime));
         const date = dateObj.getTime() - new Date().getTime() < 24 * 60 * 60 * 1000 ?
