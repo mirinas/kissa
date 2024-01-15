@@ -69,14 +69,17 @@ async def update_profile(pid: str, profile: UserPatch,
 
     potentials_ids = None
     if profile.location is not None:
+        print('Location is set, updating list of matches')
         user = UserProfile(**user)
         all_users = list(map(lambda x: UserProfile(**x), user_db.get_all_users()))
+        print('Found {} matches'.format(len(all_users)))
         potentials_ids = find_matches_within_radius(user, all_users)
 
     profile_dict = profile.model_dump(exclude_none=True)
 
     if potentials_ids is not None:
         profile_dict['potentials'] = potentials_ids
+        print('New list of potentials set to {}'.format(user.oid))
 
     updated_user = user_db.update_user(pid, profile_dict)
     
