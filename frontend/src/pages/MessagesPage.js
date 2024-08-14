@@ -65,6 +65,14 @@ export default function MessagesPage() {
                 fetchedMatches.push({image: imageData.data, profile: matchedUser, mid: mid});
             }
 
+
+            // reikšmės priskyrimas
+            const a = 'Hello World!';
+
+            // spausdinimo funkcijos panaudojimas
+            console.log(a);
+
+
             setMatches(fetchedMatches);
         });
 
